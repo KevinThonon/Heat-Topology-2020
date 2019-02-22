@@ -1,5 +1,3 @@
-%%%% A 99 LINE TOPOLOGY OPTIMIZATION CODE BY OLE SIGMUND, JANUARY 2000 %%%
-%%%% CODE MODIFIED FOR INCREASED SPEED, September 2002, BY OLE SIGMUND %%%
 function toph(nelx,nely,volfrac,penal,rmin)
 % INITIALIZE
 x(1:nely,1:nelx) = volfrac; 
@@ -78,7 +76,8 @@ for elx = 1:nelx
 end
 % DEFINE LOADS AND SUPPORTS (SQUARE PLATE WITH HEAT SINK)
 F(:,1) = 0.01;
-fixeddofs = [nely/2+1-(nely/20):2:nely/2+1+(nely/20)];
+%fixeddofs = [nely/2+1-(nely/20):2:nely/2+1+(nely/20)];
+fixeddofs = [nely/2+1-(nely/20):2:nely/2+1+(nely/20);(nely+1)*(nelx+1)+1-(nely/2+1-(nely/20):2:nely/2+1+(nely/20))];
 alldofs = [1:(nely+1)*(nelx+1)];
 freedofs    = setdiff(alldofs,fixeddofs);
 % SOLVING
@@ -90,23 +89,3 @@ KE = [ 2/3 -1/6 -1/3 -1/6
       -1/6 2/3 -1/6 -1/3
       -1/3 -1/6 2/3 -1/6
       -1/6 -1/3 -1/6 2/3];
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This Matlab code was written by Ole Sigmund, Department of Solid         %
-% Mechanics, Technical University of Denmark, DK-2800 Lyngby, Denmark.     %
-% Please sent your comments to the author: sigmund@fam.dtu.dk              %
-%                                                                          %
-% The code is intended for educational purposes and theoretical details    %
-% are discussed in the paper                                               %
-% "A 99 line topology optimization code written in Matlab"                 %
-% by Ole Sigmund (2001), Structural and Multidisciplinary Optimization,    %
-% Vol 21, pp. 120--127.                                                    %
-%                                                                          %
-% The code as well as a postscript version of the paper can be             %
-% downloaded from the web-site: http://www.topopt.dtu.dk                   %
-%                                                                          %
-% Disclaimer:                                                              %
-% The author reserves all rights but does not guaranty that the code is    %
-% free from errors. Furthermore, he shall not be liable in any event       %
-% caused by the use of the program.                                        %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
