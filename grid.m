@@ -1,58 +1,55 @@
 function [] = grid(N)
 K = zeros(N^2);
-f = zeros(N^2,1);
-h = 0.01/N;
-kmatrix = zeros(N);
+h = 0.01/N; 
+f = ones(N^2,1)*2*h^2 *10^6; %fout om verschil te tonen
+pctmetal = [.4*ones(N,.4*N) zeros(N,.6*N)];
+k = (65-0.2)*pctmetal + 0.2;
+
+Dir = [round(.3*N):round(.7*N) ...
+    pos(1,N)+(round(.3*N):round(.7*N))];
 
 for i = 1:N
     for j = 1:N
-        [xin,xis,xiw,xie] = xi(i,j);
-        if i > 1
-            K(pos(i,j),pos(i-1,j)) = -xin;
+        if ~ismember(pos(i,j), Dir)
+            [xin,xis,xiw,xie] = xi(i,j);
+            if i > 1
+                K(pos(i,j),pos(i-1,j)) = -xin;
+            end
+            if i < N
+                K(pos(i,j),pos(i+1,j)) = -xis;
+            end
+            if j > 1
+                K(pos(i,j),pos(i,j-1)) = -xiw;
+            end
+            if j < N
+                K(pos(i,j),pos(i,j+1)) = -xie;
+            end
+            K(pos(i,j),pos(i,j)) = xin+xis+xiw+xie;
         end
-        if i < N
-            K(pos(i,j),pos(i+1,j)) = -xis;
-        end
-        if j > 1
-            K(pos(i,j),pos(i,j-1)) = -xiw;
-        end
-        if j < N
-            K(pos(i,j),pos(i,j+1)) = -xie;
-        end
-        K(pos(i,j),pos(i,j)) = xin+xis+xiw+xie;
-        
-        kmatrix(i,j) = k(i,j);
     end
 end
-figure
-heatmap(kmatrix)
-figure
-f = f-ones(N^2,1)*2*h^2;
+
+%Dirichlet
+for ij = Dir
+    K(ij,ij) = 1;
+    f(ij) = 293;
+end
+
+%u
 K = sparse(K);
 u = K\f;
 
+%plot
 field = zeros(N);
 for j = 1:N
     field(:,j) = u(pos(1:N,j));
 end
+figure
 heatmap(field)
+figure
+heatmap(k)
 
 
-
-
-function y = k(i,j)
-    %pctmetal = 0.4;
-    pctmetal = 0.1;
-    if j<=0.2*N || j > 0.8*N
-        pctmetal = 0.9;
-    end  
-    y = (65-0.2)*pctmetal^3 + 0.2;
-    
-    if i<1 || j<1 || i>N || j>N
-        y = 0;
-        disp('error')
-    end
-end
 
 
 function [xin,xis,xiw,xie] = xi(i,j)
