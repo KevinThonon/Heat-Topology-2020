@@ -7,7 +7,7 @@ change = 1.;
 while change > 0.01  
   loop = loop + 1;
   xold = x;
-% FE-ANALYSIS
+% FVM-ANALYSIS
   [U]=heattop(N,reshape(x,N^2,1),penal);       
 % OBJECTIVE FUNCTION AND SENSITIVITY ANALYSIS
   [KE] = lk;
@@ -71,36 +71,6 @@ KE = [ 2/3 -1/6 -1/3 -1/6
       -1/6 2/3 -1/6 -1/3
       -1/3 -1/6 2/3 -1/6
       -1/6 -1/3 -1/6 2/3];
-
-  
-  
-
-%%%%%%%%%% FE-ANALYSIS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [U]=FE(N,x,penal)
-[KE] = lk; 
-K = sparse((N +1) *(N +1), (N +1) *(N +1));
-F = sparse((N +1) *(N +1),1); U = sparse((N +1) *(N +1),1);
-for elx = 1:N
-  for ely = 1:N
-    n1 = (N+1)*(elx-1)+ely; 
-    n2 = (N+1)* elx   +ely;
-    edof = [n1; n2; n2+1; n1+1];
-    K(edof,edof) = K(edof,edof) + (0.001+0.999*x(ely,elx)^penal)*KE;
-  end
-end
-% DEFINE LOADS AND SUPPORTS (SQUARE PLATE WITH HEAT SINK)
-F(:,1) = 0.01;
-%fixeddofs = [N/2+1-(N/20):2:N/2+1+(N/20)];
-fixeddofs = [N/2+1-(N/20):2:N/2+1+(N/20);(N+1)*(N+1)+1-(N/2+1-(N/20):2:N/2+1+(N/20))];
-alldofs = [1:(N+1)*(N+1)];
-freedofs    = setdiff(alldofs,fixeddofs);
-% SOLVING
-U(freedofs,:) = K(freedofs,freedofs) \ F(freedofs,:);      
-U(fixeddofs,:)= 0;
-
-  
-  
-  
   
 %   
 %           nlist = [];
