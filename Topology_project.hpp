@@ -14,7 +14,7 @@
 
 namespace tws {
 
-
+// variabelen definiëren
 
 int N = 10;
 
@@ -39,9 +39,9 @@ tws::matrix<double> create_k(tws::matrix<double> pctmetal) {
 }
 
 int pos(int i, int j) {
-	int ij;
-	ij = i+N*j;
-	return ij;
+	int position;
+	position = i+N*j;
+	return position;
 }
 
 double meank(double k1, double k2) {
@@ -51,53 +51,68 @@ double meank(double k1, double k2) {
 	return m;
 }
 
+tws::vector<int> create_dir_list() {
+	int length_vector_dir = 2*(round(0.7*N) - round(0.3*N));
+	int length_side = round(0.7*N) - round(0.3*N);
+	tws::vector<int> Dir_positions(length_vector_dir,0.0);
 
-tws::vector<double> xi(int i, int j, tws::matrix<double> k) {
+	int iter = 0;
+
+	for (int i = 0; i < length_side; i++) {
+		Dir_positions(i) = round(0.3*N) + iter;
+		iter += 1;
+	}
 	
-	tws::vector<double> result(4,0.0);
+	iter = 0;
 
-    	if ( i > 1 ) {
-        	result(0) = meank(k(i,j),k(i-1,j));
-    	}
+	for (int i = length_side; i < length_vector_dir; i++) {
+		Dir_positions(i) = pos(0,N-1) + round(0.3*N) + iter;
+		iter += 1;
+	}
+	
 
-    	if ( i < N ) {
-       		result(1) = meank(k(i,j),k(i+1,j));
-    	}
-
-    	if ( j > 1 ) {
-        	result(2) = meank(k(i,j),k(i,j-1));
-    	}
-
-    	if ( j < N ) {
-        	result(3) = meank(k(i,j),k(i,j+1));
-   	} 
-
-	return result;
-
-
-
+	return Dir_positions;
 }
 
-tws::matrix<double> create_K(tws::matrix<double> k) {
+tws::matrix<double> create_K(tws::matrix<double> k, tws::vector<int> dir_pos_list, tws::vector<double> f) {
 	tws::matrix<double> K(N*N,N*N,0.0);
-	tws::vector<double> xi_list(4,0.0);
-	for (int i = 1; i < N - 1; i++) {
-    		for (int j = 1; j < N - 1; j++) {
-			xi_list = xi(i, j, k);
-            		K(pos(i,j),pos(i-1,j)) = -xi_list(0);
-                	K(pos(i,j),pos(i+1,j)) = -xi_list(1);
-                	K(pos(i,j),pos(i,j-1)) = -xi_list(2);
-                	K(pos(i,j),pos(i,j+1)) = -xi_list(3);
-            		K(pos(i,j),pos(i,j)) = xi_list(0)+xi_list(1)+xi_list(2)+xi_list(3);
+	bool is_Dir_pos = false;
+
+	for (int i = 0; i < N; i++) {
+    		for (int j = 0; j < N; j++) {
+			int position = pos(i,j);
+			if  ( std::find(std::begin(dir_pos_list), std::end(dir_pos_list), position) != std::end(dir_pos_list)) {
+				is_Dir_pos = true;
+				K(pos(i,j),pos(i,j)) = 1;
+				f(pos(i,j)) = 293;
+			}
+			
+			if (! is_Dir_pos) {
+				std::cout<<pos(i,j)<<std::endl;
+				double xin = 0, xis = 0, xiw = 0, xie = 0;
+				if ( i > 1 ) {
+					xin = meank(k(i,j),k(i-1,j));
+            				K(pos(i,j),pos(i-1,j)) = -xin;
+				}
+				if ( i < N ) {
+       					xis = meank(k(i,j),k(i+1,j));
+					K(pos(i,j),pos(i+1,j)) = -xis;
+    				}
+    				if ( j > 1 ) {
+        				xiw = meank(k(i,j),k(i,j-1));
+					K(pos(i,j),pos(i,j-1)) = -xiw;
+    				}
+				if ( j < N ) {
+        				xie = meank(k(i,j),k(i,j+1));
+					K(pos(i,j),pos(i,j+1)) = -xie;
+   				}
+            			K(pos(i,j),pos(i,j)) = xin+xis+xiw+xie;
+			}
+			is_Dir_pos = false;
 		}
 	}
 	return K;
 }
-
-
-
-
-
 
 double k(int i, int j) {
 	double y;
@@ -116,11 +131,5 @@ double k(int i, int j) {
 
 	return y;
 }
-
-
-
-
-
 }
-
 #endif
