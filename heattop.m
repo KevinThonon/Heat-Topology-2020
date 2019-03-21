@@ -5,8 +5,8 @@ f = ones(N^2,1)*2*h^2 *10^7; %lengte
 %pctmetal(1:N,1:N) = 0;
 k = (65-0.2)*pctmetal.^pen + 0.2;
 
-Dir = [round(.3*N):round(.7*N)+1 ...
-    pos(1,N)-1+(round(.3*N):round(.7*N)+1)];
+Dir = [round(.3*N)+1:round(.7*N) ...
+    pos(1,N)-1+(round(.3*N)+1:round(.7*N))];
 
 for i = 1:N
     for j = 1:N
@@ -43,7 +43,7 @@ end
 K = sparse(K);
 u = K\f;
 
-
+heatmap(reshape(u,N,N));
 
 
 function m = meank(k1,k2)
