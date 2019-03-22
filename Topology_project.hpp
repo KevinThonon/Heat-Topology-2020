@@ -11,6 +11,8 @@
 #include <random>
 #include <chrono>
 #include <iterator>
+#include <armadillo>
+
 
 namespace tws {
 
