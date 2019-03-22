@@ -11,7 +11,7 @@
 #include <random>
 #include <chrono>
 #include <iterator>
-#include <armadillo>
+//#include <armadillo>
 
 
 namespace tws {
@@ -19,6 +19,9 @@ namespace tws {
 // variabelen definiëren
 
 int N = 10;
+
+tws::matrix<double> x(N,N,0.4);
+double penal = 3;
 
 tws::matrix<double> create_pctmetal() {
 	tws::matrix<double> pctmetal(N,N,0.0);
@@ -133,5 +136,46 @@ double k(int i, int j) {
 
 	return y;
 }
+
+// Objective function and sensitivity analysis
+
+tws::matrix<double> dc(tws::vector<double> U, tws::matrix<double> x) {
+	double c = 0.0;
+	tws::vector<double> Ue(4, 0.0);
+	tws::matrix<double> dc(N-2, N-2, 0.0);
+	tws::matrix<double> Stiff(4,4,0.);
+	Stiff(0,0) = 2/3;
+	Stiff(0,1) = -1/6;
+	Stiff(0,2) = -1/3;
+	Stiff(0,3) = -1/6;
+	Stiff(1,0) = -1/6;
+	Stiff(1,1) = 2/3;
+	Stiff(1,2) = -1/6;
+	Stiff(1,3) = -1/3;
+	Stiff(2,0) = -1/3;
+	Stiff(2,1) = -1/6;
+	Stiff(2,2) = 2/3;
+	Stiff(2,3) = -1/6;
+	Stiff(3,0) = -1/6;
+	Stiff(3,1) = -1/3;
+	Stiff(3,2) = -1/6;
+	Stiff(3,3) = 2/3;
+	for (int ely = 1; ely < N-1; ely++) {
+		for (int elx = 1; elx < N-1; elx++) {
+			int n1 = N*(elx-1) + ely;
+			int n2 = N*elx + ely;
+			int n3 = N*(elx+1) + ely;
+			Ue(0) = U(n1);
+			Ue(1) = U(n2-1);
+			Ue(2) = U(n3);
+			Ue(3) = U(n2+1);
+			c = c + (0.001 + 0.999*pow(x(ely,elx),penal))*inner_product(Ue, Stiff*Ue);
+			dc(ely, elx) = -0.999*penal*pow(x(ely, elx), penal-1)*inner_product(Ue, Stiff*Ue);
+		}
+	}
+	return dc;
+}
 }
 #endif
+
+
