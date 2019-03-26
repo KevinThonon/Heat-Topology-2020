@@ -18,10 +18,10 @@ namespace tws {
 
 // variabelen definiëren
 
-int N = 10;
+int N;
 
 tws::matrix<double> x(N,N,0.4);
-double penal = 3;
+double penal = 3.0;
 
 tws::matrix<double> create_pctmetal() {
 	tws::matrix<double> pctmetal(N,N,0.0);
@@ -142,8 +142,8 @@ double k(int i, int j) {
 tws::matrix<double> dc(tws::vector<double> U, tws::matrix<double> x) {
 	double c = 0.0;
 	tws::vector<double> Ue(4, 0.0);
-	tws::matrix<double> dc(N-2, N-2, 0.0);
-	tws::matrix<double> Stiff(4,4,0.);
+	tws::matrix<double> dc(N, N, 0.0);
+	tws::matrix<double> Stiff(4,4,0.0);
 	Stiff(0,0) = 2/3;
 	Stiff(0,1) = -1/6;
 	Stiff(0,2) = -1/3;
@@ -175,6 +175,74 @@ tws::matrix<double> dc(tws::vector<double> U, tws::matrix<double> x) {
 	}
 	return dc;
 }
+
+//Optimality criteria
+
+tws::matrix<double> xnew(tws::matrix<double> x, tws::matrix<double> dc){
+	double l1 = 0.0;
+	double l2 = 100000.0;
+	double move = 0.2;
+	tws::matrix<double> xnew = x;
+	while (l2-l1 > 0.0001){
+		double sum = 0.0;
+		double lmid = 0.5 * (l2 + l1);
+		for (int i = 0; i < N; i++){
+			for (int j = 0; j < N; j++){
+				xnew(i,j) = std::max(0.001, std::max(x(i,j) - move, std::min(1.0, std::min(x(i,j) + move, x(i,j) * std::sqrt(-dc(i,j)/lmid)))));
+				sum = sum + xnew(i,j);
+			}
+		}
+		if (sum > 0.4*N*N){
+			l1 = lmid;
+		}
+		else{
+			l2 = lmid;
+		}
+	}
+	return xnew;
+}
+
+
+//Mesh-independency filter
+tws::matrix<double> check(tws::matrix<double> x, tws::matrix<double> dc){
+	tws::matrix<double> dcn(N, N, 0.0);
+	for (int i = 1; i < N-1; i++){
+		for (int j = 1; j < N-1; j++){
+			double sum = 0.0;
+			for (int k = std::max(i-1,2); k < std::min(i+1, N-1); k++){
+				for (int l = std::max(j-1,2); l < std::min(j+1, N-1); l++){
+					double fac = 1.2 - std::sqrt(pow((i-k),2)+pow((j-l),2));
+					sum = sum + std::max(0.0,fac);
+					dcn(j,i) = dcn(j,i) + std::max(0.0,fac)*dc(l,k)*x(l,k);
+				}
+			}
+			dcn(j,i) = dcn(j,i)/(x(j,i)*sum);
+		}
+	}
+	return dcn;
+}
+
+tws::matrix<double> solution(int N){
+	int loop = 0;
+	double change = 1.0;
+	while (change > 0.01){
+		loop = loop + 1;
+		tws::matrix<double> xold = x;
+		tws::matrix<double> dc = dc(U, x);
+		dc = check(x, dc);
+		x = xnew(x, dc);
+		double currmax = 0.0;
+		for (int i = 0; i < N; i++){
+			for (int j = 0; j < N; j++){
+				if (std::abs(x(i,j)-xold(i,j)) > currmax){
+					currmax = std::abs(x(i,j)-xold(i,j));
+				}
+			}
+		}
+		change = currmax;
+	}
+	return x;
+}
+
 }
 #endif
-
