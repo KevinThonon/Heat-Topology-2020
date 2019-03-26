@@ -178,4 +178,3 @@ tws::matrix<double> dc(tws::vector<double> U, tws::matrix<double> x) {
 }
 #endif
 
-
