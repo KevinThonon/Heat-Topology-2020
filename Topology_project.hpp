@@ -11,8 +11,8 @@
 #include <random>
 #include <chrono>
 #include <iterator>
-//#include <armadillo>
 
+using namespace std;
 
 namespace tws {
 
@@ -79,7 +79,7 @@ tws::vector<int> create_dir_list() {
 	return Dir_positions;
 }
 
-tws::matrix<double> create_K(tws::matrix<double> k, tws::vector<int> dir_pos_list, tws::vector<double> f) {
+tws::matrix<double> create_K(tws::matrix<double> k, tws::vector<int> dir_pos_list) {
 	tws::matrix<double> K(N*N,N*N,0.0);
 	bool is_Dir_pos = false;
 
@@ -89,7 +89,6 @@ tws::matrix<double> create_K(tws::matrix<double> k, tws::vector<int> dir_pos_lis
 			if  ( std::find(std::begin(dir_pos_list), std::end(dir_pos_list), position) != std::end(dir_pos_list)) {
 				is_Dir_pos = true;
 				K(pos(i,j),pos(i,j)) = 1;
-				f(pos(i,j)) = 293;
 			}
 			
 			if (! is_Dir_pos) {
@@ -119,10 +118,22 @@ tws::matrix<double> create_K(tws::matrix<double> k, tws::vector<int> dir_pos_lis
 	return K;
 }
 
+tws::vector<double> create_f(tws::vector<int> dir_pos_list, tws::vector<double> f) {
+	for (int i = 0; i < N; i++) {
+    		for (int j = 0; j < N; j++) {
+			int position = pos(i,j);
+			if  ( std::find(std::begin(dir_pos_list), std::end(dir_pos_list), position) != std::end(dir_pos_list)) {
+				f(pos(i,j)) = 293;
+			}
+		}
+	}
+	return f;
+}
+
 double k(int i, int j) {
 	double y;
-    	//double pctmetal = 0.4;
-    	double pctmetal = 0.1;
+    	double pctmetal = 0.4;
+    	//double pctmetal = 0.1;
 
     	if ( (j<=0.2*N) || (j > 0.8*N)) {
       	  	pctmetal = 0.9;
@@ -137,9 +148,65 @@ double k(int i, int j) {
 	return y;
 }
 
+
+
+vector<double> gauss(tws::matrix<double> K, tws::vector<double> f) {
+	int n = N*N;
+	tws::matrix<double> A(N*N,N*N+1);
+	for (int i = 0; i < n; i++){
+		for (int j = 0; j < n; j++){
+			A(i,j) = K(i,j);
+		}
+	}
+	for (int i = 0; i < n; i++){
+		A(i,n) = f(i);
+	}
+
+    for (int i=0; i<n; i++) {
+        // Search for maximum in this column
+        double maxEl = abs(A(i,i));
+        int maxRow = i;
+        for (int k=i+1; k<n; k++) {
+            if (abs(A(k,i)) > maxEl) {
+                maxEl = abs(A(k,i));
+                maxRow = k;
+            }
+        }
+
+        // Swap maximum row with current row (column by column)
+        for (int k=i; k<n+1;k++) {
+            double tmp = A(maxRow, k);
+            A(maxRow, k) = A(i,k);
+            A(i,k) = tmp;
+        }
+
+        // Make all rows below this one 0 in current column
+        for (int k=i+1; k<n; k++) {
+            double c = -A(k,i)/A(i,i);
+            for (int j=i; j<n+1; j++) {
+                if (i==j) {
+                    A(k,j) = 0;
+                } else {
+                    A(k,j) += c * A(i,j);
+                }
+            }
+        }
+    }
+
+    // Solve equation Ax=b for an upper triangular matrix A
+    vector<double> x(n);
+    for (int i=n-1; i>=0; i--) {
+        x(i) = A(i,n)/A(i,i);
+        for (int k=i-1;k>=0; k--) {
+            A(k,n) -= A(k,i) * x(i);
+        }
+    }
+    return x;
+}
+
 // Objective function and sensitivity analysis
 
-tws::matrix<double> dc(tws::vector<double> U, tws::matrix<double> x) {
+tws::matrix<double> dcc(tws::vector<double> U, tws::matrix<double> x) {
 	double c = 0.0;
 	tws::vector<double> Ue(4, 0.0);
 	tws::matrix<double> dc(N, N, 0.0);
@@ -225,24 +292,38 @@ tws::matrix<double> check(tws::matrix<double> x, tws::matrix<double> dc){
 tws::matrix<double> solution(int N){
 	int loop = 0;
 	double change = 1.0;
+	tws::matrix<double> K(N*N,N*N,0.0);
+	double h = 0.01/N; 
+	tws::vector<double> f(N*N,2*h*h*pow(10.0,6.0));
+	tws::matrix<double> pctmetal(N,N,0.0);
+	tws::matrix<double> k(N,N,0.0);
+	tws::vector<int> list_dir(2*(round(0.7*N) - round(0.3*N)),0.0);
+	pctmetal = tws::create_pctmetal();
 	while (change > 0.01){
 		loop = loop + 1;
 		tws::matrix<double> xold = x;
-		tws::matrix<double> dc = dc(U, x);
-		dc = check(x, dc);
-		x = xnew(x, dc);
-		double currmax = 0.0;
-		for (int i = 0; i < N; i++){
-			for (int j = 0; j < N; j++){
-				if (std::abs(x(i,j)-xold(i,j)) > currmax){
-					currmax = std::abs(x(i,j)-xold(i,j));
-				}
-			}
-		}
-		change = currmax;
+		k = tws::create_k(pctmetal);
+		//list_dir = tws::create_dir_list();
+		//K = tws::create_K(k, list_dir);
+		//f = tws::create_f(list_dir, f);
+		//tws::vector<double> U = gauss(K, f);
+		//tws::matrix<double> dc = dcc(U, x);
+		//dc = check(x, dc);
+		//x = xnew(x, dc);
+		//double currmax = 0.0;
+		//for (int i = 0; i < N; i++){
+			//for (int j = 0; j < N; j++){
+				//if (std::abs(x(i,j)-xold(i,j)) > currmax){
+					//currmax = std::abs(x(i,j)-xold(i,j));
+				//}
+			//}
+		//}
+		//change = currmax;
 	}
-	return x;
+	return k;
 }
 
 }
 #endif
+
+
