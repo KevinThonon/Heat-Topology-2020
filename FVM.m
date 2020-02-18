@@ -207,7 +207,13 @@ end
 
 sol = LL\RL;
 
+solmat = zeros(dp,dp);
 
+for i = 1:dp
+    solmat(:,i)=sol(i*dp-dp+1:i*dp);
+end
+
+surf(solmat)
 
 
 
