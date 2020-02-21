@@ -19,19 +19,14 @@ namespace tws {
 // variabelen definiëren
 
 int N;
-
-tws::matrix<double> x(N,N,0.4);
 double penal = 3.0;
+double q = 2.0/(0.01*0.01*0.001);
+double h = 0.01/N;
+double qhp = - q * pow(h,2.0)/4.0;
+double qn = - q * pow(h,2.0)/2.0;
+double qq = - q * pow(h,2.0);
 
-tws::matrix<double> create_pctmetal() {
-	tws::matrix<double> pctmetal(N,N,0.0);
-	for (int i = 0; i < N; ++i) {
-		for (int j = 0; j < N; ++j) {
-			pctmetal(i,j) = 0.4;
-		}
-	}
-	return pctmetal;
-}
+tws::matrix<double> pctmetal(N,N,0.4);
 
 tws::matrix<double> create_k(tws::matrix<double> pctmetal) {
 	tws::matrix<double> k(N,N,0.0);
@@ -43,7 +38,156 @@ tws::matrix<double> create_k(tws::matrix<double> pctmetal) {
 	return k;
 }
 
-int pos(int i, int j) {
+tws::matrix<double> bigkmat(tws::matrix<double> k){
+	tws::matrix<double> bigmat(2*N+1, 2*N+1, 0.0);
+	for (int i = 1; i < 2*N+1; i+=2){
+		for (int j = 1; j < 2*N+1; j+=2){
+			bigmat(i,j) = k((i-1)/2, (j-1)/2);
+		}
+	}
+	
+	for (int i = 1; i < 2*N; i+=2){
+		for (int j = 2; j < 2*N; j+=2){
+			bigmat(i,j) = (k((i-1)/2, j/2) + k((i-1)/2, j/2 - 1))/2;
+		}
+	}
+	
+	for (int i = 2; i < 2*N; i+=2){
+		for (int j = 1; j < 2*N; j+=2){
+			bigmat(i,j) = (k(i/2, (j-1)/2) + k(i/2 - 1, (j-1)/2))/2;
+		}
+	}
+	
+	for (int i = 1; i < 2*N; i+=2){
+		bigmat(i, 0) = k((i-1)/2, 0);
+		bigmat(0, i) = k(0, (i-1)/2);
+		bigmat(i, 2*N) = k((i-1)/2, 2*N);
+		bigmat(2*N, i) = k(2*N, (i-1)/2);
+	}
+	return bigmat;
+}
+
+tws::vector<double> RL(){
+	tws::vector<double> rl(pow(N+1,2),qq);
+	
+	rl(0) = qhp;
+	rl(N) = qhp;
+	rl(pow(N,2)+N) = qhp; 
+	rl(pow(N,2)+2*N) = qhp;
+	
+	for (int i = 0.3*N; i < 0.7*N + 1; i++){
+		rl(i) = 293.0;
+		rl(pow(N+1,2)-i-1) = 293.0;
+	}
+	
+	for (int i = N+1; i < N+1; i+=(N+1)){
+		rl(i) = qn;
+		rl(i + N) = qn;
+	}
+	
+	for (int i = 1; i < 0.3*N; i++){
+		rl(i) = qn;
+		rl(N-i) = qn;
+		rl(pow(N, 2) + N + i) = qn;
+		rl(pow(N+1,2) - 1 - i) = qn;
+	}
+	
+	return rl;
+}
+
+tws::matrix<double> LL(tws::matrix<double> bigkmat){
+	tws::matrix<double> ll(pow(N+1,2), pow(N+1,2), 0.0);
+	for (int i = 0.3*N; i < 0.7*N + 1; i++){
+		ll(i,i) = 1.0;
+		ll(pow(N+1,2)-i-1, pow(N+1,2)-i-1) = 1.0;
+	}
+	
+	//Linksboven hoekpunt
+	ll(0,0) = -0.5*(bigkmat(1,0)+bigkmat(0,1));
+	ll(0,1) = 0.5*bigkmat(1,0);
+	ll(0,N+1) = 0.5*bigkmat(0,1);
+	
+	//Linksonder hoekpunt
+	ll(N,0) = -0.5*(bigkmat(2*N-1,0)+bigkmat(2*N-1,1));
+	ll(N,N-1) = 0.5*bigkmat(2*N-1,0);
+	ll(N,2*N+1) = 0.5*bigkmat(2*N,1);
+	
+	//Rechtsboven hoekpunt
+	ll(N*(N+1),N*(N+1)) = -0.5*(bigkmat(0,2*N-1)+bigkmat(1,2*N));
+	ll(N*(N+1),N*(N+1)+1) = 0.5*bigkmat(1,2*N);
+	ll(N*(N+1),N*N-1) = 0.5*bigkmat(0,2*N-1);
+	
+	//Rechtsonder hoekpunt
+	ll(N*(N+2),N*(N+2)) = -0.5*(bigkmat(2*N-1,2*N)+bigkmat(2*N,2*N-1));
+	ll(N*(N+2),N*(N+1)-1) = 0.5*bigkmat(2*N,2*N-1);
+	ll(N*(N+2),N*(N+2)-1) = 0.5*bigkmat(2*N-1,2*N);
+	
+	//Neumann links
+	for (int i = 1; i < 0.3*N; i++){
+		ll(i,i) = -0.5*bigkmat(2*i-1,0) -0.5*bigkmat(2*i+1,0) - bigkmat(2*i,1);
+		ll(i,i-1) = 0.5*bigkmat(2*i-1,0);
+		ll(i,i+1) = 0.5*bigkmat(2*i+1,0);
+		ll(i,i+N+1) = bigkmat(2*i,1);
+		
+		ll(N-i,N-i) = -0.5*bigkmat(2*(N-i)-1,0) -0.5*bigkmat(2*(N-i)+1,0) - bigkmat(2*(N-i),1);
+		ll(N-i,N-i-1) = 0.5*bigkmat(2*(N-i)-1,0);
+		ll(N-i,N-i+1) = 0.5*bigkmat(2*(N-i)+1,0);
+		ll(N-i,N-i+N+1) = bigkmat(2*(N-i),1);
+	}
+
+	//Neumann rechts
+	for (int i = 1; i < 0.3*N; i++){
+		ll(N*(N+1)+i,N*(N+1)+i) = -0.5*bigkmat(2*i-1,2*N) -0.5*bigkmat(2*i+1,2*N) - bigkmat(2*i,2*N-1);
+		ll(N*(N+1)+i,N*(N+1)+i-1) = 0.5*bigkmat(2*i-1,2*N);
+		ll(N*(N+1)+i,N*(N+1)+i+1) = 0.5*bigkmat(2*i+1,2*N);
+		ll(N*(N+1)+i,N*(N+1)+i-(N+1)) = bigkmat(2*i,2*N-1);
+		
+		ll(N*(N+2)-i,N*(N+2)-i) = -0.5*bigkmat(2*(N-i)-1,2*N) -0.5*bigkmat(2*(N-i)+1,2*N) - bigkmat(2*(N-i),2*N-1);
+		ll(N*(N+2)-i,N*(N+2)-i-1) = 0.5*bigkmat(2*(N-i)-1,2*N);
+		ll(N*(N+2)-i,N*(N+2)-i+1) = 0.5*bigkmat(2*(N-i)+1,2*N);
+		ll(N*(N+2)-i,N*(N+2)-i-(N+1)) = bigkmat(2*(N-i),2*N-1);
+	}
+	
+	//Neumann boven
+	for (int i = 1; i < N; i++){
+		ll(i*(N+1),i*(N+1)) = -0.5*bigkmat(0,2*i-1) -0.5*bigkmat(0,2*i+1) - bigkmat(1,2*i);
+		ll(i*(N+1),i*(N+1)+1) = bigkmat(1,2*i);
+		ll(i*(N+1),(i-1)*(N+1)) = 0.5*bigkmat(0,2*i-1);
+		ll(i*(N+1),(i+1)*(N+1)) = 0.5*bigkmat(0,2*i+1);
+	}
+	
+	//Neumann onder
+	for (int i = 1; i < N; i++){
+		ll(i*(N+1)+N,i*(N+1)+N) = -0.5*bigkmat(2*N,2*i-1) -0.5*bigkmat(2*N,2*i+1) - bigkmat(2*N-1,2*i);
+		ll(i*(N+1)+N,i*(N+1)+N-1) = bigkmat(2*N-1,2*i);
+		ll(i*(N+1)+N,(i-1)*(N+1)+N) = 0.5*bigkmat(2*N,2*i-1);
+		ll(i*(N+1)+N,(i+1)*(N+1)+N) = 0.5*bigkmat(2*N,2*i+1);
+	}
+	
+	//Gewone kolommen
+	for (int j = 1; j < N; j++){
+		for (int i = 1; i <N; i++){
+			ll(j*(N+1)+i,j*(N+1)+i) = -(bigkmat(2*i-1,2*j) + bigkmat(2*i+1,2*j) + bigkmat(2*i,2*j-1) + bigkmat(2*i,2*j+1));
+			ll(j*(N+1)+i,j*(N+1)+i-1) = bigkmat(2*i-1,2*j);
+			ll(j*(N+1)+i,j*(N+1)+i+1) = bigkmat(2*i+1,2*j);
+			ll(j*(N+1)+i,(j-1)*(N+1)+i) = bigkmat(2*i,2*j-1);
+			ll(j*(N+1)+i,(j+1)*(N+1)+i) = bigkmat(2*i,2*j+1);
+		}
+	}
+	
+	return ll;
+}
+	
+
+
+
+
+
+
+
+
+
+/* int pos(int i, int j) {
 	int position;
 	position = i+N*j;
 	return position;
@@ -52,9 +196,11 @@ int pos(int i, int j) {
 double meank(double k1, double k2) {
 	double m;
 	m = (k1+k2)/2; //arithmetic
-    	//m = 2/(1/k1+1/k2); //harmonic
+    //m = 2/(1/k1+1/k2); //harmonic
 	return m;
 }
+
+
 
 tws::vector<int> create_dir_list() {
 	int length_vector_dir = 2*(round(0.7*N) - round(0.3*N));
@@ -321,7 +467,7 @@ tws::matrix<double> solution(int N){
 		//change = currmax;
 	}
 	return k;
-}
+} */
 
 }
 #endif

@@ -5,7 +5,7 @@ close all
 %gegeven
 q = 2/(0.01*0.01*0.001);
 
-N = 100; %veelvoud van 10 nemen
+N = 10; %veelvoud van 10 nemen
 d = 0.01;
 h = 0.01/N; 
 
