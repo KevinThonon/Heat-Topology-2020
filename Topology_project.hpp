@@ -11,9 +11,10 @@
 #include <random>
 #include <chrono>
 #include <iterator>
-//#include <armadillo>
+#include <armadillo>
 
 using namespace std;
+using namespace arma;
 
 namespace tws {
 
@@ -22,10 +23,8 @@ namespace tws {
 double penal = 3.0;
 
 
-//tws::matrix<double> pctmetal(N,N,0.4);
-
-tws::matrix<double> create_k(tws::matrix<double> pctmetal, int N) {
-	tws::matrix<double> k(N,N,0.0);
+mat create_k(mat pctmetal, int N) {
+	mat k(N,N);
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < N; ++j) {
 			k(i,j) = (65-0.2)*pctmetal(i,j) + 0.2;
@@ -34,8 +33,9 @@ tws::matrix<double> create_k(tws::matrix<double> pctmetal, int N) {
 	return k;
 }
 
-tws::matrix<double> bigkmat(tws::matrix<double> k, int N){
-	tws::matrix<double> bigmat(2*N+1, 2*N+1, 0.0);
+mat bigkmat(mat k, int N){
+	mat bigmat(2*N+1, 2*N+1);
+	bigmat.fill(0.0);
 	for (int i = 1; i < 2*N+1; i+=2){
 		for (int j = 1; j < 2*N+1; j+=2){
 			bigmat(i,j) = k((i-1)/2, (j-1)/2);
@@ -54,22 +54,26 @@ tws::matrix<double> bigkmat(tws::matrix<double> k, int N){
 		}
 	}
 	
+	
 	for (int i = 1; i < 2*N; i+=2){
+		
 		bigmat(i, 0) = k((i-1)/2, 0);
 		bigmat(0, i) = k(0, (i-1)/2);
-		bigmat(i, 2*N) = k((i-1)/2, 2*N);
-		bigmat(2*N, i) = k(2*N, (i-1)/2);
+		bigmat(i, 2*N) = k((i-1)/2, N-1);
+		bigmat(2*N, i) = k(N-1, (i-1)/2);
+		
 	}
 	return bigmat;
 }
 
-tws::vector<double> RL(int N){
+vec RL(int N){
 	double q = 2.0/(0.01*0.01*0.001);
 	double h = 0.01/N;
 	double qhp = - q * pow(h,2.0)/4.0;
 	double qn = - q * pow(h,2.0)/2.0;
 	double qq = - q * pow(h,2.0);
-	tws::vector<double> rl(pow(N+1,2),qq);
+	vec rl(pow(N+1,2));
+	rl.fill(qq);
 
 	
 	rl(0) = qhp;
@@ -97,8 +101,9 @@ tws::vector<double> RL(int N){
 	return rl;
 }
 
-tws::matrix<double> LL(tws::matrix<double> bigkmat, int N){
-	tws::matrix<double> ll(((N+1)*(N+1)), ((N+1)*(N+1)), 0.0);
+mat LL(mat bigkmat, int N){
+	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
+	ll.fill(0.0);
 	for (int i = 0.3*N; i < 0.7*N + 1; i++){
 		ll(i,i) = 1.0;
 		ll(((N+1)*(N+1))-i-1, ((N+1)*(N+1))-i-1) = 1.0;
