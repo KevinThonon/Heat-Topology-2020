@@ -11,6 +11,7 @@
 #include <random>
 #include <chrono>
 #include <iterator>
+//#include <armadillo>
 
 using namespace std;
 
@@ -18,17 +19,12 @@ namespace tws {
 
 // variabelen definiëren
 
-int N;
 double penal = 3.0;
-double q = 2.0/(0.01*0.01*0.001);
-double h = 0.01/N;
-double qhp = - q * pow(h,2.0)/4.0;
-double qn = - q * pow(h,2.0)/2.0;
-double qq = - q * pow(h,2.0);
 
-tws::matrix<double> pctmetal(N,N,0.4);
 
-tws::matrix<double> create_k(tws::matrix<double> pctmetal) {
+//tws::matrix<double> pctmetal(N,N,0.4);
+
+tws::matrix<double> create_k(tws::matrix<double> pctmetal, int N) {
 	tws::matrix<double> k(N,N,0.0);
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < N; ++j) {
@@ -38,7 +34,7 @@ tws::matrix<double> create_k(tws::matrix<double> pctmetal) {
 	return k;
 }
 
-tws::matrix<double> bigkmat(tws::matrix<double> k){
+tws::matrix<double> bigkmat(tws::matrix<double> k, int N){
 	tws::matrix<double> bigmat(2*N+1, 2*N+1, 0.0);
 	for (int i = 1; i < 2*N+1; i+=2){
 		for (int j = 1; j < 2*N+1; j+=2){
@@ -67,8 +63,14 @@ tws::matrix<double> bigkmat(tws::matrix<double> k){
 	return bigmat;
 }
 
-tws::vector<double> RL(){
+tws::vector<double> RL(int N){
+	double q = 2.0/(0.01*0.01*0.001);
+	double h = 0.01/N;
+	double qhp = - q * pow(h,2.0)/4.0;
+	double qn = - q * pow(h,2.0)/2.0;
+	double qq = - q * pow(h,2.0);
 	tws::vector<double> rl(pow(N+1,2),qq);
+
 	
 	rl(0) = qhp;
 	rl(N) = qhp;
@@ -95,11 +97,11 @@ tws::vector<double> RL(){
 	return rl;
 }
 
-tws::matrix<double> LL(tws::matrix<double> bigkmat){
-	tws::matrix<double> ll(pow(N+1,2), pow(N+1,2), 0.0);
+tws::matrix<double> LL(tws::matrix<double> bigkmat, int N){
+	tws::matrix<double> ll(((N+1)*(N+1)), ((N+1)*(N+1)), 0.0);
 	for (int i = 0.3*N; i < 0.7*N + 1; i++){
 		ll(i,i) = 1.0;
-		ll(pow(N+1,2)-i-1, pow(N+1,2)-i-1) = 1.0;
+		ll(((N+1)*(N+1))-i-1, ((N+1)*(N+1))-i-1) = 1.0;
 	}
 	
 	//Linksboven hoekpunt
@@ -109,6 +111,7 @@ tws::matrix<double> LL(tws::matrix<double> bigkmat){
 	
 	//Linksonder hoekpunt
 	ll(N,0) = -0.5*(bigkmat(2*N-1,0)+bigkmat(2*N-1,1));
+	//std::cout<<N<<std::endl;
 	ll(N,N-1) = 0.5*bigkmat(2*N-1,0);
 	ll(N,2*N+1) = 0.5*bigkmat(2*N,1);
 	
@@ -166,7 +169,7 @@ tws::matrix<double> LL(tws::matrix<double> bigkmat){
 	
 	//Gewone kolommen
 	for (int j = 1; j < N; j++){
-		for (int i = 1; i <N; i++){
+		for (int i = 1; i < N; i++){
 			ll(j*(N+1)+i,j*(N+1)+i) = -(bigkmat(2*i-1,2*j) + bigkmat(2*i+1,2*j) + bigkmat(2*i,2*j-1) + bigkmat(2*i,2*j+1));
 			ll(j*(N+1)+i,j*(N+1)+i-1) = bigkmat(2*i-1,2*j);
 			ll(j*(N+1)+i,j*(N+1)+i+1) = bigkmat(2*i+1,2*j);
