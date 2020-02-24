@@ -1,6 +1,10 @@
 #include "vector.hpp"
 #include "matrix.hpp"
 #include "Topology_project.hpp"
+#include <armadillo>
+
+using namespace std;
+using namespace arma;
 
 int main(int argc, char* argv[]) {
 
