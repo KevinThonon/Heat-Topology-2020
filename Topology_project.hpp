@@ -20,7 +20,7 @@ namespace top {
 
 // variabelen definiëren
 
-double penal = 3.0;
+double penal = 1.0;
 
 
 mat create_k(mat pctmetal, int N) {

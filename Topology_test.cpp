@@ -26,7 +26,7 @@ double cost = top::objective_function(sol, ll);
 
 ofstream myfile;
 myfile.open ("results.txt");
-myfile <<"sol = ["<<sol<<"]";
+myfile <<sol;
 myfile.close();
 return 0;
 
