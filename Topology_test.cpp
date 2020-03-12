@@ -4,6 +4,7 @@
 #include <armadillo>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 using namespace arma;
@@ -28,7 +29,7 @@ ofstream myfile;
 myfile.open ("results.txt");
 myfile <<sol;
 myfile.close();
-return 0;
+return cost;
 
 
 

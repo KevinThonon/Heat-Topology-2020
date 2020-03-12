@@ -12,6 +12,8 @@
 #include <chrono>
 #include <iterator>
 #include <armadillo>
+#include <nlopt.h>
+#include <math.h>
 
 using namespace std;
 using namespace arma;
@@ -21,6 +23,35 @@ namespace top {
 // variabelen definiëren
 
 double penal = 1.0;
+
+mat K_0() {
+
+mat K_0(4,4);
+
+K_0(0,0) = 2.0/3.0;
+K_0(0,1) = -1.0/6.0;
+K_0(0,2) = -1.0/3.0;
+K_0(0,3) = -1.0/6.0;
+K_0(1,0) = -1.0/6.0;
+K_0(1,1) = 2.0/3.0;
+K_0(1,2) = -1.0/6.0;
+K_0(1,3) = -1.0/3.0;
+K_0(2,0) = -1.0/3.0;
+K_0(2,1) = -1.0/6.0;
+K_0(2,2) = 2.0/3.0;
+K_0(2,3) = -1.0/6.0;
+K_0(3,0) = -1.0/6.0;
+K_0(3,1) = -1.0/3.0;
+K_0(3,2) = -1.0/6.0;
+K_0(3,3) = 2.0/3.0;
+
+return K_0;
+
+}
+
+
+
+
 
 
 mat create_k(mat pctmetal, int N) {
@@ -192,10 +223,29 @@ double objective_function(vec T, mat K){
 }
 
 
-double sensitivity_function(vec T, mat K){
-	double cost = dot(0.5*T.t(),K*T);
-	return cost;
+mat check(int N, double rmin, mat x, mat dc){
+
+mat dcn = zeros<mat>(N,N);
+
+for (int i = 1; i < N-2; i++) {
+  for (int j = 1; j < N-2; j++) {
+    double sum = 0.0; 
+    for (int k = std::max(i - floor(rmin),2.0); k < std::min(i + floor(rmin),N-2.0); k++) {
+      for (int l = std::max(j - floor(rmin),2.0); l< std::min(j + floor(rmin),N-2.0); l++) {
+        double fac = rmin - sqrt(pow((i-k),2) + pow((j-l),2));
+        sum = sum + std::max(0.0,fac);
+        dcn(j,i) = dcn(j,i) + std::max(0.0,fac) * dc(l,k) * x(l,k);
+      }
+    }
+    dcn(j,i) = dcn(j,i) / (x(j,i) * sum);
+  }
 }
+return dcn;
+}
+
+
+
+
 
 
 }
