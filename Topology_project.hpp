@@ -24,6 +24,7 @@ namespace top {
 
 double penal = 1.0;
 
+// Dichtheid k in elk element met SIMP methode. Input: percentage metaal in elk element. Output: Dichtheid k in elk element
 mat create_k(mat pctmetal, int N) {
 	mat k(N,N);
 	for (int i = 0; i < N; ++i) {
@@ -34,15 +35,18 @@ mat create_k(mat pctmetal, int N) {
 	return k;
 }
 
+// Grote matrix met ook k-waarden op randen van elementen (arithmisch gemiddelde)
 mat bigkmat(mat k, int N){
 	mat bigmat(2*N+1, 2*N+1);
 	bigmat.fill(0.0);
+	// Midden van elk element
 	for (int i = 1; i < 2*N+1; i+=2){
 		for (int j = 1; j < 2*N+1; j+=2){
 			bigmat(i,j) = k((i-1)/2, (j-1)/2);
 		}
 	}
 	
+	// Randen van middelste elementen
 	for (int i = 1; i < 2*N; i+=2){
 		for (int j = 2; j < 2*N; j+=2){
 			bigmat(i,j) = (k((i-1)/2, j/2) + k((i-1)/2, j/2 - 1))/2;
@@ -55,7 +59,7 @@ mat bigkmat(mat k, int N){
 		}
 	}
 	
-	
+	// k-waarden op de randen van het grid
 	for (int i = 1; i < 2*N; i+=2){
 		
 		bigmat(i, 0) = k((i-1)/2, 0);
@@ -67,6 +71,7 @@ mat bigkmat(mat k, int N){
 	return bigmat;
 }
 
+// Rechterlid van Ku = f aanmaken. Output is een vector die het grid kolom per kolom bevat
 vec RL(int N){
 	double q = 2.0/(0.01*0.01*0.001);
 	double h = 0.01/N;
@@ -96,12 +101,14 @@ vec RL(int N){
 		rl(i) = qn;
 		rl(N-i) = qn;
 		rl(pow(N, 2) + N + i) = qn;
+		
 		rl(pow(N+1,2) - 1 - i) = qn;
 	}
 	
 	return rl;
 }
 
+// Matrix K aanmaken
 mat LL(mat bigkmat, int N){
 	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	ll.fill(0.0);
@@ -187,9 +194,99 @@ mat LL(mat bigkmat, int N){
 	return ll;
 }
 
-double objective_function(vec T, mat K){
-	double cost = dot(0.5*T.t(),K*T);
+// Matrix dK/dk aanmaken
+mat dKdk(int N){
+	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
+	ll.fill(0.0);
+	for (int i = 0.3*N; i < 0.7*N + 1; i++){
+		ll(i,i) = 1.0;
+		ll(((N+1)*(N+1))-i-1, ((N+1)*(N+1))-i-1) = 1.0;
+	}
+	
+	//Linksboven hoekpunt
+	ll(0,0) = -1.0;
+	ll(0,1) = 0.5;
+	ll(0,N+1) = 0.5;
+	
+	//Linksonder hoekpunt
+	ll(N,0) = -1.0;
+	ll(N,N-1) = 0.5;
+	ll(N,2*N+1) = 0.5;
+	
+	//Rechtsboven hoekpunt
+	ll(N*(N+1),N*(N+1)) = -1.0;
+	ll(N*(N+1),N*(N+1)+1) = 0.5;
+	ll(N*(N+1),N*N-1) = 0.5;
+	
+	//Rechtsonder hoekpunt
+	ll(N*(N+2),N*(N+2)) = -1.0;
+	ll(N*(N+2),N*(N+1)-1) = 0.5;
+	ll(N*(N+2),N*(N+2)-1) = 0.5;
+	
+	//Neumann links
+	for (int i = 1; i < 0.3*N; i++){
+		ll(i,i) = -2.0;
+		ll(i,i-1) = 0.5;
+		ll(i,i+1) = 0.5;
+		ll(i,i+N+1) = 1.0;
+		
+		ll(N-i,N-i) = -2.0;
+		ll(N-i,N-i-1) = 0.5;
+		ll(N-i,N-i+1) = 0.5;
+		ll(N-i,N-i+N+1) = 1.0;
+	}
+
+	//Neumann rechts
+	for (int i = 1; i < 0.3*N; i++){
+		ll(N*(N+1)+i,N*(N+1)+i) = -2.0;
+		ll(N*(N+1)+i,N*(N+1)+i-1) = 0.5;
+		ll(N*(N+1)+i,N*(N+1)+i+1) = 0.5;
+		ll(N*(N+1)+i,N*(N+1)+i-(N+1)) = 1.0;
+		
+		ll(N*(N+2)-i,N*(N+2)-i) = -2.0;
+		ll(N*(N+2)-i,N*(N+2)-i-1) = 0.5;
+		ll(N*(N+2)-i,N*(N+2)-i+1) = 0.5;
+		ll(N*(N+2)-i,N*(N+2)-i-(N+1)) = 1.0;
+	}
+	
+	//Neumann boven
+	for (int i = 1; i < N; i++){
+		ll(i*(N+1),i*(N+1)) = -2.0;
+		ll(i*(N+1),i*(N+1)+1) = 1.0;
+		ll(i*(N+1),(i-1)*(N+1)) = 0.5;
+		ll(i*(N+1),(i+1)*(N+1)) = 0.5;
+	}
+	
+	//Neumann onder
+	for (int i = 1; i < N; i++){
+		ll(i*(N+1)+N,i*(N+1)+N) = -2.0;
+		ll(i*(N+1)+N,i*(N+1)+N-1) = 1.0;
+		ll(i*(N+1)+N,(i-1)*(N+1)+N) = 0.5;
+		ll(i*(N+1)+N,(i+1)*(N+1)+N) = 0.5;
+	}
+	
+	//Gewone kolommen
+	for (int j = 1; j < N; j++){
+		for (int i = 1; i < N; i++){
+			ll(j*(N+1)+i,j*(N+1)+i) = -4.0;
+			ll(j*(N+1)+i,j*(N+1)+i-1) = 1.0;
+			ll(j*(N+1)+i,j*(N+1)+i+1) = 1.0;
+			ll(j*(N+1)+i,(j-1)*(N+1)+i) = 1.0;
+			ll(j*(N+1)+i,(j+1)*(N+1)+i) = 1.0;
+		}
+	}
+	
+	return ll;
+}
+
+double objective_function(vec T, int N){
+	double cost = dot(T.t(),T)/(N*N);
 	return cost;
+}
+
+vec lambda(vec T, mat K, int N){
+	vec lambda = solve(K.t(), (2.0/(N*N))*T);
+	return lambda;
 }
 
 
