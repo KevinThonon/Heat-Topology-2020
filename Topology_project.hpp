@@ -22,7 +22,7 @@ namespace top {
 
 // variabelen definiëren
 
-double penal = 1.0;
+double penal = 3.0;
 
 // Dichtheid k in elk element met SIMP methode. Input: percentage metaal in elk element. Output: Dichtheid k in elk element
 mat create_k(mat pctmetal, int N) {
@@ -108,7 +108,7 @@ vec RL(int N){
 	return rl;
 }
 
-// Matrix K aanmaken
+/* // Matrix K aanmaken
 mat LL(mat bigkmat, int N){
 	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	ll.fill(0.0);
@@ -192,7 +192,7 @@ mat LL(mat bigkmat, int N){
 	}
 	
 	return ll;
-}
+} */
 
 // Matrix K aanmaken zonder bigkmat
 mat K_mat(mat k, int N){
@@ -279,7 +279,47 @@ mat K_mat(mat k, int N){
 	return ll;
 }
 
-// Matrix dK/dk aanmaken
+double objective_function(vec T, int N){
+	double cost = dot(T,T)/(N*N);
+	return cost;
+}
+
+vec lambda(vec T, mat K, int N){
+	vec lambda = solve(K.t(), (2.0/(N*N))*T);
+	return lambda;
+}
+
+//dc/dk_i,j
+mat dcda(vec lambda, vec T, mat pctmetal, int N){
+//vec dcda(vec lambda, vec T, mat pctmetal, int N){
+	mat dcda(N,N);
+	// vec dcda(N*N);
+	dcda.fill(0.0);
+	vec dcdk(N*N);
+	dcdk.fill(0.0);
+	
+	for (int i = 0; i < N; i++){
+		for (int j = 0; j < N; j++){
+			vec dKdk_u((N+1)*(N+1));
+			dKdk_u.fill(0.0);
+			dKdk_u(i + j*(N+1)) = -1.0*T(i + j*(N+1)) + 0.5*T(i+1 + j*(N+1)) + 0.5*T(i + (j+1)*(N+1));
+			dKdk_u(i+1 + j*(N+1)) = -1.0*T(i+1 + j*(N+1)) + 0.5*T(i + j*(N+1)) + 0.5*T(i+1 + (j+1)*(N+1));
+			dKdk_u(i + (j+1)*(N+1)) = -1.0*T(i + (j+1)*(N+1)) + 0.5*T(i + j*(N+1)) + 0.5*T(i+1 + (j+1)*(N+1));
+			dKdk_u(i+1 + (j+1)*(N+1)) = -1.0*T(i+1 + (j+1)*(N+1)) + 0.5*T(i+1 + j*(N+1)) + 0.5*T(i + (j+1)*(N+1));
+			dcdk(i + j*(N+1)) = dot(lambda, dKdk_u);
+			dcda(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N+1));
+			//dcda(i + j*(N+1)) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N+1));
+		}
+	}
+	
+	return dcda;
+	
+}
+	
+	
+	
+
+/* // Matrix dK/dk aanmaken
 mat dKdk(int N){
 	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	ll.fill(0.0);
@@ -362,17 +402,9 @@ mat dKdk(int N){
 	}
 	
 	return ll;
-}
+} */
 
-double objective_function(vec T, int N){
-	double cost = dot(T.t(),T)/(N*N);
-	return cost;
-}
 
-vec lambda(vec T, mat K, int N){
-	vec lambda = solve(K.t(), (2.0/(N*N))*T);
-	return lambda;
-}
 
 
 mat check(int N, double rmin, mat x, mat dc){
