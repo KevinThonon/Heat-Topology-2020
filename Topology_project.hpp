@@ -196,8 +196,10 @@ mat LL(mat bigkmat, int N){
 
 // Matrix K aanmaken zonder bigkmat
 mat K_mat(mat k, int N){
+	//Aanmaken matrix en vullen met nullen
 	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	ll.fill(0.0);
+	//Dirichlett boundary conditions
 	for (int i = 0.3*N; i < 0.7*N + 1; i++){
 		ll(i,i) = 1.0;
 		ll(((N+1)*(N+1))-i-1, ((N+1)*(N+1))-i-1) = 1.0;
@@ -210,7 +212,6 @@ mat K_mat(mat k, int N){
 	
 	//Linksonder hoekpunt
 	ll(N,0) = -0.5*(k(N-1,0)+k(N-1,0));
-	//std::cout<<N<<std::endl;
 	ll(N,N-1) = 0.5*k(N-1,0);
 	ll(N,2*N+1) = 0.5*k(N-1,0);
 	
@@ -279,34 +280,44 @@ mat K_mat(mat k, int N){
 	return ll;
 }
 
+// Kostfunctie = u^T * u / #elementen
 double objective_function(vec T, int N){
 	double cost = dot(T,T)/(N*N);
 	return cost;
 }
 
+// Lambda is de oplossing van K^T * lambda = dg/du = 2*u / #elementen
 vec lambda(vec T, mat K, int N){
 	vec lambda = solve(K.t(), (2.0/(N*N))*T);
 	return lambda;
 }
 
-//dc/dk_i,j
+// dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
+// Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
 mat dcda(vec lambda, vec T, mat pctmetal, int N){
 //vec dcda(vec lambda, vec T, mat pctmetal, int N){
+	//Initialiseren dc/da en opvullen met nullen
 	mat dcda(N,N);
 	// vec dcda(N*N);
 	dcda.fill(0.0);
+	//Initialiseren dc/dk en opvullen met nullen
 	vec dcdk(N*N);
 	dcdk.fill(0.0);
 	
+	//dc/da element per element opvullen
 	for (int i = 0; i < N; i++){
 		for (int j = 0; j < N; j++){
+			//Wat berekend moet worden is dc/da_i,j = dk/da * (lambda^T * dK/dk_i,j * u). Aangezien dK/dk_i,j slechts 4 niet-nul rijen zal bevatten zal niet eerst dK/dk_i,j aangemaakt worden om dan te vermenigvuldigen met u
+			//maar zal dK/dk_i,j * u direct aangemaakt worden. 
 			vec dKdk_u((N+1)*(N+1));
 			dKdk_u.fill(0.0);
 			dKdk_u(i + j*(N+1)) = -1.0*T(i + j*(N+1)) + 0.5*T(i+1 + j*(N+1)) + 0.5*T(i + (j+1)*(N+1));
 			dKdk_u(i+1 + j*(N+1)) = -1.0*T(i+1 + j*(N+1)) + 0.5*T(i + j*(N+1)) + 0.5*T(i+1 + (j+1)*(N+1));
 			dKdk_u(i + (j+1)*(N+1)) = -1.0*T(i + (j+1)*(N+1)) + 0.5*T(i + j*(N+1)) + 0.5*T(i+1 + (j+1)*(N+1));
 			dKdk_u(i+1 + (j+1)*(N+1)) = -1.0*T(i+1 + (j+1)*(N+1)) + 0.5*T(i+1 + j*(N+1)) + 0.5*T(i + (j+1)*(N+1));
+			//Vermenigvuldiging met lambda^T om tot dc/dk te komen
 			dcdk(i + j*(N+1)) = dot(lambda, dKdk_u);
+			//Vermenigvuldiging met dk/da om tot dc/da te komen
 			dcda(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N+1));
 			//dcda(i + j*(N+1)) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N+1));
 		}
