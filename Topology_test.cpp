@@ -23,15 +23,15 @@ vec rl = top::RL(N);
 //mat ll = top::LL(bigmat, N);
 mat ll = top::K_mat(k, N);
 
-vec sol = solve(ll,rl);
-double cost = top::objective_function(sol, N);
+vec u = solve(ll,rl);
+double cost = top::objective_function(u, N);
 
-vec lambda = top::lambda(sol, ll, N);
-mat dcda = top::dcda(lambda, sol, pctmetal, N);
+vec lambda = top::lambda(u, ll, N);
+mat dcda = top::dcda(lambda, u, pctmetal, N);
 
 ofstream myfile;
 myfile.open ("results.txt");
-myfile <<sol;
+myfile <<u;
 myfile.close();
 return cost;
 

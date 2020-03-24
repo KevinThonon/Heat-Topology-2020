@@ -316,12 +316,15 @@ mat dcda(vec lambda, vec T, mat pctmetal, int N){
 			dKdk_u(i + (j+1)*(N+1)) = -1.0*T(i + (j+1)*(N+1)) + 0.5*T(i + j*(N+1)) + 0.5*T(i+1 + (j+1)*(N+1));
 			dKdk_u(i+1 + (j+1)*(N+1)) = -1.0*T(i+1 + (j+1)*(N+1)) + 0.5*T(i+1 + j*(N+1)) + 0.5*T(i + (j+1)*(N+1));
 			//Vermenigvuldiging met lambda^T om tot dc/dk te komen
-			dcdk(i + j*(N+1)) = dot(lambda, dKdk_u);
+			//std::cout<<lambda.size()<<std::endl;
+			//std::cout<<dKdk_u.size()<<std::endl;
+			dcdk(i + j*N) = dot(lambda, dKdk_u);
 			//Vermenigvuldiging met dk/da om tot dc/da te komen
-			dcda(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N+1));
+			dcda(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*N);
 			//dcda(i + j*(N+1)) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N+1));
 		}
 	}
+	
 	
 	return dcda;
 	
