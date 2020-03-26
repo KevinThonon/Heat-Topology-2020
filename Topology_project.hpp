@@ -211,14 +211,14 @@ mat K_mat(mat k, int N){
 	ll(0,N+1) = 0.5*k(0,0);
 	
 	//Linksonder hoekpunt
-	ll(N,0) = -0.5*(k(N-1,0)+k(N-1,0));
+	ll(N,N) = -0.5*(k(N-1,0)+k(N-1,0)); //index ll(N,0) aangepast
 	ll(N,N-1) = 0.5*k(N-1,0);
 	ll(N,2*N+1) = 0.5*k(N-1,0);
 	
 	//Rechtsboven hoekpunt
 	ll(N*(N+1),N*(N+1)) = -0.5*(k(0,N-1)+k(0,N-1));
 	ll(N*(N+1),N*(N+1)+1) = 0.5*k(0,N-1);
-	ll(N*(N+1),N*N-1) = 0.5*k(0,N-1);
+	ll(N*(N+1),(N+1)*(N-1)) = 0.5*k(0,N-1); // ll(N*(N+1),N*N-1) aangepast
 	
 	//Rechtsonder hoekpunt
 	ll(N*(N+2),N*(N+2)) = -0.5*(k(N-1,N-1)+k(N-1,N-1));
