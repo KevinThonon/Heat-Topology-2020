@@ -65,32 +65,3 @@ for i = 2:N-1
   end
 end
 
-%%%%%%%%%% ELEMENT STIFFNESS MATRIX %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [KE]=lk
-KE = [ 2/3 -1/6 -1/3 -1/6
-      -1/6 2/3 -1/6 -1/3
-      -1/3 -1/6 2/3 -1/6
-      -1/6 -1/3 -1/6 2/3];
-  
-%   
-%           nlist = [];
-%         if elx > 1
-%             nlist = [nlist; (N)*(elx-2)+ely];
-%         end
-%         if ely > 1      
-%             nlist = [nlist; (N)*(elx-1)+ely-1];
-%         end
-%         if ely < N
-%             nlist = [nlist; (N)*(elx-1)+ely+1];
-%         end
-%         if elx < N
-%             nlist = [nlist; (N)*(elx)+ely];
-%         end
-%       Ue = U(nlist,1);
-%       if length(nlist)==3
-%           K = K3;
-%       elseif length(nlist)==2
-%           K = K2;
-%       else
-%           K = K4;
-%       end

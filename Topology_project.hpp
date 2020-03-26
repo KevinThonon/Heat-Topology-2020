@@ -218,7 +218,7 @@ mat K_mat(mat k, int N){
 	//Rechtsboven hoekpunt
 	ll(N*(N+1),N*(N+1)) = -0.5*(k(0,N-1)+k(0,N-1));
 	ll(N*(N+1),N*(N+1)+1) = 0.5*k(0,N-1);
-	ll(N*(N+1),(N+1)*(N-1)) = 0.5*k(0,N-1); // ll(N*(N+1),N*N-1) aangepast
+	ll(N*(N+1),(N-1)*(N+1)) = 0.5*k(0,N-1);
 	
 	//Rechtsonder hoekpunt
 	ll(N*(N+2),N*(N+2)) = -0.5*(k(N-1,N-1)+k(N-1,N-1));

@@ -31,7 +31,7 @@ mat dcda = top::dcda(lambda, u, pctmetal, N);
 
 ofstream myfile;
 myfile.open ("results.txt");
-myfile <<u;
+myfile <<dcda;
 myfile.close();
 return cost;
 
