@@ -321,7 +321,7 @@ mat dcda(vec lambda, vec T, mat pctmetal, int N){
 			dcdk(i + j*N) = dot(lambda, dKdk_u);
 			//Vermenigvuldiging met dk/da om tot dc/da te komen
 			dcda(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*N);
-			//dcda(i + j*(N+1)) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N+1));
+			//dcda(i + j*N) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*N);
 		}
 	}
 	
