@@ -42,9 +42,9 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	mat ll = top::K_mat(k, N);
 
 	vec u = solve(ll,rl);
-	double cost = top::objective_function(u, N);
+	double cost = top::objective_function1(u, N);
 
-	vec lambda = top::lambda(u, ll, N);
+	vec lambda = top::lambda1(u, ll, N);
 	vec dcda = top::dcda(lambda, u, pctmetal, N);
 
 	if (grad) {

@@ -194,7 +194,14 @@ mat LL(mat bigkmat, int N){
 	return ll;
 } */
 
-// Matrix K aanmaken zonder bigkmat
+double mean(double a, double b){
+	return (a+b)/2.0;	//arithmetic
+	//return 2.0*(a*b)/(a+b);		//harmonic
+}
+
+
+
+/* // Matrix K aanmaken zonder bigkmat
 mat K_mat(mat k, int N){
 	//Aanmaken matrix en vullen met nullen
 	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
@@ -278,6 +285,92 @@ mat K_mat(mat k, int N){
 	}
 	
 	return ll;
+} */
+
+// Matrix K aanmaken zonder bigkmat met arithmetic/harmonic mean voor de k-waarden
+mat K_mat(mat k, int N){
+	//Aanmaken matrix en vullen met nullen
+	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
+	ll.fill(0.0);
+	//Dirichlett boundary conditions
+	for (int i = 0.3*N; i < 0.7*N + 1; i++){
+		ll(i,i) = 1.0;
+		ll(((N+1)*(N+1))-i-1, ((N+1)*(N+1))-i-1) = 1.0;
+	}
+	
+	//Linksboven hoekpunt
+	ll(0,0) = -1.0*mean(k(0,0),k(0,0));
+	ll(0,1) = 0.5*k(0,0);
+	ll(0,N+1) = 0.5*k(0,0);
+	
+	//Linksonder hoekpunt
+	ll(N,N) = -1.0*mean(k(N-1,0),k(N-1,0)); //index ll(N,0) aangepast
+	ll(N,N-1) = 0.5*k(N-1,0);
+	ll(N,2*N+1) = 0.5*k(N-1,0);
+	
+	//Rechtsboven hoekpunt
+	ll(N*(N+1),N*(N+1)) = -1.0*mean(k(0,N-1),k(0,N-1));
+	ll(N*(N+1),N*(N+1)+1) = 0.5*k(0,N-1);
+	ll(N*(N+1),(N-1)*(N+1)) = 0.5*k(0,N-1);
+	
+	//Rechtsonder hoekpunt
+	ll(N*(N+2),N*(N+2)) = -1.0*mean(k(N-1,N-1),k(N-1,N-1));
+	ll(N*(N+2),N*(N+1)-1) = 0.5*k(N-1,N-1);
+	ll(N*(N+2),N*(N+2)-1) = 0.5*k(N-1,N-1);
+	
+	//Neumann links
+	for (int i = 1; i < 0.3*N; i++){
+		ll(i,i) = -0.5*k(i-1,0) -0.5*k(i,0) - mean(k(i-1,0),k(i,0));
+		ll(i,i-1) = 0.5*k(i-1,0);
+		ll(i,i+1) = 0.5*k(i,0);
+		ll(i,i+N+1) = mean(k(i-1,0),k(i,0));
+		
+		ll(N-i,N-i) = -0.5*k(N-i,0) -0.5*k(N-1-i,0) - mean(k(N-i,0),k(N-1-i,0));
+		ll(N-i,N-i-1) = 0.5*k(N-1-i,0);
+		ll(N-i,N-i+1) = 0.5*k(N-i,0);
+		ll(N-i,N-i+N+1) = mean(k(N-i,0),k(N-1-i,0));
+	}
+
+	//Neumann rechts
+	for (int i = 1; i < 0.3*N; i++){
+		ll(N*(N+1)+i,N*(N+1)+i) = -0.5*k(i-1,N-1) -0.5*k(i,N-1) - mean(k(i-1,N-1),k(i,N-1));
+		ll(N*(N+1)+i,N*(N+1)+i-1) = 0.5*k(i-1,N-1);
+		ll(N*(N+1)+i,N*(N+1)+i+1) = 0.5*k(i,N-1);
+		ll(N*(N+1)+i,N*(N+1)+i-(N+1)) = mean(k(i-1,N-1),k(i,N-1));
+		
+		ll(N*(N+2)-i,N*(N+2)-i) = -0.5*k(N-i,N-1) -0.5*k(N-1-i,N-1) - mean(k(N-i,N-1),k(N-1-i,N-1));
+		ll(N*(N+2)-i,N*(N+2)-i-1) = 0.5*k(N-1-i,N-1);
+		ll(N*(N+2)-i,N*(N+2)-i+1) = 0.5*k(N-i,N-1);
+		ll(N*(N+2)-i,N*(N+2)-i-(N+1)) = mean(k(N-i,N-1),k(N-1-i,N-1));
+	}
+	
+
+	for (int i = 1; i < N; i++){
+	//Neumann boven
+		ll(i*(N+1),i*(N+1)) = -0.5*k(0,i-1) -0.5*k(0,i) - mean(k(0,i-1),k(0,i));
+		ll(i*(N+1),i*(N+1)+1) = mean(k(0,i-1),k(0,i));
+		ll(i*(N+1),(i-1)*(N+1)) = 0.5*k(0,i-1);
+		ll(i*(N+1),(i+1)*(N+1)) = 0.5*k(0,i);
+	
+	//Neumann onder
+		ll(i*(N+1)+N,i*(N+1)+N) = -0.5*k(N-1,i-1) -0.5*k(N-1,i) - mean(k(N-1,i-1),k(N-1,i));
+		ll(i*(N+1)+N,i*(N+1)+N-1) = mean(k(N-1,i-1),k(N-1,i));
+		ll(i*(N+1)+N,(i-1)*(N+1)+N) = 0.5*k(N-1,i-1);
+		ll(i*(N+1)+N,(i+1)*(N+1)+N) = 0.5*k(N-1,i);
+	}
+	
+	//Gewone kolommen
+	for (int j = 1; j < N; j++){
+		for (int i = 1; i < N; i++){
+			ll(j*(N+1)+i,j*(N+1)+i) = -1.0*(mean(k(i-1,j-1),k(i-1,j)) + mean(k(i,j-1),k(i,j)) + mean(k(i-1,j-1),k(i,j-1)) + mean(k(i-1,j),k(i,j)));
+			ll(j*(N+1)+i,j*(N+1)+i-1) = mean(k(i-1,j-1),k(i-1,j));
+			ll(j*(N+1)+i,j*(N+1)+i+1) = mean(k(i,j-1),k(i,j));
+			ll(j*(N+1)+i,(j-1)*(N+1)+i) = mean(k(i-1,j-1),k(i,j-1));
+			ll(j*(N+1)+i,(j+1)*(N+1)+i) = mean(k(i-1,j),k(i,j));
+		}
+	}
+	
+	return ll;
 }
 
 // Kostfunctie = u^T * u / #elementen
@@ -289,7 +382,7 @@ double objective_function1(vec T, int N){
 // Kostfunctie = u / #elementen
 // Deze kostfunctie is het gemiddelde van alle temperatuur-punten.
 double objective_function2(vec T, int N){
-	vec w(pow((N+1),2);
+	vec w(pow((N+1),2));
 	w.fill(1.0);
 	double cost = dot(w,T)/(pow((N+1),2));
 	return cost;
@@ -301,13 +394,13 @@ double objective_function2(vec T, int N){
 // Een hoekpunt heeft gewicht h_x * h_y / 4 (vakje is een kwart van een middelste vakje).
 double objective_function3(vec T, int N){
 	double A = pow((1.0/N),2);
-	vec w(pow((N+1),2);
+	vec w(pow((N+1),2));
 	w.fill(A);
 	w(0) = A/4.0;
 	w(N) = A/4.0;
 	w(pow(N,2)+N) = A/4.0;
 	w(pow(N,2)+2*N) = A/4.0;
-	for (int i = 1, i < N, i++){
+	for (int i = 1; i < N; i++){
 		w(i) = A/2.0;
 		w(pow(N,2)+2*N-i) = A/2.0;
 		w(i*(N+1)) = A/2.0;
@@ -325,7 +418,7 @@ vec lambda1(vec T, mat K, int N){
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = - eenheidsvector / #elementen
 vec lambda2(mat K, int N){
-	vec w(pow((N+1),2);
+	vec w(pow((N+1),2));
 	w.fill(-1.0);
 	vec lambda = solve(K.t(), w);
 	return lambda;
@@ -334,13 +427,13 @@ vec lambda2(mat K, int N){
 // Lambda is de oplossing van K^T * lambda = -dg/du = -w
 vec lambda3(mat K, int N){
 	double A = pow((1.0/N),2);
-	vec w(pow((N+1),2);
+	vec w(pow((N+1),2));
 	w.fill(A);
 	w(0) = A/4.0;
 	w(N) = A/4.0;
 	w(pow(N,2)+N) = A/4.0;
 	w(pow(N,2)+2*N) = A/4.0;
-	for (int i = 1, i < N, i++){
+	for (int i = 1; i < N; i++){
 		w(i) = A/2.0;
 		w(pow(N,2)+2*N-i) = A/2.0;
 		w(i*(N+1)) = A/2.0;
