@@ -281,16 +281,76 @@ mat K_mat(mat k, int N){
 }
 
 // Kostfunctie = u^T * u / #elementen
-double objective_function(vec T, int N){
+double objective_function1(vec T, int N){
 	double cost = dot(T,T)/(N*N);
 	return cost;
 }
 
-// Lambda is de oplossing van K^T * lambda = dg/du = 2*u / #elementen
-vec lambda(vec T, mat K, int N){
-	vec lambda = solve(K.t(), (2.0/(N*N))*T);
+// Kostfunctie = u / #elementen
+// Deze kostfunctie is het gemiddelde van alle temperatuur-punten.
+double objective_function2(vec T, int N){
+	vec w(pow((N+1),2);
+	w.fill(1.0);
+	double cost = dot(w,T)/(pow((N+1),2));
+	return cost;
+}
+
+// Kostfunctie = w^T * u / #elementen
+// Deze kostfunctie is het gewogen gemiddelde van alle temperatuur-punten.
+// w is het gewicht van elk temperatuur-punt. De som van alle gewichten is 1. Een middenpunt heeft gewicht 1/N² = h_x * h_y. Een randpunt heeft hiervan de helft (vakje is half zo klein).
+// Een hoekpunt heeft gewicht h_x * h_y / 4 (vakje is een kwart van een middelste vakje).
+double objective_function3(vec T, int N){
+	double A = pow((1.0/N),2);
+	vec w(pow((N+1),2);
+	w.fill(A);
+	w(0) = A/4.0;
+	w(N) = A/4.0;
+	w(pow(N,2)+N) = A/4.0;
+	w(pow(N,2)+2*N) = A/4.0;
+	for (int i = 1, i < N, i++){
+		w(i) = A/2.0;
+		w(pow(N,2)+2*N-i) = A/2.0;
+		w(i*(N+1)) = A/2.0;
+		w(i*(N+1)+N) = A/2.0;
+	}
+	double cost = dot(w,T);
+	return cost;
+}
+
+// Lambda is de oplossing van K^T * lambda = -dg/du = -2*u / #elementen
+vec lambda1(vec T, mat K, int N){
+	vec lambda = solve(K.t(), (-2.0/(N*N))*T); //Veranderd van 2.0 naar -2.0
 	return lambda;
 }
+
+// Lambda is de oplossing van K^T * lambda = -dg/du = - eenheidsvector / #elementen
+vec lambda2(mat K, int N){
+	vec w(pow((N+1),2);
+	w.fill(-1.0);
+	vec lambda = solve(K.t(), w);
+	return lambda;
+}
+
+// Lambda is de oplossing van K^T * lambda = -dg/du = -w
+vec lambda3(mat K, int N){
+	double A = pow((1.0/N),2);
+	vec w(pow((N+1),2);
+	w.fill(A);
+	w(0) = A/4.0;
+	w(N) = A/4.0;
+	w(pow(N,2)+N) = A/4.0;
+	w(pow(N,2)+2*N) = A/4.0;
+	for (int i = 1, i < N, i++){
+		w(i) = A/2.0;
+		w(pow(N,2)+2*N-i) = A/2.0;
+		w(i*(N+1)) = A/2.0;
+		w(i*(N+1)+N) = A/2.0;
+	}
+	vec lambda = solve(K.t(), -1.0*w);
+	return lambda;
+}
+
+
 
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
