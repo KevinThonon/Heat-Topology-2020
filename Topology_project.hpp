@@ -29,7 +29,7 @@ mat create_k(const double *a, int N) {
 	mat k(N,N);
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < N; ++j) {
-			k(i,j) = (65-0.2)*pow(a[i*N + j],penal) + 0.2;
+			k(i,j) = (65-0.2)*pow(a[i + N*j],penal) + 0.2;
 		}
 	}
 	return k;
