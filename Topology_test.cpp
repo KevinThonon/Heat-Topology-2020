@@ -30,11 +30,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
     	}
     	myfile.close();
 
-	//double cost = top::objective_function1(u, N);
-	//vec lambda = top::lambda1(u, ll, N);
+	double cost = top::objective_function1(u, N);
+	vec lambda = top::lambda1(u, ll, N);
 
-	double cost = top::objective_function2(u, N);
-	vec lambda = top::lambda2(ll, N);
+	//double cost = top::objective_function2(u, N);
+	//vec lambda = top::lambda2(ll, N);
 
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);

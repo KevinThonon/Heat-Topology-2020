@@ -29,11 +29,11 @@ for i = 1:N
 end
 
 
-surf(gradient_mat,'FaceColor','interp')
+%surf(gradient_mat,'FaceColor','interp')
 
 %surf(temperature_mat,'FaceColor','interp')
 
-%surf(metal_mat,'FaceColor','interp')
+surf(metal_mat,'FaceColor','interp')
 
 
 
