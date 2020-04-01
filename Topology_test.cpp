@@ -15,13 +15,20 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 
 	std::cout<<"runs"<<std::endl;
 
-	int N = n/sqrt(n);
+	int N = sqrt(n);
 
 	mat k = top::create_k(a, N);
 	vec rl = top::RL(N);
 	mat ll = top::K_mat(k, N);
 
 	vec u = solve(ll,rl);
+
+	ofstream myfile;
+        myfile.open ("temperature.txt");
+        for (int i = 0; i < n; ++i) {
+    		myfile <<u(i)<<std::endl;
+    	}
+    	myfile.close();
 
 	//double cost = top::objective_function1(u, N);
 	//vec lambda = top::lambda1(u, ll, N);
@@ -34,8 +41,15 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 
 	vec dcda = top::dcda(lambda, u, a, N);
 
+	ofstream myfile1;
+        myfile1.open ("gradient.txt");
+        for (int i = 0; i < n; ++i) {
+    		myfile1 <<dcda(i)<<std::endl;
+    	}
+    	myfile1.close();
+
 	if (grad) {
-	for (int i = 0; i < dcda.size(); ++i) {
+	for (int i = 0; i < n; ++i) {
         	grad[i] = dcda(i);
 	}
     }
@@ -121,7 +135,7 @@ if (nlopt_optimize(opt, a, &minf) < 0) {
 }
 else {
     ofstream myfile;
-    myfile.open ("a.txt");
+    myfile.open ("metal.txt");
     for (int i = 0; i < N*N; ++i) {
     	myfile <<a[i]<<std::endl;
     }
