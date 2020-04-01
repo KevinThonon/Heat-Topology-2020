@@ -120,9 +120,13 @@ if (nlopt_optimize(opt, a, &minf) < 0) {
     printf("nlopt failed!\n");
 }
 else {
+    ofstream myfile;
+    myfile.open ("a.txt");
     for (int i = 0; i < N*N; ++i) {
-    	std::cout<<a[i]<<std::endl;
+    	myfile <<a[i]<<std::endl;
     }
+    myfile.close();
+    return 0;
 }
 
 nlopt_destroy(opt);
