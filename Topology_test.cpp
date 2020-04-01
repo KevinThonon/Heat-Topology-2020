@@ -11,41 +11,28 @@
 using namespace std;
 using namespace arma;
 
-
-typedef struct {
-  mat pctmetal;
-} *my_func_data;
-
 double myfunc(unsigned n, const double *a, double *grad, void *data){
 
-	int N = 10;
+	std::cout<<"runs"<<std::endl;
 
-	// transfer *data (a pointer) to the real matrix pctmetal 
-	// (algorithm is way faster because not every time a new matrix is being build every
-	// iteration)
+	int N = n/sqrt(n);
 
-	my_func_data &temp = (my_func_data &) data;
-	mat pctmetal = temp->pctmetal;
-
-
-	// put the percentages of metal in the pctmetal matrix. 
-	// (initial guess a is 0.4 for every element)
-
-	for (int i = 0; i < N; ++i) {
-		for (int j = 0; j < N; ++j) {
-			pctmetal(i,j) = a[i*N + j];
-		}
-	}
-
-	mat k = top::create_k(pctmetal, N);
+	mat k = top::create_k(a, N);
 	vec rl = top::RL(N);
 	mat ll = top::K_mat(k, N);
 
 	vec u = solve(ll,rl);
-	double cost = top::objective_function1(u, N);
 
-	vec lambda = top::lambda1(u, ll, N);
-	vec dcda = top::dcda(lambda, u, pctmetal, N);
+	//double cost = top::objective_function1(u, N);
+	//vec lambda = top::lambda1(u, ll, N);
+
+	//double cost = top::objective_function2(u, N);
+	//vec lambda = top::lambda2(ll, N);
+
+	double cost = top::objective_function3(u, N);
+	vec lambda = top::lambda3(ll, N);
+
+	vec dcda = top::dcda(lambda, u, a, N);
 
 	if (grad) {
 	for (int i = 0; i < dcda.size(); ++i) {
@@ -58,13 +45,13 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 // Inequality constraint: sum(a(i,j))/N^2 - 0.4 <= 0
 
 double myconstraint(unsigned n, const double *a, double *grad, void *data){
-	int N = 10;
+	int N = n/sqrt(n);
 	double sum = 0.0;
-	for (int i = 0; i < N*N; ++i) {
+	for (int i = 0; i < n; ++i) {
 		sum += a[i];
 	}
 	double average_pctmetal = sum/pow(N,2);
-	std::cout<<average_pctmetal<<std::endl;
+	std::cout<<"constraint ="<<average_pctmetal - 0.4<<std::endl;
  
     	return average_pctmetal - 0.4;
 }
@@ -75,7 +62,6 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 int main() {
 
 int N = 10;
-mat pctmetal(N,N);
 
 // MMA - method
 
@@ -97,7 +83,7 @@ for (int i = 0; i < N*N; ++i) {
 
 nlopt_opt opt;
 
-// create algorithm with dimension N^2
+// create algorithm with dimension N^2 (unsigned n = N*N)
 
 opt = nlopt_create(NLOPT_LD_MMA, N*N); /* algorithm and dimensionality */
 
@@ -110,7 +96,7 @@ nlopt_set_upper_bounds(opt, ub);
 // a reference to pctmetal is given as data so that 
 // not every time in myfunc a new matrix pctmetal is made
 
-nlopt_set_min_objective(opt, myfunc, &pctmetal);
+nlopt_set_min_objective(opt, myfunc, NULL);
 
 // Add the inequality constraint to the problem with the parameters: opt (object), 
 // myconstraint (the sum(a(i,j)/N^2) <= 0.4 constraint), 

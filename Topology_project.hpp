@@ -25,11 +25,11 @@ namespace top {
 double penal = 3.0;
 
 // Dichtheid k in elk element met SIMP methode. Input: percentage metaal in elk element. Output: Dichtheid k in elk element
-mat create_k(mat pctmetal, int N) {
+mat create_k(const double *a, int N) {
 	mat k(N,N);
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < N; ++j) {
-			k(i,j) = (65-0.2)*pow(pctmetal(i,j),penal) + 0.2;
+			k(i,j) = (65-0.2)*pow(a[i*N + j],penal) + 0.2;
 		}
 	}
 	return k;
@@ -447,8 +447,8 @@ vec lambda3(mat K, int N){
 
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
-//mat dcda(vec lambda, vec T, mat pctmetal, int N){
-vec dcda(vec lambda, vec T, mat pctmetal, int N){
+//mat dcda(vec lambda, vec T, const double *a, int N){
+vec dcda(vec lambda, vec T, const double *a, int N){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
 	vec dcda(N*N);
@@ -473,8 +473,8 @@ vec dcda(vec lambda, vec T, mat pctmetal, int N){
 			//std::cout<<dKdk_u.size()<<std::endl;
 			dcdk(i + j*N) = dot(lambda, dKdk_u);
 			//Vermenigvuldiging met dk/da om tot dc/da te komen
-			//dcda(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*N);
-			dcda(i + j*(N)) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + j*(N));
+			//dcda(i,j) = penal*(65.0-0.2)*pow(a[i*N + j],penal-1)*dcdk(i + j*N);
+			dcda(i + j*(N)) = penal*(65.0-0.2)*pow(a[i*N + j],penal-1)*dcdk(i + j*(N));
 		}
 	}
 	
