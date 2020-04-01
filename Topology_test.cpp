@@ -45,12 +45,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 // Inequality constraint: sum(a(i,j))/N^2 - 0.4 <= 0
 
 double myconstraint(unsigned n, const double *a, double *grad, void *data){
-	int N = n/sqrt(n);
 	double sum = 0.0;
 	for (int i = 0; i < n; ++i) {
 		sum += a[i];
 	}
-	double average_pctmetal = sum/pow(N,2);
+	double average_pctmetal = sum/n;
 	std::cout<<"constraint ="<<average_pctmetal - 0.4<<std::endl;
  
     	return average_pctmetal - 0.4;
