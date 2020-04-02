@@ -388,7 +388,7 @@ double objective_function2(vec T, int N){
 	return cost;
 }
 
-// Kostfunctie = w^T * u / #elementen
+// Kostfunctie = w^T * u
 // Deze kostfunctie is het gewogen gemiddelde van alle temperatuur-punten.
 // w is het gewicht van elk temperatuur-punt. De som van alle gewichten is 1. Een middenpunt heeft gewicht 1/N² = h_x * h_y. Een randpunt heeft hiervan de helft (vakje is half zo klein).
 // Een hoekpunt heeft gewicht h_x * h_y / 4 (vakje is een kwart van een middelste vakje).
@@ -474,7 +474,7 @@ vec dcda(vec lambda, vec T, const double *a, int N){
 			dcdk(i + j*N) = dot(lambda, dKdk_u);
 			//Vermenigvuldiging met dk/da om tot dc/da te komen
 			//dcda(i,j) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*N);
-			dcda(i + j*(N)) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*(N));
+			dcda(i + j*N) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*N);
 		}
 	}
 	
