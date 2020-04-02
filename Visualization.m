@@ -24,7 +24,7 @@ for i = 1:N
     for j = 1:N
          gradient_mat(i,j) = gradient((i-1)*N+j);
          temperature_mat(i,j) = temperature((i-1)*N+j);
-         metal_mat(i,j) = metal((i-1)*N+j);
+         metal_mat(i,j) = metal(i + N*(j-1));
     end
 end
 
