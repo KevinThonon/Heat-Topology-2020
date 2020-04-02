@@ -118,13 +118,14 @@ nlopt_set_min_objective(opt, myfunc, NULL);
 nlopt_add_inequality_constraint(opt, myconstraint, NULL, 1e-8);
 
 // stopping criteria
-nlopt_set_xtol_rel(opt, 1e-4);
+//nlopt_set_xtol_rel(opt, 1e-4);
+nlopt_set_maxeval(opt, 3);
 
 // Initial guess
 
 double a[N*N];  // some initial guess: average percentage of metal in one element is 0.4
 for (int i = 0; i < N*N; ++i) {
-	a[i] = 0.2; 
+	a[i] = 0.3; 
 }
 
 // value of the objective function during the iterations.
