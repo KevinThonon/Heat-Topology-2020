@@ -81,7 +81,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 
 int main() {
 
-int N = 100;
+int N = 70;
 
 // MMA - method
 
@@ -122,11 +122,10 @@ nlopt_set_min_objective(opt, myfunc, NULL);
 // myconstraint (the sum(a(i,j)/N^2) <= 0.4 constraint), 
 // NULL (no data is given) and tolerance (1*10^-8)
 
-nlopt_add_inequality_constraint(opt, myconstraint, NULL, 1e-8);
+nlopt_add_inequality_constraint(opt, myconstraint, NULL, 1e-14);
 
 // stopping criteria
-//nlopt_set_xtol_rel(opt, 1e-4);
-nlopt_set_maxeval(opt, 100);
+nlopt_set_xtol_rel(opt, 1e-8);
 
 // Initial guess
 

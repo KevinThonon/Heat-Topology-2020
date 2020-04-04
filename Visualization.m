@@ -1,4 +1,4 @@
-N = 100;
+N = 70;
 
 gradient = 'gradient.txt';
 fileID = fopen(gradient,'r');
@@ -23,6 +23,7 @@ dp = N;
 for i = 1:dp
     gradient_mat(:,i)=gradient(i*dp-dp+1:i*dp);
     metal_mat(:,i)=metal(i*dp-dp+1:i*dp);
+    
 end
 
 temperature_mat = zeros(N+1,N+1);
