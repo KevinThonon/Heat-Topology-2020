@@ -22,7 +22,7 @@ namespace top {
 
 // variabelen definiëren
 
-double penal = 3.0;
+double penal = 10.0;
 
 // Dichtheid k in elk element met SIMP methode. Input: percentage metaal in elk element. Output: Dichtheid k in elk element
 mat create_k(const double *a, int N) {

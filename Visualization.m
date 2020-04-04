@@ -1,4 +1,4 @@
-N = 10;
+N = 70;
 
 gradient = 'gradient.txt';
 fileID = fopen(gradient,'r');
@@ -17,15 +17,20 @@ temperature = fscanf(fileID,formatSpec);
 
 
 gradient_mat = zeros(N,N);
-temperature_mat = zeros(N,N);
 metal_mat = zeros(N,N);
 
-for i = 1:N
-    for j = 1:N
-         gradient_mat(i,j) = gradient((i-1)*N+j);
-         temperature_mat(i,j) = temperature((i-1)*N+j);
-         metal_mat(i,j) = metal(i + N*(j-1));
-    end
+dp = N;
+for i = 1:dp
+    gradient_mat(:,i)=gradient(i*dp-dp+1:i*dp);
+    metal_mat(:,i)=metal(i*dp-dp+1:i*dp);
+    
+end
+
+temperature_mat = zeros(N+1,N+1);
+
+dp = N+1;
+for i = 1:dp
+    temperature_mat(:,i)=temperature(i*dp-dp+1:i*dp);
 end
 
 
@@ -33,7 +38,7 @@ end
 
 %surf(temperature_mat,'FaceColor','interp')
 
-surf(metal_mat,'FaceColor','interp')
+surf(metal_mat)
 
 
 

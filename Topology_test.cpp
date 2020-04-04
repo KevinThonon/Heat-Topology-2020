@@ -25,7 +25,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 
 	ofstream myfile;
         myfile.open ("temperature.txt");
-        for (int i = 0; i < n; ++i) {
+        for (int i = 0; i < (N+1)*(N+1); ++i) {
     		myfile <<u(i)<<std::endl;
     	}
     	myfile.close();
@@ -47,6 +47,13 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
     		myfile1 <<dcda(i)<<std::endl;
     	}
     	myfile1.close();
+
+	ofstream myfile4;
+    	myfile4.open ("metal.txt");
+    	for (int i = 0; i < n; ++i) {
+    		myfile4 <<a[i]<<std::endl;
+   	 }
+   	myfile4.close();
 
 	if (grad) {
 	for (int i = 0; i < n; ++i) {
@@ -74,7 +81,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 
 int main() {
 
-int N = 10;
+int N = 70;
 
 // MMA - method
 
@@ -115,17 +122,16 @@ nlopt_set_min_objective(opt, myfunc, NULL);
 // myconstraint (the sum(a(i,j)/N^2) <= 0.4 constraint), 
 // NULL (no data is given) and tolerance (1*10^-8)
 
-nlopt_add_inequality_constraint(opt, myconstraint, NULL, 1e-8);
+nlopt_add_inequality_constraint(opt, myconstraint, NULL, 1e-14);
 
 // stopping criteria
-//nlopt_set_xtol_rel(opt, 1e-4);
-nlopt_set_maxeval(opt, 3);
+nlopt_set_xtol_rel(opt, 1e-8);
 
 // Initial guess
 
 double a[N*N];  // some initial guess: average percentage of metal in one element is 0.4
 for (int i = 0; i < N*N; ++i) {
-	a[i] = 0.3; 
+	a[i] = 0.1; 
 }
 
 // value of the objective function during the iterations.
