@@ -3,8 +3,7 @@ function [solution, LL, RL] = fvm_func(kmat, N, q)
     h = 0.01/N;
     dp = N+1;
 
-    %bigk = bigKmat(kmat);
-    
+        
     [LL,RL] = FVM_mat(q,h,dp,kmat);
     solution = LL\RL;
     
