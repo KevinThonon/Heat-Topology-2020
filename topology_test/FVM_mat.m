@@ -120,7 +120,7 @@ for j = 2:1:N
     end
 end
 
-
+ll = sparse(ll);
 
 
 % %col1 hardcoden in LL
