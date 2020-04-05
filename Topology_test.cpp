@@ -95,7 +95,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 		sum += a[i];
 	}
 	double average_pctmetal = sum/n;
-	std::cout<<"constraint ="<<average_pctmetal - 0.4<<std::endl;
+	std::cout<<"average pct of metal = "<<average_pctmetal<<" (absolute error = "<<average_pctmetal-0.4<<")"<<std::endl;
  
     	return average_pctmetal - 0.4;
 }
@@ -166,12 +166,7 @@ if (nlopt_optimize(opt, a, &minf) < 0) {
     printf("nlopt failed!\n");
 }
 else {
-    ofstream myfile;
-    myfile.open ("metal.txt");
-    for (int i = 0; i < N*N; ++i) {
-    	myfile <<a[i]<<std::endl;
-    }
-    myfile.close();
+    std::cout<<"optimization stopped because of the stopping criteria"<<std::endl;
     return 0;
 }
 

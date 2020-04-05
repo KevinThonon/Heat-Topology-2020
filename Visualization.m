@@ -41,9 +41,9 @@ for iterations = 1:87
     
    
 
-    %surface(metal_mat)
+    surface(metal_mat)
     %surface(temperature_mat)
-    surface(gradient_mat)
+    %surface(gradient_mat)
     
     pause(1)
     
