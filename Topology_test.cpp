@@ -30,9 +30,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
   	string t = "temperature_";
   	t += to_string(*(int *)data);
   	t += ".txt";
+	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/temperature/";
+	path_temperature += t;
 
 	ofstream temperature_file;
-        temperature_file.open (t);
+        temperature_file.open(path_temperature);
         for (int i = 0; i < (N+1)*(N+1); ++i) {
     		temperature_file <<u(i)<<std::endl;
     	}
@@ -52,9 +54,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
   	string g = "gradient_";
   	g += to_string(*(int *)data);
   	g += ".txt";
+	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/gradient/";
+	path_gradient += g;
 
 	ofstream gradient_file;
-        gradient_file.open (g);
+        gradient_file.open(path_gradient);
         for (int i = 0; i < n; ++i) {
     		gradient_file <<dcda(i)<<std::endl;
     	}
@@ -63,9 +67,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
   	string m = "metal_";
   	m += to_string(*(int *)data);
   	m += ".txt";
+	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/metal/";
+	path_metal += m;
 
 	ofstream metal_file;
-        metal_file.open (m);
+        metal_file.open(path_metal);
         for (int i = 0; i < n; ++i) {
     		metal_file <<a[i]<<std::endl;
     	}
@@ -99,7 +105,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 
 int main() {
 
-int N = 150;
+int N = 50;
 int iterations = 0;
 
 // MMA - method

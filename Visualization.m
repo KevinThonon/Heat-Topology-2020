@@ -1,6 +1,6 @@
-N = 150;
+N = 50;
 
-for iterations = 1:50
+for iterations = 1:87
     
     iter = int2str(iterations);
 
@@ -39,9 +39,11 @@ for iterations = 1:50
         temperature_mat(:,i)=temperature(i*dp-dp+1:i*dp);
     end
     
-    
-    surface(metal_mat)
-    
+   
+
+    %surface(metal_mat)
+    %surface(temperature_mat)
+    surface(gradient_mat)
     
     pause(1)
     
