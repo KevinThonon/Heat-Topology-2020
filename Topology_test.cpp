@@ -41,7 +41,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	vec dcda = top::dcda(lambda, u, a, N);
+	vec dcda = top::dcda_harm(lambda, u, a, k, N);
 
 	ofstream myfile1;
         myfile1.open ("gradient.txt");
