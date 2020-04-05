@@ -16,6 +16,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 
 	std::cout<<"iteration = "<<*(int *)data<<std::endl;
 	*(int *)data += 1;
+	
 
 	int N = sqrt(n);
 
@@ -25,12 +26,19 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 
 	vec u = spsolve(ll,rl,"lapack");
 
-	ofstream myfile;
-        myfile.open ("temperature.txt");
+  
+  	string t = "temperature_";
+  	t += to_string(*(int *)data);
+  	t += ".txt";
+	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/temperature/";
+	path_temperature += t;
+
+	ofstream temperature_file;
+        temperature_file.open(path_temperature);
         for (int i = 0; i < (N+1)*(N+1); ++i) {
-    		myfile <<u(i)<<std::endl;
+    		temperature_file <<u(i)<<std::endl;
     	}
-    	myfile.close();
+    	temperature_file.close();
 
 	double cost = top::objective_function1(u, N);
 	vec lambda = top::lambda1(u, ll, N);
@@ -43,19 +51,32 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 
 	vec dcda = top::dcda_harm(lambda, u, a, k, N);
 
-	ofstream myfile1;
-        myfile1.open ("gradient.txt");
-        for (int i = 0; i < n; ++i) {
-    		myfile1 <<dcda(i)<<std::endl;
-    	}
-    	myfile1.close();
+  	string g = "gradient_";
+  	g += to_string(*(int *)data);
+  	g += ".txt";
+	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/gradient/";
+	path_gradient += g;
 
-	ofstream myfile4;
-    	myfile4.open ("metal.txt");
-    	for (int i = 0; i < n; ++i) {
-    		myfile4 <<a[i]<<std::endl;
-   	 }
-   	myfile4.close();
+	ofstream gradient_file;
+        gradient_file.open(path_gradient);
+        for (int i = 0; i < n; ++i) {
+    		gradient_file <<dcda(i)<<std::endl;
+    	}
+    	gradient_file.close();
+
+  	string m = "metal_";
+  	m += to_string(*(int *)data);
+  	m += ".txt";
+	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/metal/";
+	path_metal += m;
+
+	ofstream metal_file;
+        metal_file.open(path_metal);
+        for (int i = 0; i < n; ++i) {
+    		metal_file <<a[i]<<std::endl;
+    	}
+    	metal_file.close();
+
 
 	if (grad) {
 	for (int i = 0; i < n; ++i) {
@@ -74,7 +95,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 		sum += a[i];
 	}
 	double average_pctmetal = sum/n;
-	std::cout<<"constraint ="<<average_pctmetal - 0.4<<std::endl;
+	std::cout<<"average pct of metal = "<<average_pctmetal<<" (absolute error = "<<average_pctmetal-0.4<<")"<<std::endl;
  
     	return average_pctmetal - 0.4;
 }
@@ -84,13 +105,8 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 
 int main() {
 
-int N = 70;
+int N = 50;
 int iterations = 0;
-
-string base(".txt");
-for(int i=1;i<=5;++i){
-      ofstream(to_string(i)+base);
-}
 
 // MMA - method
 
@@ -140,7 +156,7 @@ nlopt_set_xtol_rel(opt, 1e-8);
 
 double a[N*N];  // some initial guess: average percentage of metal in one element is 0.4
 for (int i = 0; i < N*N; ++i) {
-	a[i] = 0.1; 
+	a[i] = 0.01; 
 }
 
 // value of the objective function during the iterations.
@@ -150,12 +166,7 @@ if (nlopt_optimize(opt, a, &minf) < 0) {
     printf("nlopt failed!\n");
 }
 else {
-    ofstream myfile;
-    myfile.open ("metal.txt");
-    for (int i = 0; i < N*N; ++i) {
-    	myfile <<a[i]<<std::endl;
-    }
-    myfile.close();
+    std::cout<<"optimization stopped because of the stopping criteria"<<std::endl;
     return 0;
 }
 
