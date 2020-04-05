@@ -2,7 +2,7 @@ clear all
 close all
 
 % gegevens
-N = 100;
+N = 10;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 
@@ -14,7 +14,7 @@ pctmetal = 0.4*ones(N,N);
 loop = 0;
 change = 1.;
 while change > 0.01
-    loop = loop +1;
+    loop = loop +1
     pctmetal_old = pctmetal;
 
 

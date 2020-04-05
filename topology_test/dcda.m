@@ -16,6 +16,7 @@ for i = 1:1:N
         dcdk(i+(j-1)*N) = transpose(lambda)*dKdk_u;
         dcdam(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + (j-1)*N);
         
+        
     end
 end
 

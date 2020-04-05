@@ -16,12 +16,10 @@ col1(dp,1) = qhp;
 counter2 = 0;
 %DirichletRVW in RL
 for i=1:dp
-    h*(i-1);
     if(h*(i-1)>=0.003)&&(h*(i-1)<=0.007)
         col1(i) = 293;
         counter2 = counter2+1;
     end
-    
 end
 
 col2 = qq*ones(dp,1);
@@ -34,7 +32,8 @@ RL((dp*(dp-1)+1):end,1)=col1;
 
 
 
-ll = zeros(dp^2,dp^2);
+%ll = zeros(dp^2,dp^2);
+ll = sparse(dp^2,dp^2);
 N = dp-1;
 
 %dirichlet
@@ -45,34 +44,34 @@ end
 
 %hoekpunten
 %linksboven
-ll(1,1) = -0.5*(k(1,1)+k(1,1));
+ll(1,1) = -mean(k(1,1), k(1,1));
 ll(1,2) = 0.5*k(1,1);
 ll(1,dp+1) = 0.5*k(1,1);
 %linksonder
-ll(dp,dp) = -0.5*(k(N,1)+k(N,1));
+ll(dp,dp) = -mean(k(N,1), k(N,1));
 ll(dp,dp-1) = 0.5*k(N,1);
 ll(dp,2*dp) = 0.5*k(N,1);
 %rechtsboven
-ll((dp-1)*dp+1,(dp-1)*dp+1) = -0.5*(k(1,N)+k(1,N));
+ll((dp-1)*dp+1,(dp-1)*dp+1) = -mean(k(1,N), k(1,N));
 ll((dp-1)*dp+1,(dp-1)*dp+2) = 0.5*k(1,N);
 ll((dp-1)*dp+1,dp*(dp-2)+1) = 0.5*k(1,N);
 %rechtsonder
-ll(dp^2,dp^2) = -0.5*(k(N,N)+k(N,N));
+ll(dp^2,dp^2) = -mean(k(N,N), k(N,N));
 ll(dp^2,(dp-1)*dp) = 0.5*k(N-1,N-1);
 ll(dp^2,dp^2-1) = 0.5*k(N-1,N-1);
 
 %Neumann links&rechts
 i = 1;
 while i<0.3*N
-    ll(i+1,i+1) = -0.5*k(i,1) -0.5*k(i+1,1) - ((k(i,1) + k(i+1,1))/2.0);
+    ll(i+1,i+1) = -0.5*k(i,1) -0.5*k(i+1,1) - mean(k(i,1),k(i+1,1));
     ll(i+1,i) = 0.5*k(i,1);
     ll(i+1,i+1+1) = 0.5*k(i+1,1);
-    ll(i+1,i+N+1+1) = (k(i,1) + k(i+1,1))/2.0;
+    ll(i+1,i+N+1+1) = mean(k(i,1), k(i+1,1));
 
-    ll(N-i+1,N-i+1) = -0.5*k(N-i+1,1) -0.5*k(N-i,1) - ((k(N-i+1,1) + k(N-i,1))/2.0);
+    ll(N-i+1,N-i+1) = -0.5*k(N-i+1,1) -0.5*k(N-i,1) - mean(k(N-i+1,1), k(N-i,1));
     ll(N-i+1,N-i-1+1) = 0.5*k(N-i,1);
     ll(N-i+1,N-i+1+1) = 0.5*k(N-i+1,1);
-    ll(N-i+1,N-i+N+1+1) = (k(N-i+1,1) + k(N-i,1))/2.0;
+    ll(N-i+1,N-i+N+1+1) = mean(k(N-i+1,1), k(N-i,1));
     
     i = i+1;
 end
@@ -80,15 +79,15 @@ end
 
 i = 1;
 while i<0.3*N
-    ll(N*(N+1)+i+1,N*(N+1)+i+1) = -0.5*k(i-1+1,N-1+1) -0.5*k(i+1,N-1+1) - ((k(i-1+1,N-1+1) + k(i+1,N-1+1))/2.0);
+    ll(N*(N+1)+i+1,N*(N+1)+i+1) = -0.5*k(i-1+1,N-1+1) -0.5*k(i+1,N-1+1) - mean(k(i-1+1,N-1+1), k(i+1,N-1+1));
     ll(N*(N+1)+i+1,N*(N+1)+i-1+1) = 0.5*k(i-1+1,N-1+1);
     ll(N*(N+1)+i+1,N*(N+1)+i+1+1) = 0.5*k(i+1,N-1+1);
-    ll(N*(N+1)+i+1,N*(N+1)+i-(N+1)+1) = (k(i-1+1,N-1+1) + k(i+1,N-1+1))/2.0;
+    ll(N*(N+1)+i+1,N*(N+1)+i-(N+1)+1) = mean(k(i-1+1,N-1+1), k(i+1,N-1+1));
 
-    ll(N*(N+2)-i+1,N*(N+2)-i+1) = -0.5*k(N-i+1,N-1+1) -0.5*k(N-1-i+1,N-1+1) - ((k(N-i+1,N-1+1) + k(N-1-i+1,N-1+1))/2.0);
+    ll(N*(N+2)-i+1,N*(N+2)-i+1) = -0.5*k(N-i+1,N-1+1) -0.5*k(N-1-i+1,N-1+1) - mean(k(N-i+1,N-1+1), k(N-1-i+1,N-1+1));
     ll(N*(N+2)-i+1,N*(N+2)-i-1+1) = 0.5*k(N-1-i+1,N-1+1);
     ll(N*(N+2)-i+1,N*(N+2)-i+1+1) = 0.5*k(N-i+1,N-1+1);
-    ll(N*(N+2)-i+1,N*(N+2)-i-(N+1)+1) = (k(N-i+1,N-1+1) + k(N-1-i+1,N-1+1))/2.0;
+    ll(N*(N+2)-i+1,N*(N+2)-i-(N+1)+1) = mean(k(N-i+1,N-1+1), k(N-1-i+1,N-1+1));
 
     i = i+1;
 end
@@ -97,13 +96,13 @@ end
 %while i<(N+1)
 for i = 2:1:N
    
-    ll((i-1)*(N+1)+1,(i-1)*(N+1)+1) = -0.5*k(1,i-1) -0.5*k(1,i) - ((k(1,i-1) + k(1,i))/2.0);
-    ll((i-1)*(N+1)+1,(i-1)*(N+1)+1+1) = (k(1,i-1) + k(1,i))/2.0;
+    ll((i-1)*(N+1)+1,(i-1)*(N+1)+1) = -0.5*k(1,i-1) -0.5*k(1,i) - mean(k(1,i-1), k(1,i));
+    ll((i-1)*(N+1)+1,(i-1)*(N+1)+1+1) = mean(k(1,i-1), k(1,i));
     ll((i-1)*(N+1)+1,(i-2)*(N+1)+1) = 0.5*k(1,i-1);
     ll((i-1)*(N+1)+1,(i)*(N+1)+1) = 0.5*k(1,i);
 
-    ll(i*(N+1),i*(N+1)) = -0.5*k(N,i-1) -0.5*k(N,i) - ((k(N,i-1) + k(N,i))/2.0);
-    ll(i*(N+1),i*(N+1)-1) = (k(N,i-1) + k(N,i))/2.0;
+    ll(i*(N+1),i*(N+1)) = -0.5*k(N,i-1) -0.5*k(N,i) - mean(k(N,i-1), k(N,i));
+    ll(i*(N+1),i*(N+1)-1) = mean(k(N,i-1), k(N,i));
     ll(i*(N+1),(i-1)*(N+1)) = 0.5*k(N,i-1);
     ll(i*(N+1),(i+1)*(N+1)) = 0.5*k(N,i);
     
@@ -112,11 +111,11 @@ end
 for j = 2:1:N
     for i = 2:1:N
         
-        ll((j-1)*(N+1)+i,(j-1)*(N+1)+i) = -((k(i-1,j-1)+k(i-1,j))/2.0 + (k(i,j-1)+k(i,j))/2.0 + (k(i-1,j-1)+k(i,j-1))/2.0 + (k(i-1,j)+k(i,j))/2.0);
-        ll((j-1)*(N+1)+i,(j-1)*(N+1)+i-1) = (k(i-1,j-1)+k(i-1,j))/2.0;
-        ll((j-1)*(N+1)+i,(j-1)*(N+1)+i+1) = (k(i,j-1)+k(i,j))/2.0;
-        ll((j-1)*(N+1)+i,(j-2)*(N+1)+i) = (k(i-1,j-1)+k(i,j-1))/2.0;
-        ll((j-1)*(N+1)+i,j*(N+1)+i) = (k(i-1,j)+k(i,j))/2.0;
+        ll((j-1)*(N+1)+i,(j-1)*(N+1)+i) = -(mean(k(i-1,j-1), k(i-1,j)) + mean(k(i,j-1), k(i,j)) + mean(k(i-1,j-1), k(i,j-1)) + mean(k(i-1,j), k(i,j)));
+        ll((j-1)*(N+1)+i,(j-1)*(N+1)+i-1) = mean(k(i-1,j-1), k(i-1,j));
+        ll((j-1)*(N+1)+i,(j-1)*(N+1)+i+1) = mean(k(i,j-1),k(i,j));
+        ll((j-1)*(N+1)+i,(j-2)*(N+1)+i) = mean(k(i-1,j-1),k(i,j-1));
+        ll((j-1)*(N+1)+i,j*(N+1)+i) = mean(k(i-1,j),k(i,j));
     end
 end
 
@@ -203,6 +202,13 @@ end
 % normZ = norm(Z)
 % 
 % ll=LL;
+
+end
+
+
+function k = mean(a, b)
+%k = (a+b)/2;           % arithmetic mean
+k = 2.0*(a*b)/(a+b);    % harmonic mean
 
 end
 
