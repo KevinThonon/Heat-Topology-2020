@@ -288,10 +288,9 @@ mat K_mat(mat k, int N){
 } */
 
 // Matrix K aanmaken zonder bigkmat met arithmetic/harmonic mean voor de k-waarden
-mat K_mat(mat k, int N){
+sp_mat K_mat(mat k, int N){
 	//Aanmaken matrix en vullen met nullen
-	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
-	ll.fill(0.0);
+	sp_mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	//Dirichlett boundary conditions
 	for (int i = 0.3*N; i < 0.7*N + 1; i++){
 		ll(i,i) = 1.0;
@@ -411,21 +410,21 @@ double objective_function3(vec T, int N){
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = -2*u / #elementen
-vec lambda1(vec T, mat K, int N){
-	vec lambda = solve(K.t(), (-2.0/(N*N))*T); //Veranderd van 2.0 naar -2.0
+vec lambda1(vec T, sp_mat K, int N){
+	vec lambda = spsolve(K.t(), (-2.0/(N*N))*T, "lapack"); //Veranderd van 2.0 naar -2.0
 	return lambda;
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = - eenheidsvector / #elementen
-vec lambda2(mat K, int N){
+vec lambda2(sp_mat K, int N){
 	vec w(pow((N+1),2));
 	w.fill(-1.0);
-	vec lambda = solve(K.t(), w);
+	vec lambda = spsolve(K.t(), w, "lapack");
 	return lambda;
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = -w
-vec lambda3(mat K, int N){
+vec lambda3(sp_mat K, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
 	w.fill(A);
@@ -439,7 +438,7 @@ vec lambda3(mat K, int N){
 		w(i*(N+1)) = A/2.0;
 		w(i*(N+1)+N) = A/2.0;
 	}
-	vec lambda = solve(K.t(), -1.0*w);
+	vec lambda = spsolve(K.t(), -1.0*w,"lapack");
 	return lambda;
 }
 

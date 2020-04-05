@@ -4,6 +4,7 @@
 #include <armadillo>
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <algorithm>
 #include <math.h>
 #include <nlopt.h>
@@ -13,15 +14,16 @@ using namespace arma;
 
 double myfunc(unsigned n, const double *a, double *grad, void *data){
 
-	std::cout<<"runs"<<std::endl;
+	std::cout<<"iteration = "<<*(int *)data<<std::endl;
+	*(int *)data += 1;
 
 	int N = sqrt(n);
 
 	mat k = top::create_k(a, N);
 	vec rl = top::RL(N);
-	mat ll = top::K_mat(k, N);
+	sp_mat ll = top::K_mat(k, N);
 
-	vec u = solve(ll,rl);
+	vec u = spsolve(ll,rl,"lapack");
 
 	ofstream myfile;
         myfile.open ("temperature.txt");
@@ -60,6 +62,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
         	grad[i] = dcda(i);
 	}
     }
+
     return cost;
 }
 
@@ -82,6 +85,12 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 int main() {
 
 int N = 70;
+int iterations = 0;
+
+string base(".txt");
+for(int i=1;i<=5;++i){
+      ofstream(to_string(i)+base);
+}
 
 // MMA - method
 
@@ -116,7 +125,7 @@ nlopt_set_upper_bounds(opt, ub);
 // a reference to pctmetal is given as data so that 
 // not every time in myfunc a new matrix pctmetal is made
 
-nlopt_set_min_objective(opt, myfunc, NULL);
+nlopt_set_min_objective(opt, myfunc, &iterations);
 
 // Add the inequality constraint to the problem with the parameters: opt (object), 
 // myconstraint (the sum(a(i,j)/N^2) <= 0.4 constraint), 

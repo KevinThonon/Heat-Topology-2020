@@ -1,5 +1,7 @@
 N = 70;
 
+for iterations = 1:100
+
 gradient = 'gradient.txt';
 fileID = fopen(gradient,'r');
 formatSpec = '%f';
@@ -34,11 +36,18 @@ for i = 1:dp
 end
 
 
-%surf(gradient_mat,'FaceColor','interp')
+surface(gradient_mat)
 
-%surf(temperature_mat,'FaceColor','interp')
+hold on
+surface(temperature_mat)
+hold on
 
-surf(metal_mat)
+surface(metal_mat)
+
+pause(1)
+
+end
+
 
 
 
