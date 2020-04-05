@@ -506,8 +506,6 @@ vec dcda_harm(vec lambda, vec T, const double *a, mat k, int N){
 			dKdk_u(i + (j+1)*(N+1)) = (-2.0*(pow(k(i-1,j),2)/pow((k(i-1,j) + k(i,j)),2) + pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2)))*T(i + (j+1)*(N+1)) + (2.0*(pow(k(i-1,j),2)/pow((k(i-1,j) + k(i,j)),2)))*T(i + j*(N+1)) + (2.0*pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2))*T(i+1 + (j+1)*(N+1));
 			dKdk_u(i+1 + (j+1)*(N+1)) = (-2.0*(pow(k(i+1,j),2)/pow((k(i+1,j) + k(i,j)),2) + pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2)))*T(i+1 + (j+1)*(N+1)) + (2.0*(pow(k(i+1,j),2)/pow((k(i+1,j) + k(i,j)),2)))*T(i+1 + j*(N+1)) + (2.0*(pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2)))*T(i + (j+1)*(N+1));
 			//Vermenigvuldiging met lambda^T om tot dc/dk te komen
-			//std::cout<<lambda.size()<<std::endl;
-			//std::cout<<dKdk_u.size()<<std::endl;
 			dcdk(i + j*N) = dot(lambda, dKdk_u);
 			//Vermenigvuldiging met dk/da om tot dc/da te komen
 			//dcda(i,j) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*N);
@@ -520,17 +518,15 @@ vec dcda_harm(vec lambda, vec T, const double *a, mat k, int N){
 		//maar zal dK/dk_0,j * u direct aangemaakt worden. 
 		vec dKdk_u((N+1)*(N+1));
 		dKdk_u.fill(0.0);
-		dKdk_u(0 + j*(N+1)) = (-2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2)) - 1.0)*T(0 + j*(N+1)) + (2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2)))*T(0+1 + j*(N+1)) + 1.0*T(0 + (j+1)*(N+1));
-		dKdk_u(0+1 + j*(N+1)) = (-2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2) + pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2)))*T(0+1 + j*(N+1)) + (2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2)))*T(0 + j*(N+1)) + (2.0*pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2))*T(0+1 + (j+1)*(N+1));
-		dKdk_u(0 + (j+1)*(N+1)) = (-1.0 - 2.0*(pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2)))*T(0 + (j+1)*(N+1)) + 1.0*T(0 + j*(N+1)) + (2.0*pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2))*T(0+1 + (j+1)*(N+1));
-		dKdk_u(0+1 + (j+1)*(N+1)) = (-2.0*(pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2) + pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2)))*T(0+1 + (j+1)*(N+1)) + (2.0*(pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2)))*T(0+1 + j*(N+1)) + (2.0*(pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2)))*T(0 + (j+1)*(N+1));
+		dKdk_u(j*(N+1)) = (-2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2)) - 1.0)*T(j*(N+1)) + (2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2)))*T(1 + j*(N+1)) + 1.0*T((j+1)*(N+1));
+		dKdk_u(1 + j*(N+1)) = (-2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2) + pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2)))*T(1 + j*(N+1)) + (2.0*(pow(k(0,j-1),2)/pow((k(0,j-1) + k(0,j)),2)))*T(j*(N+1)) + (2.0*pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2))*T(1 + (j+1)*(N+1));
+		dKdk_u((j+1)*(N+1)) = (-1.0 - 2.0*(pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2)))*T((j+1)*(N+1)) + 1.0*T(j*(N+1)) + (2.0*pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2))*T(1 + (j+1)*(N+1));
+		dKdk_u(1 + (j+1)*(N+1)) = (-2.0*(pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2) + pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2)))*T(1 + (j+1)*(N+1)) + (2.0*(pow(k(0+1,j),2)/pow((k(0+1,j) + k(0,j)),2)))*T(1 + j*(N+1)) + (2.0*(pow(k(0,j+1),2)/pow((k(0,j+1) + k(0,j)),2)))*T((j+1)*(N+1));
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
-		//std::cout<<lambda.size()<<std::endl;
-		//std::cout<<dKdk_u.size()<<std::endl;
-		dcdk(0 + j*N) = dot(lambda, dKdk_u);
+		dcdk(j*N) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
-		//dcda(0,j) = penal*(65.0-0.2)*pow(a[0 + N*j],penal-1)*dcdk(0 + j*N);
-		dcda(0 + j*N) = penal*(65.0-0.2)*pow(a[0 + N*j],penal-1)*dcdk(0 + j*N);
+		//dcda(0,j) = penal*(65.0-0.2)*pow(a[N*j],penal-1)*dcdk(j*N);
+		dcda(j*N) = penal*(65.0-0.2)*pow(a[N*j],penal-1)*dcdk(j*N);
 	}
 	
 	for (int i = 1; i < N-1; i++){
@@ -538,17 +534,15 @@ vec dcda_harm(vec lambda, vec T, const double *a, mat k, int N){
 		//maar zal dK/dk_i,0 * u direct aangemaakt worden. 
 		vec dKdk_u((N+1)*(N+1));
 		dKdk_u.fill(0.0);
-		dKdk_u(i + 0*(N+1)) = (-1.0 - 2.0*(pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2)))*T(i + 0*(N+1)) + 1.0*T(i+1 + 0*(N+1)) + (2.0*pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2))*T(i + (0+1)*(N+1));
-		dKdk_u(i+1 + 0*(N+1)) = (-1.0 - 2.0*(pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2)))*T(i+1 + 0*(N+1)) + 1.0*T(i + 0*(N+1)) + (2.0*pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2))*T(i+1 + (0+1)*(N+1));
-		dKdk_u(i + (0+1)*(N+1)) = (-2.0*(pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2) + pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2)))*T(i + (0+1)*(N+1)) + (2.0*(pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2)))*T(i + 0*(N+1)) + (2.0*pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2))*T(i+1 + (0+1)*(N+1));
-		dKdk_u(i+1 + (0+1)*(N+1)) = (-2.0*(pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2) + pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2)))*T(i+1 + (0+1)*(N+1)) + (2.0*(pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2)))*T(i+1 + 0*(N+1)) + (2.0*(pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2)))*T(i + (0+1)*(N+1));
+		dKdk_u(i) = (-1.0 - 2.0*(pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2)))*T(i) + 1.0*T(i+1) + (2.0*pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2))*T(i + (N+1));
+		dKdk_u(i+1) = (-1.0 - 2.0*(pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2)))*T(i+1) + 1.0*T(i) + (2.0*pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2))*T(i+1 + (N+1));
+		dKdk_u(i + (N+1)) = (-2.0*(pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2) + pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2)))*T(i + (N+1)) + (2.0*(pow(k(i-1,0),2)/pow((k(i-1,0) + k(i,0)),2)))*T(i) + (2.0*pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2))*T(i+1 + (N+1));
+		dKdk_u(i+1 + (N+1)) = (-2.0*(pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2) + pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2)))*T(i+1 + (N+1)) + (2.0*(pow(k(i+1,0),2)/pow((k(i+1,0) + k(i,0)),2)))*T(i+1) + (2.0*(pow(k(i,0+1),2)/pow((k(i,0+1) + k(i,0)),2)))*T(i + (N+1));
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
-		//std::cout<<lambda.size()<<std::endl;
-		//std::cout<<dKdk_u.size()<<std::endl;
-		dcdk(i + 0*N) = dot(lambda, dKdk_u);
+		dcdk(i) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
-		//dcda(i,0) = penal*(65.0-0.2)*pow(a[i + N*0],penal-1)*dcdk(i + 0*N);
-		dcda(i + 0*N) = penal*(65.0-0.2)*pow(a[i + N*0],penal-1)*dcdk(i + 0*N);
+		//dcda(i,0) = penal*(65.0-0.2)*pow(a[i],penal-1)*dcdk(i);
+		dcda(i) = penal*(65.0-0.2)*pow(a[i],penal-1)*dcdk(i);
 	}
 	
 	for (int j = 1; j < N-1; j++){
@@ -561,8 +555,6 @@ vec dcda_harm(vec lambda, vec T, const double *a, mat k, int N){
 		dKdk_u(N-1 + (j+1)*(N+1)) = (-2.0*(pow(k(N-2,j),2)/pow((k(N-2,j) + k(N-1,j)),2) + pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N-1,j)),2)))*T(N-1 + (j+1)*(N+1)) + (2.0*(pow(k(N-2,j),2)/pow((k(N-2,j) + k(N-1,j)),2)))*T(N-1 + j*(N+1)) + (2.0*pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N-1,j)),2))*T(N + (j+1)*(N+1));
 		dKdk_u(N + (j+1)*(N+1)) = (-1.0 - 2.0*(pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N-1,j)),2)))*T(N + (j+1)*(N+1)) + 1.0*T(N + j*(N+1)) + (2.0*(pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N-1,j)),2)))*T(N-1 + (j+1)*(N+1));
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
-		//std::cout<<lambda.size()<<std::endl;
-		//std::cout<<dKdk_u.size()<<std::endl;
 		dcdk(N-1 + j*N) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
 		//dcda(N-1,j) = penal*(65.0-0.2)*pow(a[N-1 + N*j],penal-1)*dcdk(N-1 + j*N);
@@ -579,8 +571,6 @@ vec dcda_harm(vec lambda, vec T, const double *a, mat k, int N){
 		dKdk_u(i + (N)*(N+1)) = (-2.0*(pow(k(i-1,N-1),2)/pow((k(i-1,N-1) + k(i,N-1)),2)) - 1.0)*T(i + (N)*(N+1)) + (2.0*(pow(k(i-1,N-1),2)/pow((k(i-1,N-1) + k(i,N-1)),2)))*T(i + (N-1)*(N+1)) + 1.0*T(i+1 + (N)*(N+1));
 		dKdk_u(i+1 + (N)*(N+1)) = (-2.0*(pow(k(i+1,N-1),2)/pow((k(i+1,N-1) + k(i,N-1)),2)) - 1.0)*T(i+1 + (N)*(N+1)) + (2.0*(pow(k(i+1,N-1),2)/pow((k(i+1,N-1) + k(i,N-1)),2)))*T(i+1 + (N-1)*(N+1)) + 1.0*T(i + (N)*(N+1));
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
-		//std::cout<<lambda.size()<<std::endl;
-		//std::cout<<dKdk_u.size()<<std::endl;
 		dcdk(i + (N-1)*N) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
 		//dcda(i,N-1) = penal*(65.0-0.2)*pow(a[i + N*(N-1)],penal-1)*dcdk(i + (N-1)*N);
