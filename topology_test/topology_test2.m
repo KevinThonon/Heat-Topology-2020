@@ -31,6 +31,7 @@ end
 
 
 figure()
+pctmetal = meshrefine(pctmetal,4);
 surface(pctmetal,'FaceColor','interp')
 
 % times = 4;

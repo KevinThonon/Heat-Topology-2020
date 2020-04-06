@@ -15,7 +15,7 @@ using namespace arma;
 
 int main() {
 
-	int N = 50;
+	int N = 100;
 	int iterations = 0;
 
 	vec a(N*N);
@@ -24,11 +24,26 @@ int main() {
 	}
 
 	double change = 1.0; 
+	double penal = 3.0;
 
-	while (change > 0.02) {
+	while (change > 0.01) {
+
 	std::cout<<"iteration = "<<iterations<<std::endl;
 
-	mat k = top::create_k(a, N);
+	
+	if (iterations == 10){
+		penal = 4.0;
+	}
+
+	if (iterations == 20){
+		penal = 5.0;
+	}
+
+	if (iterations == 30){
+		penal = 6.0;
+	}
+ 
+	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);
 	sp_mat ll = top::K_mat(k, N);
 	vec u = spsolve(ll,rl,"lapack");
@@ -56,8 +71,8 @@ int main() {
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	//vec dcda = top::dcda(lambda, u, a, N);
-	vec dcda = top::dcda_harm(lambda, u, a, k, N);
+	//vec dcda = top::dcda(lambda, u, a, N, penal);
+	vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
 
 	double rmin = 2.0;
 	vec dcda_check = top::check(N, rmin, a, dcda);

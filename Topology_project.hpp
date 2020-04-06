@@ -22,10 +22,9 @@ namespace top {
 
 // variabelen definiëren
 
-double penal = 5.0;
 
 // Dichtheid k in elk element met SIMP methode. Input: percentage metaal in elk element. Output: Dichtheid k in elk element
-mat create_k(vec a, int N) {
+mat create_k(vec a, int N, double penal) {
 	mat k(N,N);
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < N; ++j) {
@@ -447,7 +446,7 @@ vec lambda3(sp_mat& K, int N){
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
 //mat dcda(vec& lambda, vec& T, vec& a, int N){
-vec dcda(vec lambda, vec T, vec& a, int N){
+vec dcda(vec lambda, vec T, vec& a, int N, double penal){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
 	vec dcda(N*N);
@@ -485,7 +484,7 @@ vec dcda(vec lambda, vec T, vec& a, int N){
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
 //mat dcda(vec lambda, vec T, vec& a, int N){
-vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N){
+vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N, double penal){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
 	vec dcda(N*N);
