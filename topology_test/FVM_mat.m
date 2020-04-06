@@ -207,8 +207,8 @@ end
 
 
 function k = mean(a, b)
-%k = (a+b)/2;           % arithmetic mean
-k = 2.0*(a*b)/(a+b);    % harmonic mean
+k = (a+b)/2;           % arithmetic mean
+%k = 2.0*(a*b)/(a+b);    % harmonic mean
 
 end
 
