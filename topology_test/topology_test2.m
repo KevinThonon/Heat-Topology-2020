@@ -13,25 +13,12 @@ pctmetal = 0.3*ones(N,N);
 
 loop1 = 0;
 change = 1.0;
-while change > 0.01 %change > 0.01
+while loop1 < 500 %change > 0.01
     loop1 = loop1 + 1
     pctmetal_old = pctmetal;
 
     [k] = createK(pctmetal, N);
     [T, K, f] = fvm_func(k, N, q);
-
-%     figure()
-%     spy(K)
-% 
-%     Tmat = zeros(dp,dp);
-%     for i = 1:dp
-%          Tmat(:,i)=T(i*dp-dp+1:i*dp);
-%     end
-% 
-%     figure()
-%     surface(Tmat)
-
-    %cost = cost1(T, dp);
 
     lambda_vec = lambda1(T, K, dp);
     dcda_mat1 = dcda(lambda_vec, T, pctmetal, N);
