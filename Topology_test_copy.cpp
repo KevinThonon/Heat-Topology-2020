@@ -24,25 +24,28 @@ int main() {
 	}
 
 	double change = 1.0; 
-	double penal = 3.0;
+	double penal = 2.0;
 
 	while (change > 0.01) {
 
 	std::cout<<"iteration = "<<iterations<<std::endl;
 
 	
-	if (iterations == 10){
+	if (iterations == 5){
+		penal = 3.0;
+	}
+
+	if (iterations == 15){
 		penal = 4.0;
 	}
 
 	if (iterations == 20){
-		penal = 5.0;
-	}
-
-	if (iterations == 30){
 		penal = 6.0;
 	}
  
+	if (iterations == 25){
+		penal = 7.0;
+	}
 	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);
 	sp_mat ll = top::K_mat(k, N);
@@ -89,6 +92,7 @@ int main() {
 	} 
 
 	change = change_n;
+	std::cout<<"change ="<<change<<std::endl;
 
   	string g = "gradient_";
   	g += to_string(iterations);
