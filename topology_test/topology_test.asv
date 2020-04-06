@@ -16,6 +16,7 @@ change = 1.;
 while change > 0.01
     loop1 = loop1 +1
     pctmetal_old = pctmetal;
+²   
 
 
     [T, K, f] = fvm_func(pctmetal, N, q);
@@ -44,7 +45,7 @@ end
 
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 times = 4;
 N = times*N;
@@ -117,7 +118,7 @@ end
 % end
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 times = 2;
 N = times*N;
@@ -126,7 +127,7 @@ pctmetal = meshrefine(pctmetal,times);
 
 loop3 = loop2;
 change = 1.;
-while change > 0.02
+while change > 0.03
     loop3 = loop3 +1
     pctmetal_old = pctmetal;
     [T, K, f] = fvm_func(pctmetal, N, q);
@@ -154,17 +155,17 @@ while change > 0.02
 end
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 times = 10/8;
 N = times*N;
 dp = N+1;
 pctmetal = meshrefine(pctmetal,times);
 
-loop4 = loop;
+loop4 = loop3;
 change = 1.;
 while change > 0.01
-    loop = loop +1
+    loop4 = loop4 +1
     pctmetal_old = pctmetal;
     [T, K, f] = fvm_func(pctmetal, N, q);
 
@@ -191,7 +192,7 @@ while change > 0.01
 end
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 %%
 heatsink = pctmetal*60 + (1-pctmetal)*0.2;
@@ -204,17 +205,17 @@ for i = 1:dp
 end
 
 figure()
-surf(dcda_mat1, 'FaceColor', 'interp')
+surface(dcda_mat1)
 
 
 figure()
-surf(Tmat)
+surface(Tmat)
 
 figure()
-surf(heatsink)
+surface(heatsink)
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 % N = 100 -> 179 loops nodig
 

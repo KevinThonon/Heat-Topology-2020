@@ -17,8 +17,9 @@ while change > 0.01
     loop1 = loop1 +1
     pctmetal_old = pctmetal;
 
+    [k] = createK(pctmetal, N);
 
-    [T, K, f] = fvm_func(pctmetal, N, q);
+    [T, K, f] = fvm_func(k, N, q);
 
 %     figure()
 %     spy(K)
@@ -56,7 +57,9 @@ change = 1.;
 while change > 0.02
     loop2 = loop2 +1
     pctmetal_old = pctmetal;
-    [T, K, f] = fvm_func(pctmetal, N, q);
+    [k] = createK(pctmetal, N);
+
+    [T, K, f] = fvm_func(k, N, q);
 
 %     figure()
 %     spy(K)
@@ -128,8 +131,9 @@ loop3 = loop2;
 change = 1.;
 while change > 0.03
     loop3 = loop3 +1
-    pctmetal_old = pctmetal;
-    [T, K, f] = fvm_func(pctmetal, N, q);
+    [k] = createK(pctmetal, N);
+
+    [T, K, f] = fvm_func(k, N, q);
 
 %     figure()
 %     spy(K)
@@ -166,7 +170,9 @@ change = 1.;
 while change > 0.01
     loop4 = loop4 +1
     pctmetal_old = pctmetal;
-    [T, K, f] = fvm_func(pctmetal, N, q);
+    [k] = createK(pctmetal, N);
+
+    [T, K, f] = fvm_func(k, N, q);
 
 %     figure()
 %     spy(K)
@@ -194,7 +200,7 @@ figure()
 surface(pctmetal)
 
 %%
-heatsink = pctmetal*60 + (1-pctmetal)*0.2;
+heatsink = pctmetal*65 + (1-pctmetal)*0.2;
 
 [T, K, f] = fvm_func(heatsink, N, q);
 
