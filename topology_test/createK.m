@@ -4,7 +4,7 @@ penal = 3;
 K = zeros(N,N);
 for i = 1:1:N
     for j = 1:1:N
-        K(i,j) = (65-0.2)*(pctmetal(i,j)^penal) + 0.2;
+        K(i,j) = 64.8*(pctmetal(i,j)^penal) + 0.2;
     end
 end
 

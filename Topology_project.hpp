@@ -22,14 +22,14 @@ namespace top {
 
 // variabelen definiëren
 
-double penal = 3.0;
+double penal = 5.0;
 
 // Dichtheid k in elk element met SIMP methode. Input: percentage metaal in elk element. Output: Dichtheid k in elk element
-mat create_k(const double *a, int N) {
+mat create_k(vec a, int N) {
 	mat k(N,N);
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < N; ++j) {
-			k(i,j) = (65-0.2)*pow(a[i + N*j],penal) + 0.2;
+			k(i,j) = (65-0.2)*pow(a(i + N*j),penal) + 0.2;
 		}
 	}
 	return k;
@@ -446,8 +446,8 @@ vec lambda3(sp_mat& K, int N){
 
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
-//mat dcda(vec& lambda, vec& T, const double *a, int N){
-vec dcda(vec lambda, vec T, const double *a, int N){
+//mat dcda(vec& lambda, vec& T, vec& a, int N){
+vec dcda(vec lambda, vec T, vec& a, int N){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
 	vec dcda(N*N);
@@ -472,8 +472,8 @@ vec dcda(vec lambda, vec T, const double *a, int N){
 			//std::cout<<dKdk_u.size()<<std::endl;
 			dcdk(i + j*N) = dot(lambda, dKdk_u);
 			//Vermenigvuldiging met dk/da om tot dc/da te komen
-			//dcda(i,j) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*N);
-			dcda(i + j*N) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*N);
+			//dcda(i,j) = penal*(65.0-0.2)*pow(a(i + N*j),penal-1)*dcdk(i + j*N);
+			dcda(i + j*N) = penal*(65.0-0.2)*pow(a(i + N*j),penal-1)*dcdk(i + j*N);
 		}
 	}
 	
@@ -484,8 +484,8 @@ vec dcda(vec lambda, vec T, const double *a, int N){
 
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
-//mat dcda(vec lambda, vec T, const double *a, int N){
-vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
+//mat dcda(vec lambda, vec T, vec& a, int N){
+vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
 	vec dcda(N*N);
@@ -508,8 +508,8 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 			//Vermenigvuldiging met lambda^T om tot dc/dk te komen
 			dcdk(i + j*N) = dot(lambda, dKdk_u);
 			//Vermenigvuldiging met dk/da om tot dc/da te komen
-			//dcda(i,j) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*N);
-			dcda(i + j*N) = penal*(65.0-0.2)*pow(a[i + N*j],penal-1)*dcdk(i + j*N);
+			//dcda(i,j) = penal*(65.0-0.2)*pow(a(i + N*j),penal-1)*dcdk(i + j*N);
+			dcda(i + j*N) = penal*(65.0-0.2)*pow(a(i + N*j),penal-1)*dcdk(i + j*N);
 		}
 	}
 	
@@ -525,8 +525,8 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
 		dcdk(j*N) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
-		//dcda(0,j) = penal*(65.0-0.2)*pow(a[N*j],penal-1)*dcdk(j*N);
-		dcda(j*N) = penal*(65.0-0.2)*pow(a[N*j],penal-1)*dcdk(j*N);
+		//dcda(0,j) = penal*(65.0-0.2)*pow(a(N*j),penal-1)*dcdk(j*N);
+		dcda(j*N) = penal*(65.0-0.2)*pow(a(N*j),penal-1)*dcdk(j*N);
 	}
 	
 	for (int i = 1; i < N-1; i++){
@@ -541,8 +541,8 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
 		dcdk(i) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
-		//dcda(i,0) = penal*(65.0-0.2)*pow(a[i],penal-1)*dcdk(i);
-		dcda(i) = penal*(65.0-0.2)*pow(a[i],penal-1)*dcdk(i);
+		//dcda(i,0) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
+		dcda(i) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
 	}
 	
 	for (int j = 1; j < N-1; j++){
@@ -557,8 +557,8 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
 		dcdk(N-1 + j*N) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
-		//dcda(N-1,j) = penal*(65.0-0.2)*pow(a[N-1 + N*j],penal-1)*dcdk(N-1 + j*N);
-		dcda(N-1 + j*N) = penal*(65.0-0.2)*pow(a[N-1 + N*j],penal-1)*dcdk(N-1 + j*N);
+		//dcda(N-1,j) = penal*(65.0-0.2)*pow(a(N-1 + N*j),penal-1)*dcdk(N-1 + j*N);
+		dcda(N-1 + j*N) = penal*(65.0-0.2)*pow(a(N-1 + N*j),penal-1)*dcdk(N-1 + j*N);
 	}
 	
 	for (int i = 1; i < N-1; i++){
@@ -573,8 +573,8 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 		//Vermenigvuldiging met lambda^T om tot dc/dk te komen
 		dcdk(i + (N-1)*N) = dot(lambda, dKdk_u);
 		//Vermenigvuldiging met dk/da om tot dc/da te komen
-		//dcda(i,N-1) = penal*(65.0-0.2)*pow(a[i + N*(N-1)],penal-1)*dcdk(i + (N-1)*N);
-		dcda(i + (N-1)*N) = penal*(65.0-0.2)*pow(a[i + N*(N-1)],penal-1)*dcdk(i + (N-1)*N);
+		//dcda(i,N-1) = penal*(65.0-0.2)*pow(a(i + N*(N-1)),penal-1)*dcdk(i + (N-1)*N);
+		dcda(i + (N-1)*N) = penal*(65.0-0.2)*pow(a(i + N*(N-1)),penal-1)*dcdk(i + (N-1)*N);
 	}
 	
 	//Linksboven hoekpunt
@@ -587,7 +587,7 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 
 	dcdk(0) = dot(lambda, dKdk_ulb);
 
-	dcda(0) = penal*(65.0-0.2)*pow(a[0],penal-1)*dcdk(0);
+	dcda(0) = penal*(65.0-0.2)*pow(a(0),penal-1)*dcdk(0);
 	
 	//Linksonder hoekpunt
 	vec dKdk_ulo((N+1)*(N+1));
@@ -599,7 +599,7 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 
 	dcdk(N-1) = dot(lambda, dKdk_ulo);
 
-	dcda(N-1) = penal*(65.0-0.2)*pow(a[N-1],penal-1)*dcdk(N-1);
+	dcda(N-1) = penal*(65.0-0.2)*pow(a(N-1),penal-1)*dcdk(N-1);
 	
 	//Rechtsboven hoekpunt
 	vec dKdk_urb((N+1)*(N+1));
@@ -611,7 +611,7 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 	
 	dcdk((N-1)*N) = dot(lambda, dKdk_urb);
 
-	dcda((N-1)*N) = penal*(65.0-0.2)*pow(a[(N-1)*N],penal-1)*dcdk((N-1)*N);
+	dcda((N-1)*N) = penal*(65.0-0.2)*pow(a((N-1)*N),penal-1)*dcdk((N-1)*N);
 	
 	//Rechtsonder hoekpunt
 	vec dKdk_uro((N+1)*(N+1));
@@ -623,7 +623,7 @@ vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 	
 	dcdk(N*N - 1) = dot(lambda, dKdk_uro);
 	
-	dcda(N*N - 1) = penal*(65.0-0.2)*pow(a[N*N - 1],penal-1)*dcdk(N*N - 1);
+	dcda(N*N - 1) = penal*(65.0-0.2)*pow(a(N*N - 1),penal-1)*dcdk(N*N - 1);
 
 	
 	return dcda;
@@ -721,7 +721,7 @@ mat dKdk(int N){
 
 
 
-vec check(int N, double rmin, const double *x, mat dc){
+vec check(int N, double rmin, vec x, mat dc){
 
 vec dcn = zeros<vec>(N*N);
 
@@ -732,14 +732,46 @@ for (int i = 0; i < N; i++) {
       for (int l = std::max(j - floor(rmin),0.0); l< std::min(j + floor(rmin),(double)N); l++) {
         double fac = rmin - sqrt(pow((i-k),2) + pow((j-l),2));
         sum = sum + std::max(0.0,fac);
-        dcn(i*N + j) = dcn(i*N + j) + std::max(0.0,fac) * dc(N*k+l) * x[N*k+l];
+        dcn(i*N + j) = dcn(i*N + j) + std::max(0.0,fac) * dc(N*k+l) * x(N*k+l);
       }
     }
-    dcn(i*N + j) = dcn(i*N + j) / (x[i*N + j] * sum);
+    dcn(i*N + j) = dcn(i*N + j) / (x(i*N + j) * sum);
   }
 }
 return dcn;
 }
+
+vec OC(int N, vec x, double volfrac, vec dc){
+
+double l1 = 0.0;
+double l2 = 100000.0;
+double move = 0.2;
+vec xnew(N*N);
+
+while ((l2-l1)>1e-4){
+	double lmid = 0.5*(l2+l1);
+
+	for (int i = 0; i < N*N; i++){
+    		xnew(i) = max(0.001, max(x(i)-move,min(1.0,min(x(i)+move, x(i)*sqrt(abs(-dc(i)/lmid))))));
+	}	
+
+	double sum_x = 0.0;
+
+	for (int i = 0; i < N*N; i++){
+		sum_x += xnew(i);
+	}
+ 
+   	if (sum_x - volfrac * (N*N) > 0){
+   	     l1 = lmid;
+   	}
+   	else
+   	{
+   	    l2 = lmid;
+   	}
+}
+return xnew;
+}
+
 
 
 

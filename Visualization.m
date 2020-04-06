@@ -1,6 +1,6 @@
-N = 10;
+N = 50;
 
-for iterations = 1:42
+for iterations = 1:120
     
     iter = int2str(iterations);
 
@@ -41,11 +41,11 @@ for iterations = 1:42
     
    
 
-    surface(metal_mat)
+    surface(metal_mat,'FaceColor','interp')
     %surface(temperature_mat)
     %surface(gradient_mat)
     
-    pause(1)
+    pause(0.3)
     
 end
 

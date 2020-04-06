@@ -1,13 +1,13 @@
-N = 10;
-fileID = fopen('gradient_1.txt','r');
+N = 50;
+fileID = fopen('gradient_3.txt','r');
 formatSpec = '%f';
 gradient = fscanf(fileID,formatSpec);
 
-fileID = fopen('metal_1.txt','r');
+fileID = fopen('metal_360.txt','r');
 formatSpec = '%f';
 metal = fscanf(fileID,formatSpec);
 
-fileID = fopen('temperature_1.txt','r');
+fileID = fopen('temperature_512.txt','r');
 formatSpec = '%f';
 temperature = fscanf(fileID,formatSpec);
 
@@ -27,6 +27,6 @@ end
         temperature_mat(:,i)=temperature(i*dp-dp+1:i*dp);
     end
     
-%surface(gradient_mat)
-%surface(metal_mat)
-surface(temperature_mat)
+%surface(gradient_mat,'FaceColor','interp')
+surface(metal_mat,'FaceColor','interp')
+%surface(temperature_mat)
