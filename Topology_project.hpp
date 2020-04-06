@@ -92,7 +92,7 @@ vec RL(int N){
 		rl(pow(N+1,2)-i-1) = 293.0;
 	}
 	
-	for (int i = N+1; i < N+1; i+=(N+1)){
+	for (int i = N+1; i < N*(N+1); i+=(N+1)){
 		rl(i) = qn;
 		rl(i + N) = qn;
 	}
