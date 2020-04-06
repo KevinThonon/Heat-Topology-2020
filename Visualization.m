@@ -1,6 +1,6 @@
-N = 50;
+N = 10;
 
-for iterations = 1:87
+for iterations = 1:42
     
     iter = int2str(iterations);
 

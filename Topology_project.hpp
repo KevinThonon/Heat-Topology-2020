@@ -109,7 +109,7 @@ vec RL(int N){
 }
 
 /* // Matrix K aanmaken
-mat LL(mat bigkmat, int N){
+mat LL(mat& bigkmat, int N){
 	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	ll.fill(0.0);
 	for (int i = 0.3*N; i < 0.7*N + 1; i++){
@@ -202,7 +202,7 @@ double mean(double a, double b){
 
 
 /* // Matrix K aanmaken zonder bigkmat
-mat K_mat(mat k, int N){
+mat K_mat(mat& k, int N){
 	//Aanmaken matrix en vullen met nullen
 	mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	ll.fill(0.0);
@@ -288,7 +288,7 @@ mat K_mat(mat k, int N){
 } */
 
 // Matrix K aanmaken zonder bigkmat met arithmetic/harmonic mean voor de k-waarden
-sp_mat K_mat(mat k, int N){
+sp_mat K_mat(mat& k, int N){
 	//Aanmaken matrix en vullen met nullen
 	sp_mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
 	//Dirichlett boundary conditions
@@ -373,14 +373,14 @@ sp_mat K_mat(mat k, int N){
 }
 
 // Kostfunctie = u^T * u / #elementen
-double objective_function1(vec T, int N){
+double objective_function1(vec& T, int N){
 	double cost = dot(T,T)/(N*N);
 	return cost;
 }
 
 // Kostfunctie = u / #elementen
 // Deze kostfunctie is het gemiddelde van alle temperatuur-punten.
-double objective_function2(vec T, int N){
+double objective_function2(vec& T, int N){
 	vec w(pow((N+1),2));
 	w.fill(1.0);
 	double cost = dot(w,T)/(pow((N+1),2));
@@ -391,7 +391,7 @@ double objective_function2(vec T, int N){
 // Deze kostfunctie is het gewogen gemiddelde van alle temperatuur-punten.
 // w is het gewicht van elk temperatuur-punt. De som van alle gewichten is 1. Een middenpunt heeft gewicht 1/N² = h_x * h_y. Een randpunt heeft hiervan de helft (vakje is half zo klein).
 // Een hoekpunt heeft gewicht h_x * h_y / 4 (vakje is een kwart van een middelste vakje).
-double objective_function3(vec T, int N){
+double objective_function3(vec& T, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
 	w.fill(A);
@@ -410,13 +410,13 @@ double objective_function3(vec T, int N){
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = -2*u / #elementen
-vec lambda1(vec T, sp_mat K, int N){
+vec lambda1(vec& T, sp_mat& K, int N){
 	vec lambda = spsolve(K.t(), (-2.0/(N*N))*T, "lapack"); //Veranderd van 2.0 naar -2.0
 	return lambda;
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = - eenheidsvector / #elementen
-vec lambda2(sp_mat K, int N){
+vec lambda2(sp_mat& K, int N){
 	vec w(pow((N+1),2));
 	w.fill(-1.0);
 	vec lambda = spsolve(K.t(), w, "lapack");
@@ -424,7 +424,7 @@ vec lambda2(sp_mat K, int N){
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = -w
-vec lambda3(sp_mat K, int N){
+vec lambda3(sp_mat& K, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
 	w.fill(A);
@@ -446,7 +446,7 @@ vec lambda3(sp_mat K, int N){
 
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
-//mat dcda(vec lambda, vec T, const double *a, int N){
+//mat dcda(vec& lambda, vec& T, const double *a, int N){
 vec dcda(vec lambda, vec T, const double *a, int N){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
@@ -485,7 +485,7 @@ vec dcda(vec lambda, vec T, const double *a, int N){
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
 //mat dcda(vec lambda, vec T, const double *a, int N){
-vec dcda_harm(vec lambda, vec T, const double *a, mat k, int N){
+vec dcda_harm(vec& lambda, vec& T, const double *a, mat& k, int N){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
 	vec dcda(N*N);
@@ -721,21 +721,21 @@ mat dKdk(int N){
 
 
 
-mat check(int N, double rmin, mat x, mat dc){
+vec check(int N, double rmin, const double *x, mat dc){
 
-mat dcn = zeros<mat>(N,N);
+vec dcn = zeros<vec>(N*N);
 
-for (int i = 1; i < N-2; i++) {
-  for (int j = 1; j < N-2; j++) {
+for (int i = 0; i < N; i++) {
+  for (int j = 0; j < N; j++) {
     double sum = 0.0; 
-    for (int k = std::max(i - floor(rmin),2.0); k < std::min(i + floor(rmin),N-2.0); k++) {
-      for (int l = std::max(j - floor(rmin),2.0); l< std::min(j + floor(rmin),N-2.0); l++) {
+    for (int k = std::max(i - floor(rmin),0.0); k < std::min(i + floor(rmin),(double)N); k++) {
+      for (int l = std::max(j - floor(rmin),0.0); l< std::min(j + floor(rmin),(double)N); l++) {
         double fac = rmin - sqrt(pow((i-k),2) + pow((j-l),2));
         sum = sum + std::max(0.0,fac);
-        dcn(j,i) = dcn(j,i) + std::max(0.0,fac) * dc(l,k) * x(l,k);
+        dcn(i*N + j) = dcn(i*N + j) + std::max(0.0,fac) * dc(N*k+l) * x[N*k+l];
       }
     }
-    dcn(j,i) = dcn(j,i) / (x(j,i) * sum);
+    dcn(i*N + j) = dcn(i*N + j) / (x[i*N + j] * sum);
   }
 }
 return dcn;

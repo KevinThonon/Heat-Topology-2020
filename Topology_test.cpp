@@ -49,7 +49,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
+	//vec dcda = top::dcda(lambda, u, a, N);
 	vec dcda = top::dcda_harm(lambda, u, a, k, N);
+
+	//double rmin = 2.0;
+	//vec dcda_check = top::check(N, rmin, a, dcda);
 
   	string g = "gradient_";
   	g += to_string(*(int *)data);
@@ -105,7 +109,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 
 int main() {
 
-int N = 50;
+int N = 10;
 int iterations = 0;
 
 // MMA - method

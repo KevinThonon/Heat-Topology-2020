@@ -1,5 +1,5 @@
-N = 50;
-fileID = fopen('temperature_10.txt','r');
+N = 10;
+fileID = fopen('gradient_1.txt','r');
 formatSpec = '%f';
 gradient = fscanf(fileID,formatSpec);
 
@@ -19,4 +19,4 @@ end
         temperature_mat(:,i)=temperature(i*dp-dp+1:i*dp);
     end
     
-surf(temperature_mat,'FaceColor','interp')
+surface(gradient_mat)

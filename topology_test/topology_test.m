@@ -44,7 +44,7 @@ end
 
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 times = 4;
 N = times*N;
@@ -117,7 +117,7 @@ end
 % end
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 times = 2;
 N = times*N;
@@ -154,7 +154,7 @@ while change > 0.03
 end
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 times = 10/8;
 N = times*N;
@@ -191,7 +191,7 @@ while change > 0.01
 end
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 %%
 heatsink = pctmetal*60 + (1-pctmetal)*0.2;
@@ -204,17 +204,17 @@ for i = 1:dp
 end
 
 figure()
-surf(dcda_mat1, 'FaceColor', 'interp')
+surface(dcda_mat1)
 
 
 figure()
-surf(Tmat)
+surface(Tmat)
 
 figure()
-surf(heatsink)
+surface(heatsink)
 
 figure()
-surf(pctmetal)
+surface(pctmetal)
 
 % N = 100 -> 179 loops nodig
 
