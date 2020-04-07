@@ -13,7 +13,7 @@ using namespace arma;
 
 int main() {
 
-	int N = 100;
+	int N = 10;
 	int iterations = 0;
 
 	vec a(N*N);
@@ -73,9 +73,9 @@ int main() {
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	// vec dcda = top::dcda_fd(u, rl, a, N, penal);
+	vec dcda = top::dcda_fd(u, rl, a, N, penal);
 	//vec dcda = top::dcda_arit(lambda, u, a, N, penal);
-	vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
+	//vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
 
 	double rmin = 2.0;
 	vec dcda_check = top::check(N, rmin, a, dcda);
