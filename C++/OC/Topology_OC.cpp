@@ -73,9 +73,15 @@ int main() {
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	vec dcda = top::dcda_fd(u, rl, a, N, penal);
+	vec dcda_fd = top::dcda_fd(u, rl, a, N, penal);
 	//vec dcda = top::dcda_arit(lambda, u, a, N, penal);
-	//vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
+	vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
+
+	vec difference (N*N);
+
+	for (int i = 0; i < N*N ; i++){
+		difference(i) = dcda(i)-dcda_fd(i);
+	}
 
 	double rmin = 2.0;
 	vec dcda_check = top::check(N, rmin, a, dcda);
@@ -93,6 +99,19 @@ int main() {
 
 	change = change_n;
 	std::cout<<"change ="<<change<<std::endl;
+
+  	string d = "difference_";
+  	d += to_string(iterations);
+  	d += ".txt";
+	string path_difference = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/difference/";
+	path_difference += d;
+
+	ofstream difference_file;
+        difference_file.open(path_difference);
+        for (int i = 0; i < N*N; ++i) {
+    		difference_file <<difference(i)<<std::endl;
+    	}
+    	difference_file.close();
 
   	string g = "gradient_";
   	g += to_string(iterations);
