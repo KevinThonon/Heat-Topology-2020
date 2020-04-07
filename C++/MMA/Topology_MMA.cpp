@@ -36,7 +36,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
   	string t = "temperature_";
   	t += to_string(*(int *)data);
   	t += ".txt";
-	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/temperature/";
+	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/MMA/solutions_MMA/temperature/";
 	path_temperature += t;
 
 	ofstream temperature_file;
@@ -65,7 +65,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
   	string g = "gradient_";
   	g += to_string(*(int *)data);
   	g += ".txt";
-	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/gradient/";
+	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/MMA/solutions_MMA/gradient/";
 	path_gradient += g;
 
 	ofstream gradient_file;
@@ -78,7 +78,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
   	string m = "metal_";
   	m += to_string(*(int *)data);
   	m += ".txt";
-	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/metal/";
+	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/MMA/solutions_MMA/metal/";
 	path_metal += m;
 
 	ofstream metal_file;
