@@ -1,6 +1,6 @@
-N = 100;
+N = 10;
 
-for iterations = 1:30
+for iterations = 0:0
     
     iter = int2str(iterations);
 
@@ -23,14 +23,22 @@ for iterations = 1:30
     formatSpec = '%f';
     temperature = fscanf(fileID,formatSpec);
     
+    d = strcat('difference_',iter);
+    difference = strcat(d,'.txt');
+    fileID = fopen(difference,'r');
+    formatSpec = '%f';
+    difference = fscanf(fileID,formatSpec);
+    
     gradient_mat = zeros(N,N);
     metal_mat = zeros(N,N);
+    difference_mat = zeros(N,N);
     temperature_mat = zeros(N+1,N+1);
     
     dp = N;
     for i = 1:dp
         gradient_mat(:,i)=gradient(i*dp-dp+1:i*dp);
         metal_mat(:,i)=metal(i*dp-dp+1:i*dp);
+        difference_mat(:,i)=difference(i*dp-dp+1:i*dp);
         
     end
     
@@ -44,7 +52,7 @@ for iterations = 1:30
     temperature_mat = meshrefine(temperature_mat,2);
     
     figure()
-    surface(metal_mat,'FaceColor','interp')
+    surface(difference_mat,'FaceColor','interp')
     colorbar()
     iterations
     pause(0.1)
@@ -52,8 +60,8 @@ for iterations = 1:30
     
 end
 
-pause(1)
-close all
+%pause(1)
+%close all
 
 
 
