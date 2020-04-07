@@ -439,11 +439,39 @@ vec lambda3(sp_mat& K, int N){
 }
 
 
+//Finite difference
+vec dcda_fd(vec& T, vec& RL, vec& a, int N, double penal){
+	vec dcda(N*N);
+	dcda.fill(0.0);
+	
+	//cost function using original a
+	double cost_original = objective_function1(T, N);
+	
+	for (int i = 0; i < N; i++){
+		for (int j = 0; j < N; j++){
+			//Change element a_i,j a little bit (reduce percentage of metal in a_i,j with 0.01) 
+			a(i + j*N) -= 0.01;
+			//With updated a_i,j calculate k again, then K, then u
+			mat k = create_k(a, N, penal);
+			sp_mat ll = K_mat(k, N);
+			vec u = spsolve(ll,RL,"lapack");
+			//Use this updated u in the cost function
+			double cost_update = objective_function1(u, N);
+			//Use finite difference between original cost function and updated cost function where the difference between original and updated a_i,j = 0.01
+			dcda(i + j*N) = (cost_original - cost_update)/0.01;
+		}
+	}
+	
+	return dcda;
+
+}
+			
+
 
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
 //mat dcda(vec& lambda, vec& T, vec& a, int N){
-vec dcda(vec lambda, vec T, vec& a, int N, double penal){
+vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	//Initialiseren dc/da en opvullen met nullen
 	//mat dcda(N,N);
 	vec dcda(N*N);
