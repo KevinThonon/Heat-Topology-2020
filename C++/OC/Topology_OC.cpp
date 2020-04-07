@@ -54,7 +54,7 @@ int main() {
   	string t = "temperature_";
   	t += to_string(iterations);
   	t += ".txt";
-	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/temperature/";
+	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/temperature/";
 	path_temperature += t;
 
 	ofstream temperature_file;
@@ -96,7 +96,7 @@ int main() {
   	string g = "gradient_";
   	g += to_string(iterations);
   	g += ".txt";
-	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/gradient/";
+	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/gradient/";
 	path_gradient += g;
 
 	ofstream gradient_file;
@@ -109,7 +109,7 @@ int main() {
   	string m = "metal_";
   	m += to_string(iterations);
   	m += ".txt";
-	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/metal/";
+	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/metal/";
 	path_metal += m;
 
 	ofstream metal_file;
