@@ -469,7 +469,7 @@ vec dcda_fd(vec& T, vec& RL, vec& a, int N, double penal){
 			
 
 //Klopt nog niet helemaal
-// dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
+// dc/da is een vector van gradienten die nodig is in de optimalisatie stap
 vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	//Initialiseren dc/da en opvullen met nullen
 	vec dcda(N*N);
