@@ -3,7 +3,7 @@ fileID = fopen('gradient_1.txt','r');
 formatSpec = '%f';
 gradient = fscanf(fileID,formatSpec);
 
-fileID = fopen('metal_50.txt','r');
+fileID = fopen('metal_33.txt','r');
 formatSpec = '%f';
 metal = fscanf(fileID,formatSpec);
 

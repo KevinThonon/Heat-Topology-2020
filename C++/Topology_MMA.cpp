@@ -1,6 +1,4 @@
-#include "vector.hpp"
-#include "matrix.hpp"
-#include "Topology_project.hpp"
+#include "Topology_project_MMA.hpp"
 #include <armadillo>
 #include <iostream>
 #include <fstream>
@@ -17,14 +15,22 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	std::cout<<"iteration = "<<*(int *)data<<std::endl;
 	*(int *)data += 1;
 	
+	double penal = 1.0;
+	int d = *(int *)data;
+
+	if (d >= 40) {
+		std::cout<<d<<std::endl;
+		
+		penal = 4.0;
+	}
+	std::cout<<"penal ="<<penal<<std::endl;
 
 	int N = sqrt(n);
 
-	mat k = top::create_k(a, N);
+	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);
 	sp_mat ll = top::K_mat(k, N);
 	vec u = spsolve(ll,rl,"lapack");
-	//std::cout<<u<<std::endl;
 
   
   	string t = "temperature_";
@@ -41,6 +47,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
     	temperature_file.close();
 
 	double cost = top::objective_function1(u, N);
+	std::cout<<"cost ="<<cost<<std::endl;
 	vec lambda = top::lambda1(u, ll, N);
 
 	//double cost = top::objective_function2(u, N);
@@ -49,11 +56,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	//vec dcda = top::dcda(lambda, u, a, N);
-	vec dcda = top::dcda_harm(lambda, u, a, k, N);
+	vec dcda = top::dcda(lambda, u, a, N, penal);
+	//vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
 
-	//double rmin = 2.0;
-	//vec dcda_check = top::check(N, rmin, a, dcda);
+	double rmin = 2.0;
+	vec dcda_check = top::check(N, rmin, a, dcda);
 
   	string g = "gradient_";
   	g += to_string(*(int *)data);
@@ -84,7 +91,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 
 	if (grad) {
 	for (int i = 0; i < n; ++i) {
-        	grad[i] = dcda(i);
+        	grad[i] = dcda_check(i);
 	}
     }
 
@@ -161,7 +168,7 @@ nlopt_set_xtol_rel(opt, 1e-8);
 
 double a[N*N];  // some initial guess: average percentage of metal in one element is 0.4
 for (int i = 0; i < N*N; ++i) {
-	a[i] = 0.01; 
+	a[i] = 0.35; 
 }
 
 // value of the objective function during the iterations.

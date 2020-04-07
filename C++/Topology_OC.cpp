@@ -1,6 +1,4 @@
-#include "vector.hpp"
-#include "matrix.hpp"
-#include "Topology_project.hpp"
+#include "Topology_project_OC.hpp"
 #include <armadillo>
 #include <iostream>
 #include <fstream>
@@ -46,6 +44,7 @@ int main() {
 	if (iterations == 25){
 		penal = 7.0;
 	}
+	
 	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);
 	sp_mat ll = top::K_mat(k, N);
@@ -120,6 +119,9 @@ int main() {
     	}
     	metal_file.close();
 	iterations += 1;
+	if (change <= 0.1){
+		penal += 1.0;
+	}
 	}
 	
 
