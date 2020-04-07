@@ -47,12 +47,12 @@ for iterations = 1:30
     surface(metal_mat,'FaceColor','interp')
     colorbar()
     iterations
-    pause(0.1)
+    pause(0.5)
     
     
 end
 
-pause(1)
+pause(3)
 close all
 
 

@@ -24,25 +24,25 @@ int main() {
 	double change = 1.0; 
 	double penal = 2.0;
 
-	while (change > 0.01) {
+	while (change > 0.008) {
 
 	std::cout<<"iteration = "<<iterations<<std::endl;
 
 	
-	if (iterations == 5){
+	if (iterations == 6){
 		penal = 3.0;
 	}
-
-	if (iterations == 15){
-		penal = 4.0;
+	
+	if (iterations == 14){
+		penal = 5.0;
 	}
-
-	if (iterations == 20){
-		penal = 6.0;
-	}
- 
-	if (iterations == 25){
+	
+	if (iterations == 20 ){
 		penal = 7.0;
+	}
+ 	
+	if (iterations == 25){
+		penal = 9.0;
 	}
 	
 	mat k = top::create_k(a, N, penal);
