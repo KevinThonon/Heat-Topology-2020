@@ -22,14 +22,14 @@ int main() {
 	}
 
 	double change = 1.0; 
-	double penal = 2.0;
+	double penal = 3.0;
 
 	while (change > 0.01) {
 
 	std::cout<<"iteration = "<<iterations<<std::endl;
 
 	
-	if (iterations == 5){
+	/* if (iterations == 5){
 		penal = 3.0;
 	}
 
@@ -43,7 +43,7 @@ int main() {
  
 	if (iterations == 25){
 		penal = 7.0;
-	}
+	} */
 	
 	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);

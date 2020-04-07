@@ -459,6 +459,7 @@ vec dcda_fd(vec& T, vec& RL, vec& a, int N, double penal){
 			double cost_update = objective_function1(u, N);
 			//Use finite difference between original cost function and updated cost function where the difference between original and updated a_i,j = 0.01
 			dcda(i + j*N) = (cost_original - cost_update)/0.01;
+			a(i + j*N) += 0.01;
 		}
 	}
 	
