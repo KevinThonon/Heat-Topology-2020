@@ -73,7 +73,8 @@ int main() {
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	//vec dcda = top::dcda(lambda, u, a, N, penal);
+	// vec dcda = top::dcda_fd(u, rl, a, N, penal);
+	//vec dcda = top::dcda_arit(lambda, u, a, N, penal);
 	vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
 
 	double rmin = 2.0;
