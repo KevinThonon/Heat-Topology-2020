@@ -439,6 +439,30 @@ vec lambda3(sp_mat& K, int N){
 }
 
 
+//Finite difference
+vec dcda(vec& T, vec& RL, vec& a, int N, double penal){
+	vec dcda(N*N);
+	
+	//cost function using original a
+	double cost_original = objective_function1(T, N);
+	
+	for (int i = 0; i < N; i++){
+		for (int j = 0; j < N; j++){
+			a(i, j) -= 0.01;
+			mat k = create_k(a, N, penal);
+			vec rl = RL(N);
+			sp_mat ll = K_mat(k, N);
+			vec u = spsolve(ll,rl,"lapack");
+			double cost_update = objective_function1(u, N);
+			dcda(i,j) = (cost_original - cost_update)/0.01;
+		}
+	}
+	
+	return dcda;
+
+}
+			
+
 
 // dc/da is een matrix/vector van gradienten die nodig zijn in de optimalisatie stap
 // Afhankelijk of matrix of vector nodig is in optimalisatie stap, moet mat of vec gecomment worden
