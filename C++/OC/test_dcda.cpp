@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 	vec difference(N*N);
 
 	for (int i = 0; i < N*N ; i++){
-		difference(i) = (dcda_arit(i)-dcda_fd(i));
+		difference(i) = (dcda_arit(i)-dcda_fd(i))/cost;
 	}
 	
 	std::cout<<difference<<std::endl;
