@@ -507,7 +507,6 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	dcdk(0) = dot(lambda, dKdk_ulb);
 	
 	dcda(0) = penal*(65.0-0.2)*pow(a(0),penal-1)*dcdk(0);
-	}
 	
 	//Linksonder
 	vec dKdk_ulo((N+1)*(N+1));
@@ -520,7 +519,6 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	dcdk(N-1) = dot(lambda, dKdk_ulo);
 	
 	dcda(N-1) = penal*(65.0-0.2)*pow(a(N-1),penal-1)*dcdk(N-1);
-	}
 	
 	//Rechtsboven
 	vec dKdk_urb((N+1)*(N+1));
@@ -533,7 +531,6 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	dcdk((N-1)*N) = dot(lambda, dKdk_urb);
 	
 	dcda((N-1)*N) = penal*(65.0-0.2)*pow(a((N-1)*N),penal-1)*dcdk((N-1)*N);
-	}
 	
 	//Rechtsonder
 	vec dKdk_uro((N+1)*(N+1));
@@ -546,7 +543,6 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	dcdk(N*N-1) = dot(lambda, dKdk_uro);
 	
 	dcda(N*N-1) = penal*(65.0-0.2)*pow(a(N*N-1),penal-1)*dcdk(N*N-1);
-	}
 	
 	//Bovenrand en onderrand
 	for (int j = 1; j < N-1; j++){
@@ -559,7 +555,8 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	
 		dcdk(j*N) = dot(lambda, dKdk_ub);
 	
-		dcda(j*N) = penal*(65.0-0.2)*pow(a(i + N*j),penal-1)*dcdk(i + j*N);
+		dcda(j*N) = penal*(65.0-0.2)*pow(a(j*N),penal-1)*dcdk(j*N);
+		
 		
 		vec dKdk_uo((N+1)*(N+1));
 		dKdk_uo.fill(0.0);
@@ -585,6 +582,7 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 		dcdk(i) = dot(lambda, dKdk_unlb);
 
 		dcda(i) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
+		
 			
 		vec dKdk_unlo((N+1)*(N+1));
 		dKdk_unlo.fill(0.0);
@@ -611,6 +609,7 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 
 		dcda(N*N-N+i) = penal*(65.0-0.2)*pow(a(N*N-N+i),penal-1)*dcdk(N*N-N+i);
 		
+		
 		vec dKdk_unro((N+1)*(N+1));
 		dKdk_unro.fill(0.0);
 		dKdk_unro(N-i + N*(N+1)) = -1.0*T(N-i + N*(N+1)) + 0.5*T(N-i-1 + N*(N+1)) + 0.5*T(N-i + (N-1)*(N+1));
@@ -630,32 +629,79 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	
 	//dcda_harm zou normaal al alles moeten hebben buiten vakjes met 1 of 2 hoekpunten met 293
 	
-	
-	
-	//To check for correctness
 	vec dKdk_uhlb((N+1)*(N+1));
 	dKdk_uhlb.fill(0.0);
 	dKdk_uhlb(0.3*N - 1) = -1.0*T(0.3*N - 1) + 0.5*T(0.3*N) + 0.5*T(0.3*N - 1 + (N+1));
-	//dKdk_uhlb(i+1) = -1.0*T(i+1) + 0.5*T(i) + 0.5*T(i+1 + (N+1));
+	//dKdk_uhlb(0.3*N) = -1.0*T(0.3*N) + 0.5*T(0.3*N - 1) + 0.5*T(0.3*N + (N+1));
 	dKdk_uhlb(0.3*N - 1 + (N+1)) = -1.0*T(0.3*N - 1 + (N+1)) + 0.5*T(0.3*N - 1) + 0.5*T(0.3*N + (N+1));
 	dKdk_uhlb(0.3*N + (N+1)) = -1.0*T(0.3*N + (N+1)) + 0.5*T(0.3*N) + 0.5*T(0.3*N - 1 + (N+1));
 
 	dcdk(0.3*N - 1) = dot(lambda, dKdk_uhlb);
 
-	dcda(0.3*N - 1) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
+	dcda(0.3*N - 1) = penal*(65.0-0.2)*pow(a(0.3*N - 1),penal-1)*dcdk(0.3*N - 1);
 	
 	
-	//To check for correctness
-	vec dKdk_uhlb((N+1)*(N+1));
-	dKdk_uhlb.fill(0.0);
-	dKdk_uhlb(0.3*N - 1 + N*(N+1)) = -1.0*T(0.3*N - 1 + N*(N+1)) + 0.5*T(0.3*N + N*(N+1)) + 0.5*T(0.3*N - 1 + (N-1)*(N+1));
-	dKdk_uhlb(i+1 + N*(N+1)) = -1.0*T(i+1 + N*(N+1)) + 0.5*T(i + N*(N+1)) + 0.5*T(i+1 + (N-1)*(N+1));
-	dKdk_uhlb(i + (N-1)*(N+1)) = -1.0*T(i + (N-1)*(N+1)) + 0.5*T(i + N*(N+1)) + 0.5*T(i+1 + (N-1)*(N+1));
-	dKdk_uhlb(i+1 + (N-1)*(N+1)) = -1.0*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + N*(N+1));
+	vec dKdk_uhlo((N+1)*(N+1));
+	dKdk_uhlo.fill(0.0);
+	//dKdk_uhlo(0.7*N) = -1.0*T(0.7*N) + 0.5*T(0.7*N + 1) + 0.5*T(0.7*N + (N+1));
+	dKdk_uhlo(0.7*N + 1) = -1.0*T(0.7*N + 1) + 0.5*T(0.7*N) + 0.5*T(0.7*N + 1 + (N+1));
+	dKdk_uhlo(0.7*N + (N+1)) = -1.0*T(0.7*N + (N+1)) + 0.5*T(0.7*N) + 0.5*T(0.7*N + 1 + (N+1));
+	dKdk_uhlo(0.7*N + 1 + (N+1)) = -1.0*T(0.7*N + 1 + (N+1)) + 0.5*T(0.7*N + 1) + 0.5*T(0.7*N + (N+1));
 
-	dcdk(N*N-N+i) = dot(lambda, dKdk_uhlb);
+	dcdk(0.7*N) = dot(lambda, dKdk_uhlo);
 
-	dcda(N*N-N+i) = penal*(65.0-0.2)*pow(a(N*N-N+i),penal-1)*dcdk(N*N-N+i);
+	dcda(0.7*N) = penal*(65.0-0.2)*pow(a(0.7*N),penal-1)*dcdk(0.7*N);
+	
+	
+	for (int i = 0.3*N; i < 0.7*N; i++){
+		vec dKdk_udl((N+1)*(N+1));
+		dKdk_udl.fill(0.0);
+		//dKdk_udl(i) = -1.0*T(i) + 0.5*T(i+1) + 0.5*T(i + (N+1));
+		//dKdk_udl(i+1) = -1.0*T(i+1) + 0.5*T(i) + 0.5*T(i+1 + (N+1));
+		dKdk_udl(i + (N+1)) = -1.0*T(i + (N+1)) + 0.5*T(i) + 0.5*T(i+1 + (N+1));
+		dKdk_udl(i+1 + (N+1)) = -1.0*T(i+1 + (N+1)) + 0.5*T(i+1) + 0.5*T(i + (N+1));
+
+		dcdk(i) = dot(lambda, dKdk_udl);
+
+		dcda(i) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
+	}
+	
+	
+	vec dKdk_uhrb((N+1)*(N+1));
+	dKdk_uhrb.fill(0.0);
+	dKdk_uhrb(N*N-1 + 0.3*N - 1) = -1.0*T(N*N-1 + 0.3*N - 1) + 0.5*T(N*N-1 + 0.3*N) + 0.5*T(N*N+N + 0.3*N - 1);
+	dKdk_uhrb(N*N-1 + 0.3*N) = -1.0*T(N*N-1 + 0.3*N) + 0.5*T(N*N-1 + 0.3*N - 1) + 0.5*T(N*N+N + 0.3*N);
+	dKdk_uhrb(N*N+N + 0.3*N - 1) = -1.0*T(N*N+N + 0.3*N - 1) + 0.5*T(N*N-1 + 0.3*N - 1) + 0.5*T(N*N+N + 0.3*N);
+	//dKdk_uhrb(N*N+N + 0.3*N) = -1.0*T(N*N+N + 0.3*N) + 0.5*T(N*N-1 + 0.3*N) + 0.5*T(N*N+N + 0.3*N - 1);
+
+	dcdk(N*(N-1) + 0.3*N - 1) = dot(lambda, dKdk_uhrb);
+
+	dcda(N*(N-1) + 0.3*N - 1) = penal*(65.0-0.2)*pow(a(N*(N-1) + 0.3*N - 1),penal-1)*dcdk(N*(N-1) + 0.3*N - 1);
+	
+	
+	vec dKdk_uhro((N+1)*(N+1));
+	dKdk_uhro.fill(0.0);
+	dKdk_uhro(N*N-1 + 0.7*N) = -1.0*T(N*N-1 + 0.7*N) + 0.5*T(N*N-1 + 0.7*N + 1) + 0.5*T(N*N+N + 0.7*N);
+	dKdk_uhro(N*N-1 + 0.7*N + 1) = -1.0*T(N*N-1 + 0.7*N + 1) + 0.5*T(N*N-1 + 0.7*N) + 0.5*T(N*N+N + 0.7*N + 1);
+	//dKdk_uhro(N*N+N + 0.7*N) = -1.0*T(N*N+N + 0.7*N) + 0.5*T(N*N-1 + 0.7*N) + 0.5*T(N*N+N + 0.7*N + 1);
+	dKdk_uhro(N*N+N + 0.7*N + 1) = -1.0*T(N*N+N + 0.7*N + 1) + 0.5*T(N*N-1 + 0.7*N + 1) + 0.5*T(N*N+N + 0.7*N);
+
+	dcdk(N*(N-1) + 0.7*N) = dot(lambda, dKdk_uhro);
+
+	dcda(N*(N-1) + 0.7*N) = penal*(65.0-0.2)*pow(a(N*(N-1) + 0.7*N),penal-1)*dcdk(N*(N-1) + 0.7*N);
+		
+	for (int i = 0.3*N; i < 0.7*N; i++){
+		vec dKdk_udr((N+1)*(N+1));
+		dKdk_udr.fill(0.0);
+		dKdk_udr(N*N-1 + i) = -1.0*T(N*N-1 + i) + 0.5*T(N*N-1 + i+1) + 0.5*T(N*N+N + i);
+		dKdk_udr(N*N-1 + i+1) = -1.0*T(N*N-1 + i+1) + 0.5*T(N*N-1 + i) + 0.5*T(N*N+N + i+1);
+		//dKdk_udr(N*N+N + i) = -1.0*T(N*N+N + i) + 0.5*T(N*N-1 + i) + 0.5*T(N*N+N + i+1);
+		//dKdk_udr(N*N+N + i+1) = -1.0*T(N*N+N + i+1) + 0.5*T(N*N-1 + i+1) + 0.5*T(N*N+N + i);
+
+		dcdk(N*(N-1) + i) = dot(lambda, dKdk_udr);
+
+		dcda(N*(N-1) + i) = penal*(65.0-0.2)*pow(a(N*(N-1) + i),penal-1)*dcdk(N*(N-1) + i);
+	}
 	
 	return dcda;
 	
