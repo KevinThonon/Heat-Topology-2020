@@ -1,6 +1,6 @@
-N = 10;
+N = 50;
 
-for iterations = 0:0
+for iterations = 0:30
     
     iter = int2str(iterations);
 
@@ -52,7 +52,7 @@ for iterations = 0:0
     temperature_mat = meshrefine(temperature_mat,2);
     
     figure()
-    surface(difference_mat,'FaceColor','interp')
+    surface(metal_mat)
     colorbar()
     iterations
     pause(0.1)
@@ -60,8 +60,8 @@ for iterations = 0:0
     
 end
 
-%pause(1)
-%close all
+pause(1)
+close all
 
 
 

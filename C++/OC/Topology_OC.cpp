@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	std::cout<<"iteration = "<<iterations<<std::endl;
 
 	
-	/* if (iterations == 5){
+	if (iterations == 5){
 		penal = 3.0;
 	}
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
  
 	if (iterations == 25){
 		penal = 7.0;
-	} */
+	} 
 	
 	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);
@@ -75,15 +75,15 @@ int main(int argc, char *argv[]) {
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	vec dcda_fd = top::dcda_fd(u, rl, a, N, penal);
+	//vec dcda_fd = top::dcda_fd(u, rl, a, N, penal);
 	vec dcda_arit = top::dcda_arit(lambda, u, a, N, penal);
-	vec dcda_harm = top::dcda_harm(lambda, u, a, k, N, penal);
+	//vec dcda_harm = top::dcda_harm(lambda, u, a, k, N, penal);
 
 	vec difference (N*N);
 
-	for (int i = 0; i < N*N ; i++){
-		difference(i) = dcda_arit(i)-dcda_fd(i);
-	}
+	//for (int i = 0; i < N*N ; i++){
+	//	difference(i) = dcda_arit(i)-dcda_fd(i);
+	//}
 
 	double rmin = 2.0;
 	vec dcda_check = top::check(N, rmin, a, dcda_arit);
