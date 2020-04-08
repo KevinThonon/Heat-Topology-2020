@@ -1,4 +1,4 @@
-#include "Topology_project_OC.hpp"
+#include "Topology_project_IPOPT.hpp"
 #include <armadillo>
 #include <iostream>
 #include <fstream>
@@ -6,25 +6,24 @@
 #include <algorithm>
 #include <math.h>
 #include <nlopt.h>
+#include <cppad/ipopt/solve.hpp>
 
 using namespace std;
 using namespace arma;
 
 
-int main(int argc, char *argv[]) {
+int main() {
 
-	int N = atoi(argv[1]);
-	double pctmetal = atof(argv[2]);
-	double penal = atof(argv[3]);
-
+	int N = 10;
 	int iterations = 0;
 
 	vec a(N*N);
 	for (int i = 0; i < N*N; ++i) {
-		a(i) = pctmetal; 
+		a(i) = 0.3; 
 	}
 
 	double change = 1.0; 
+	double penal = 3.0;
 
 	while (change > 0.01) {
 
