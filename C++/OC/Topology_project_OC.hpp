@@ -623,12 +623,6 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 	}
 	
 	
-	//Momenteel zijn alle middelste punten gedaan, alsook alle hoekpunten, boven en onder-randvoorwaarden, links en rechts neumann
-	// randvoorwaarden voor alle vakjes die geen hoekpunt van 293 hebben. Vakjes die 1 zo'n hoekpunt hebben zullen maar 3 niet-nul
-	//rijen hebben (zie net hieronder). Vakjes met 2 hoekpunten van 293 zullen maar 2 niet-nul rijen hebben (nog te implementeren)
-	
-	//dcda_harm zou normaal al alles moeten hebben buiten vakjes met 1 of 2 hoekpunten met 293
-	
 	vec dKdk_uhlb((N+1)*(N+1));
 	dKdk_uhlb.fill(0.0);
 	dKdk_uhlb(0.3*N - 1) = -1.0*T(0.3*N - 1) + 0.5*T(0.3*N) + 0.5*T(0.3*N - 1 + (N+1));
