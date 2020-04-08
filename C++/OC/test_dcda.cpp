@@ -43,12 +43,13 @@ int main(int argc, char *argv[]) {
 	vec difference(N*N);
 
 	for (int i = 0; i < N*N ; i++){
-		difference(i) = (dcda_arit(i)-dcda_fd(i))/cost;
+		difference(i) = (dcda_harm(i)-dcda_fd(i))/cost;
 	}
 	
 	std::cout<<difference<<std::endl;
-	//std::cout<<dcda_fd<<std::endl;
-	//std::cout<<" "<<std::endl;
-	//std::cout<<dcda_arit<<std::endl;
+	std::cout<<" "<<std::endl;
+	std::cout<<dcda_fd<<std::endl;
+	std::cout<<" "<<std::endl;
+	std::cout<<dcda_harm<<std::endl;
 
 }
