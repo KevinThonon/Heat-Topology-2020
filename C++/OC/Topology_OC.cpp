@@ -17,14 +17,26 @@ int main(int argc, char *argv[]) {
 	double pctmetal = atof(argv[2]);
 	double penal = atof(argv[3]);
 
-	int iterations = 0;
-
 	vec a(N*N);
+	mat k(N,N);
+	vec rl(pow(N+1,2));
+	sp_mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
+	vec u((N+1)*(N+1));
+	vec lambda((N+1)*(N+1));
+	vec dcda_arit(N*N);
+	vec difference(N*N);
+	vec dcda_check(N*N);
+	vec a_old(N*N);
+	vec change_v(N*N);
+	int iterations = 0;
+	double change = 1.0; 
+
+	
 	for (int i = 0; i < N*N; ++i) {
 		a(i) = pctmetal; 
 	}
 
-	double change = 1.0; 
+	
 
 	while (change > 0.01) {
 
@@ -32,11 +44,11 @@ int main(int argc, char *argv[]) {
 
 	
 	if (iterations == 5){
-		penal = 3.0;
+		penal = 4.0;
 	}
 
 	if (iterations == 15){
-		penal = 4.0;
+		penal = 5.0;
 	}
 
 	if (iterations == 20){
@@ -47,10 +59,10 @@ int main(int argc, char *argv[]) {
 		penal = 7.0;
 	} 
 	
-	mat k = top::create_k(a, N, penal);
-	vec rl = top::RL(N);
-	sp_mat ll = top::K_mat(k, N);
-	vec u = spsolve(ll,rl,"lapack");
+	k = top::create_k(a, N, penal);
+	rl = top::RL(N);
+	ll = top::K_mat(k, N);
+	u = spsolve(ll,rl,"lapack");
 
   
   	string t = "temperature_";
@@ -67,7 +79,7 @@ int main(int argc, char *argv[]) {
     	temperature_file.close();
 
 	//double cost = top::objective_function1(u, N);
-	vec lambda = top::lambda1(u, ll, N);
+	lambda = top::lambda1(u, ll, N);
 
 	//double cost = top::objective_function2(u, N);
 	//vec lambda = top::lambda2(ll, N);
@@ -76,22 +88,20 @@ int main(int argc, char *argv[]) {
 	//vec lambda = top::lambda3(ll, N);
 
 	//vec dcda_fd = top::dcda_fd(u, rl, a, N, penal);
-	vec dcda_arit = top::dcda_arit(lambda, u, a, N, penal);
-	//vec dcda_harm = top::dcda_harm(lambda, u, a, k, N, penal);
+	//vec dcda_arit = top::dcda_arit(lambda, u, a, N, penal);
+	vec dcda_harm = top::dcda_harm(lambda, u, a, k, N, penal);
 
-	vec difference (N*N);
 
 	//for (int i = 0; i < N*N ; i++){
 	//	difference(i) = dcda_arit(i)-dcda_fd(i);
 	//}
 
 	double rmin = 2.0;
-	vec dcda_check = top::check(N, rmin, a, dcda_arit);
-	vec a_old = a;
+	dcda_check = top::check(N, rmin, a, dcda_harm);
+	a_old = a;
 
 	a = top::OC(N, a, 0.4, dcda_check);
 	
-	vec change_v (N*N);
 	double change_n = 0.0;
 
 	for (int i = 0; i < N*N ; i++){
