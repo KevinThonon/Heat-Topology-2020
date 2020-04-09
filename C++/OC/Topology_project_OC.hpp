@@ -806,8 +806,7 @@ vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N, double penal){
 	
 	dcda(N*N - 1) = penal*(65.0-0.2)*pow(a(N*N - 1),penal-1)*dcdk(N*N - 1);
 	
-	//To check vanaf hier
-	
+
 	//Neumann links, boven dirichlett
 	for (int i = 1; i < 0.3*N - 1; i++){
 		vec dKdk_u((N+1)*(N+1));
@@ -892,13 +891,11 @@ vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N, double penal){
 		dcda(i + (N-1)*N) = penal*(65.0-0.2)*pow(a(i + N*(N-1)),penal-1)*dcdk(i + (N-1)*N);
 	}
 	
-	//Vanaf hier nog heel goed checken
-	
 	//Vakje met 1 hoekpunt van 293K, linkerkant, boven dirichlett boundary condition
 	vec dKdk_hlb((N+1)*(N+1));
 	dKdk_hlb.fill(0.0);
-	dKdk_hlb(0.3*N - 1) = (-1.0 - 2.0*(pow(k(0.3*N - 2,0),2)/pow((k(0.3*N - 2,0) + k(0.3*N - 1,0)),2)))*T(0.3*N - 1) + 1.0*T(0.3*N) + (2.0*pow(k(0.3*N - 2,0),2)/pow((k(0.3*N - 2,0) + k(0.3*N - 1,0)),2))*T(0.3*N - 1 + (N+1));
-	//dKdk_hlb(0.3*N) = (-1.0 - 2.0*(pow(k(0.3*N,0),2)/pow((k(0.3*N,0) + k(0.3*N - 1,0)),2)))*T(0.3*N) + 1.0*T(0.3*N - 1) + (2.0*pow(k(0.3*N,0),2)/pow((k(0.3*N,0) + k(0.3*N - 1,0)),2))*T(0.3*N + (N+1));
+	dKdk_hlb(0.3*N - 1) = (-0.5 - 2.0*(pow(k(0.3*N - 2,0),2)/pow((k(0.3*N - 2,0) + k(0.3*N - 1,0)),2)))*T(0.3*N - 1) + 0.5*T(0.3*N) + (2.0*pow(k(0.3*N - 2,0),2)/pow((k(0.3*N - 2,0) + k(0.3*N - 1,0)),2))*T(0.3*N - 1 + (N+1));
+	//dKdk_hlb(0.3*N) = (-0.5 - 2.0*(pow(k(0.3*N,0),2)/pow((k(0.3*N,0) + k(0.3*N - 1,0)),2)))*T(0.3*N) + 0.5*T(0.3*N - 1) + (2.0*pow(k(0.3*N,0),2)/pow((k(0.3*N,0) + k(0.3*N - 1,0)),2))*T(0.3*N + (N+1));
 	dKdk_hlb(0.3*N - 1 + (N+1)) = (-2.0*(pow(k(0.3*N - 2,0),2)/pow((k(0.3*N - 2,0) + k(0.3*N - 1,0)),2) + pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N - 1,0)),2)))*T(0.3*N - 1 + (N+1)) + (2.0*(pow(k(0.3*N - 2,0),2)/pow((k(0.3*N - 2,0) + k(0.3*N - 1,0)),2)))*T(0.3*N - 1) + (2.0*pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N - 1,0)),2))*T(0.3*N + (N+1));
 	dKdk_hlb(0.3*N + (N+1)) = (-2.0*(pow(k(0.3*N,0),2)/pow((k(0.3*N,0) + k(0.3*N - 1,0)),2) + pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N - 1,0)),2)))*T(0.3*N + (N+1)) + (2.0*(pow(k(0.3*N,0),2)/pow((k(0.3*N,0) + k(0.3*N - 1,0)),2)))*T(0.3*N) + (2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N - 1,0)),2)))*T(0.3*N - 1 + (N+1));
 
@@ -909,8 +906,8 @@ vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N, double penal){
 	//Vakje met 1 hoekpunt van 293K, linkerkant, onder dirichlett boundary condition
 	vec dKdk_hlo((N+1)*(N+1));
 	dKdk_hlo.fill(0.0);
-	//dKdk_hlo(0.7*N) = (-1.0 - 2.0*(pow(k(0.7*N-1,0),2)/pow((k(0.7*N-1,0) + k(0.7*N,0)),2)))*T(0.7*N) + 1.0*T(0.7*N+1) + (2.0*pow(k(0.7*N-1,0),2)/pow((k(0.7*N-1,0) + k(0.7*N,0)),2))*T(0.7*N + (N+1));
-	dKdk_hlo(0.7*N+1) = (-1.0 - 2.0*(pow(k(0.7*N+1,0),2)/pow((k(0.7*N+1,0) + k(0.7*N,0)),2)))*T(0.7*N+1) + 1.0*T(0.7*N) + (2.0*pow(k(0.7*N+1,0),2)/pow((k(0.7*N+1,0) + k(0.7*N,0)),2))*T(0.7*N+1 + (N+1));
+	//dKdk_hlo(0.7*N) = (-0.5 - 2.0*(pow(k(0.7*N-1,0),2)/pow((k(0.7*N-1,0) + k(0.7*N,0)),2)))*T(0.7*N) + 0.5*T(0.7*N+1) + (2.0*pow(k(0.7*N-1,0),2)/pow((k(0.7*N-1,0) + k(0.7*N,0)),2))*T(0.7*N + (N+1));
+	dKdk_hlo(0.7*N+1) = (-0.5 - 2.0*(pow(k(0.7*N+1,0),2)/pow((k(0.7*N+1,0) + k(0.7*N,0)),2)))*T(0.7*N+1) + 0.5*T(0.7*N) + (2.0*pow(k(0.7*N+1,0),2)/pow((k(0.7*N+1,0) + k(0.7*N,0)),2))*T(0.7*N+1 + (N+1));
 	dKdk_hlo(0.7*N + (N+1)) = (-2.0*(pow(k(0.7*N-1,0),2)/pow((k(0.7*N-1,0) + k(0.7*N,0)),2) + pow(k(0.7*N,1),2)/pow((k(0.7*N,1) + k(0.7*N,0)),2)))*T(0.7*N + (N+1)) + (2.0*(pow(k(0.7*N-1,0),2)/pow((k(0.7*N-1,0) + k(0.7*N,0)),2)))*T(0.7*N) + (2.0*pow(k(0.7*N,1),2)/pow((k(0.7*N,1) + k(0.7*N,0)),2))*T(0.7*N+1 + (N+1));
 	dKdk_hlo(0.7*N+1 + (N+1)) = (-2.0*(pow(k(0.7*N+1,0),2)/pow((k(0.7*N+1,0) + k(0.7*N,0)),2) + pow(k(0.7*N,1),2)/pow((k(0.7*N,1) + k(0.7*N,0)),2)))*T(0.7*N+1 + (N+1)) + (2.0*(pow(k(0.7*N+1,0),2)/pow((k(0.7*N+1,0) + k(0.7*N,0)),2)))*T(0.7*N+1) + (2.0*(pow(k(0.7*N,1),2)/pow((k(0.7*N,1) + k(0.7*N,0)),2)))*T(0.7*N + (N+1));
 
@@ -923,8 +920,8 @@ vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N, double penal){
 	dKdk_hrb.fill(0.0);
 	dKdk_hrb(0.3*N - 1 + (N-1)*(N+1)) = (-2.0*(pow(k(0.3*N - 1,N-2),2)/pow((k(0.3*N - 1,N-2) + k(0.3*N - 1,N-1)),2) + pow(k(0.3*N - 2,N-1),2)/pow((k(0.3*N - 2,N-1) + k(0.3*N - 1,N-1)),2)))*T(0.3*N - 1 + (N-1)*(N+1)) + (2.0*(pow(k(0.3*N - 1,N-2),2)/pow((k(0.3*N - 1,N-2) + k(0.3*N - 1,N-1)),2)))*T(0.3*N + (N-1)*(N+1)) + (2.0*pow(k(0.3*N - 2,N-1),2)/pow((k(0.3*N - 2,N-1) + k(0.3*N - 1,N-1)),2))*T(0.3*N - 1 + (N)*(N+1));
 	dKdk_hrb(0.3*N + (N-1)*(N+1)) = (-2.0*(pow(k(0.3*N - 1,N-2),2)/pow((k(0.3*N - 1,N-2) + k(0.3*N - 1,N-1)),2) + pow(k(0.3*N,N-1),2)/pow((k(0.3*N,N-1) + k(0.3*N - 1,N-1)),2)))*T(0.3*N + (N-1)*(N+1)) + (2.0*(pow(k(0.3*N - 1,N-2),2)/pow((k(0.3*N - 1,N-2) + k(0.3*N - 1,N-1)),2)))*T(0.3*N - 1 + (N-1)*(N+1)) + (2.0*pow(k(0.3*N,N-1),2)/pow((k(0.3*N,N-1) + k(0.3*N - 1,N-1)),2))*T(0.3*N + (N)*(N+1));
-	dKdk_hrb(0.3*N - 1 + (N)*(N+1)) = (-2.0*(pow(k(0.3*N - 2,N-1),2)/pow((k(0.3*N - 2,N-1) + k(0.3*N - 1,N-1)),2)) - 1.0)*T(0.3*N - 1 + (N)*(N+1)) + (2.0*(pow(k(0.3*N - 2,N-1),2)/pow((k(0.3*N - 2,N-1) + k(0.3*N - 1,N-1)),2)))*T(0.3*N - 1 + (N-1)*(N+1)) + 1.0*T(0.3*N + (N)*(N+1));
-	//dKdk_hrb(0.3*N + (N)*(N+1)) = (-2.0*(pow(k(0.3*N,N-1),2)/pow((k(0.3*N,N-1) + k(0.3*N - 1,N-1)),2)) - 1.0)*T(0.3*N + (N)*(N+1)) + (2.0*(pow(k(0.3*N,N-1),2)/pow((k(0.3*N,N-1) + k(0.3*N - 1,N-1)),2)))*T(0.3*N + (N-1)*(N+1)) + 1.0*T(0.3*N - 1 + (N)*(N+1));
+	dKdk_hrb(0.3*N - 1 + (N)*(N+1)) = (-2.0*(pow(k(0.3*N - 2,N-1),2)/pow((k(0.3*N - 2,N-1) + k(0.3*N - 1,N-1)),2)) - 0.5)*T(0.3*N - 1 + (N)*(N+1)) + (2.0*(pow(k(0.3*N - 2,N-1),2)/pow((k(0.3*N - 2,N-1) + k(0.3*N - 1,N-1)),2)))*T(0.3*N - 1 + (N-1)*(N+1)) + 0.5*T(0.3*N + (N)*(N+1));
+	//dKdk_hrb(0.3*N + (N)*(N+1)) = (-2.0*(pow(k(0.3*N,N-1),2)/pow((k(0.3*N,N-1) + k(0.3*N - 1,N-1)),2)) - 0.5)*T(0.3*N + (N)*(N+1)) + (2.0*(pow(k(0.3*N,N-1),2)/pow((k(0.3*N,N-1) + k(0.3*N - 1,N-1)),2)))*T(0.3*N + (N-1)*(N+1)) + 0.5*T(0.3*N - 1 + (N)*(N+1));
 
 	dcdk(0.3*N - 1 + (N-1)*N) = dot(lambda, dKdk_hrb);
 
@@ -935,65 +932,12 @@ vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N, double penal){
 	dKdk_hro.fill(0.0);
 	dKdk_hro(0.7*N + (N-1)*(N+1)) = (-2.0*(pow(k(0.7*N,N-2),2)/pow((k(0.7*N,N-2) + k(0.7*N,N-1)),2) + pow(k(0.7*N-1,N-1),2)/pow((k(0.7*N-1,N-1) + k(0.7*N,N-1)),2)))*T(0.7*N + (N-1)*(N+1)) + (2.0*(pow(k(0.7*N,N-2),2)/pow((k(0.7*N,N-2) + k(0.7*N,N-1)),2)))*T(0.7*N+1 + (N-1)*(N+1)) + (2.0*pow(k(0.7*N-1,N-1),2)/pow((k(0.7*N-1,N-1) + k(0.7*N,N-1)),2))*T(0.7*N + (N)*(N+1));
 	dKdk_hro(0.7*N+1 + (N-1)*(N+1)) = (-2.0*(pow(k(0.7*N,N-2),2)/pow((k(0.7*N,N-2) + k(0.7*N,N-1)),2) + pow(k(0.7*N+1,N-1),2)/pow((k(0.7*N+1,N-1) + k(0.7*N,N-1)),2)))*T(0.7*N+1 + (N-1)*(N+1)) + (2.0*(pow(k(0.7*N,N-2),2)/pow((k(0.7*N,N-2) + k(0.7*N,N-1)),2)))*T(0.7*N + (N-1)*(N+1)) + (2.0*pow(k(0.7*N+1,N-1),2)/pow((k(0.7*N+1,N-1) + k(0.7*N,N-1)),2))*T(0.7*N+1 + (N)*(N+1));
-	//dKdk_hro(0.7*N + (N)*(N+1)) = (-2.0*(pow(k(0.7*N-1,N-1),2)/pow((k(0.7*N-1,N-1) + k(0.7*N,N-1)),2)) - 1.0)*T(0.7*N + (N)*(N+1)) + (2.0*(pow(k(0.7*N-1,N-1),2)/pow((k(0.7*N-1,N-1) + k(0.7*N,N-1)),2)))*T(0.7*N + (N-1)*(N+1)) + 1.0*T(0.7*N+1 + (N)*(N+1));
-	dKdk_hro(0.7*N+1 + (N)*(N+1)) = (-2.0*(pow(k(0.7*N+1,N-1),2)/pow((k(0.7*N+1,N-1) + k(0.7*N,N-1)),2)) - 1.0)*T(0.7*N+1 + (N)*(N+1)) + (2.0*(pow(k(0.7*N+1,N-1),2)/pow((k(0.7*N+1,N-1) + k(0.7*N,N-1)),2)))*T(0.7*N+1 + (N-1)*(N+1)) + 1.0*T(0.7*N + (N)*(N+1));
+	//dKdk_hro(0.7*N + (N)*(N+1)) = (-2.0*(pow(k(0.7*N-1,N-1),2)/pow((k(0.7*N-1,N-1) + k(0.7*N,N-1)),2)) - 0.5)*T(0.7*N + (N)*(N+1)) + (2.0*(pow(k(0.7*N-1,N-1),2)/pow((k(0.7*N-1,N-1) + k(0.7*N,N-1)),2)))*T(0.7*N + (N-1)*(N+1)) + 0.5*T(0.7*N+1 + (N)*(N+1));
+	dKdk_hro(0.7*N+1 + (N)*(N+1)) = (-2.0*(pow(k(0.7*N+1,N-1),2)/pow((k(0.7*N+1,N-1) + k(0.7*N,N-1)),2)) - 0.5)*T(0.7*N+1 + (N)*(N+1)) + (2.0*(pow(k(0.7*N+1,N-1),2)/pow((k(0.7*N+1,N-1) + k(0.7*N,N-1)),2)))*T(0.7*N+1 + (N-1)*(N+1)) + 0.5*T(0.7*N + (N)*(N+1));
 
 	dcdk(0.7*N + (N-1)*N) = dot(lambda, dKdk_hro);
 
 	dcda(0.7*N + (N-1)*N) = penal*(65.0-0.2)*pow(a(0.7*N + N*(N-1)),penal-1)*dcdk(0.7*N + (N-1)*N);
-	
-	/*
-	//Dirichlett hoekpunten van dcda_arit als basis
-	
-	//Vakje met 1 hoekpunt van 293K, linkerkant, boven dirichlett boundary condition
-	vec dKdk_uhlb((N+1)*(N+1));
-	dKdk_uhlb.fill(0.0);
-	dKdk_uhlb(0.3*N - 1) = -1.0*T(0.3*N - 1) + 0.5*T(0.3*N) + 0.5*T(0.3*N - 1 + (N+1));
-	//dKdk_uhlb(0.3*N) = -1.0*T(0.3*N) + 0.5*T(0.3*N - 1) + 0.5*T(0.3*N + (N+1));
-	dKdk_uhlb(0.3*N - 1 + (N+1)) = -1.0*T(0.3*N - 1 + (N+1)) + 0.5*T(0.3*N - 1) + 0.5*T(0.3*N + (N+1));
-	dKdk_uhlb(0.3*N + (N+1)) = -1.0*T(0.3*N + (N+1)) + 0.5*T(0.3*N) + 0.5*T(0.3*N - 1 + (N+1));
-
-	dcdk(0.3*N - 1) = dot(lambda, dKdk_uhlb);
-
-	dcda(0.3*N - 1) = penal*(65.0-0.2)*pow(a(0.3*N - 1),penal-1)*dcdk(0.3*N - 1);
-	
-	//Vakje met 1 hoekpunt van 293K, linkerkant, onder dirichlett boundary condition
-	vec dKdk_uhlo((N+1)*(N+1));
-	dKdk_uhlo.fill(0.0);
-	//dKdk_uhlo(0.7*N) = -1.0*T(0.7*N) + 0.5*T(0.7*N + 1) + 0.5*T(0.7*N + (N+1));
-	dKdk_uhlo(0.7*N + 1) = -1.0*T(0.7*N + 1) + 0.5*T(0.7*N) + 0.5*T(0.7*N + 1 + (N+1));
-	dKdk_uhlo(0.7*N + (N+1)) = -1.0*T(0.7*N + (N+1)) + 0.5*T(0.7*N) + 0.5*T(0.7*N + 1 + (N+1));
-	dKdk_uhlo(0.7*N + 1 + (N+1)) = -1.0*T(0.7*N + 1 + (N+1)) + 0.5*T(0.7*N + 1) + 0.5*T(0.7*N + (N+1));
-
-	dcdk(0.7*N) = dot(lambda, dKdk_uhlo);
-
-	dcda(0.7*N) = penal*(65.0-0.2)*pow(a(0.7*N),penal-1)*dcdk(0.7*N);
-	
-	//Vakje met 1 hoekpunt van 293K, rechterkant, boven dirichlett boundary condition
-	vec dKdk_uhrb((N+1)*(N+1));
-	dKdk_uhrb.fill(0.0);
-	dKdk_uhrb(N*N-1 + 0.3*N - 1) = -1.0*T(N*N-1 + 0.3*N - 1) + 0.5*T(N*N-1 + 0.3*N) + 0.5*T(N*N+N + 0.3*N - 1);
-	dKdk_uhrb(N*N-1 + 0.3*N) = -1.0*T(N*N-1 + 0.3*N) + 0.5*T(N*N-1 + 0.3*N - 1) + 0.5*T(N*N+N + 0.3*N);
-	dKdk_uhrb(N*N+N + 0.3*N - 1) = -1.0*T(N*N+N + 0.3*N - 1) + 0.5*T(N*N-1 + 0.3*N - 1) + 0.5*T(N*N+N + 0.3*N);
-	//dKdk_uhrb(N*N+N + 0.3*N) = -1.0*T(N*N+N + 0.3*N) + 0.5*T(N*N-1 + 0.3*N) + 0.5*T(N*N+N + 0.3*N - 1);
-
-	dcdk(N*(N-1) + 0.3*N - 1) = dot(lambda, dKdk_uhrb);
-
-	dcda(N*(N-1) + 0.3*N - 1) = penal*(65.0-0.2)*pow(a(N*(N-1) + 0.3*N - 1),penal-1)*dcdk(N*(N-1) + 0.3*N - 1);
-	
-	//Vakje met 1 hoekpunt van 293K, rechterkant, onder dirichlett boundary condition
-	vec dKdk_uhro((N+1)*(N+1));
-	dKdk_uhro.fill(0.0);
-	dKdk_uhro(N*N-1 + 0.7*N) = -1.0*T(N*N-1 + 0.7*N) + 0.5*T(N*N-1 + 0.7*N + 1) + 0.5*T(N*N+N + 0.7*N);
-	dKdk_uhro(N*N-1 + 0.7*N + 1) = -1.0*T(N*N-1 + 0.7*N + 1) + 0.5*T(N*N-1 + 0.7*N) + 0.5*T(N*N+N + 0.7*N + 1);
-	//dKdk_uhro(N*N+N + 0.7*N) = -1.0*T(N*N+N + 0.7*N) + 0.5*T(N*N-1 + 0.7*N) + 0.5*T(N*N+N + 0.7*N + 1);
-	dKdk_uhro(N*N+N + 0.7*N + 1) = -1.0*T(N*N+N + 0.7*N + 1) + 0.5*T(N*N-1 + 0.7*N + 1) + 0.5*T(N*N+N + 0.7*N);
-
-	dcdk(N*(N-1) + 0.7*N) = dot(lambda, dKdk_uhro);
-
-	dcda(N*(N-1) + 0.7*N) = penal*(65.0-0.2)*pow(a(N*(N-1) + 0.7*N),penal-1)*dcdk(N*(N-1) + 0.7*N);
-	*/
-
 	
 	return dcda;
 	
