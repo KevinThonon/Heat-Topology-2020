@@ -560,10 +560,10 @@ vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
 		
 		vec dKdk_uo((N+1)*(N+1));
 		dKdk_uo.fill(0.0);
-		dKdk_uo(j*(N+1)) = -1.0*T(N-1 + j*(N+1)) + 0.5*T(N + j*(N+1)) + 0.5*T(N-1 + (j+1)*(N+1));
-		dKdk_uo(1 + j*(N+1)) = -1.0*T(N + j*(N+1)) + 0.5*T(N-1 + j*(N+1)) + 0.5*T(N + (j+1)*(N+1));
-		dKdk_uo((j+1)*(N+1)) = -1.0*T(N-1 + (j+1)*(N+1)) + 0.5*T(N-1 + j*(N+1)) + 0.5*T(N + (j+1)*(N+1));
-		dKdk_uo(1 + (j+1)*(N+1)) = -1.0*T(N + (j+1)*(N+1)) + 0.5*T(N + j*(N+1)) + 0.5*T(N-1 + (j+1)*(N+1));
+		dKdk_uo(N-1 + j*(N+1)) = -1.0*T(N-1 + j*(N+1)) + 0.5*T(N + j*(N+1)) + 0.5*T(N-1 + (j+1)*(N+1));
+		dKdk_uo(N + j*(N+1)) = -1.0*T(N + j*(N+1)) + 0.5*T(N-1 + j*(N+1)) + 0.5*T(N + (j+1)*(N+1));
+		dKdk_uo(N-1 + (j+1)*(N+1)) = -1.0*T(N-1 + (j+1)*(N+1)) + 0.5*T(N-1 + j*(N+1)) + 0.5*T(N + (j+1)*(N+1));
+		dKdk_uo(N + (j+1)*(N+1)) = -1.0*T(N + (j+1)*(N+1)) + 0.5*T(N + j*(N+1)) + 0.5*T(N-1 + (j+1)*(N+1));
 	
 		dcdk(N-1 + j*N) = dot(lambda, dKdk_uo);
 	
