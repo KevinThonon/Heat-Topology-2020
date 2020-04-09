@@ -191,8 +191,8 @@ mat LL(mat& bigkmat, int N){
 } */
 
 double mean(double a, double b){
-	//return (a+b)/2.0;	//arithmetic
-	return 2.0*(a*b)/(a+b);		//harmonic
+	return (a+b)/2.0;	//arithmetic
+	//return 2.0*(a*b)/(a+b);		//harmonic
 }
 
 
@@ -997,6 +997,81 @@ while ((l2-l1)>1e-4){
 }
 return xnew;
 }
+
+void temperatureToTxtFile(vec u , int iterations, int N){
+
+  	string t = "temperature_";
+  	t += to_string(iterations);
+  	t += ".txt";
+	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/temperature/";
+	path_temperature += t;
+
+	ofstream temperature_file;
+        temperature_file.open(path_temperature);
+        for (int i = 0; i < (N+1)*(N+1); ++i) {
+    		temperature_file <<u(i)<<std::endl;
+    	}
+    	temperature_file.close();
+
+}
+
+void gradientToTxtFile(vec dcda, int iterations, int N){
+
+  	string g = "gradient_";
+  	g += to_string(iterations);
+  	g += ".txt";
+	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/gradient/";
+	path_gradient += g;
+
+	ofstream gradient_file;
+        gradient_file.open(path_gradient);
+        for (int i = 0; i < N*N; ++i) {
+    		gradient_file <<dcda(i)<<std::endl;
+    	}
+    	gradient_file.close();
+
+}
+
+void metalToTxtFile(vec a, int iterations, int N){
+
+  	string m = "metal_";
+  	m += to_string(iterations);
+  	m += ".txt";
+	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/metal/";
+	path_metal += m;
+
+	ofstream metal_file;
+        metal_file.open(path_metal);
+        for (int i = 0; i < N*N; ++i) {
+    		metal_file <<a(i)<<std::endl;
+    	}
+    	metal_file.close();
+
+
+
+}
+
+void differenceToTxtFile(vec difference, int iterations, int N){
+
+  	string d = "difference_";
+  	d += to_string(iterations);
+  	d += ".txt";
+	string path_difference = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/difference/";
+	path_difference += d;
+
+	ofstream difference_file;
+        difference_file.open(path_difference);
+        for (int i = 0; i < N*N; ++i) {
+    		difference_file <<difference(i)<<std::endl;
+    	}
+    	difference_file.close();
+
+
+
+}
+
+
+
 
 }
 #endif

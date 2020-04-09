@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace arma;
+using namespace top;
 
 
 int main(int argc, char *argv[]) {
@@ -18,12 +19,13 @@ int main(int argc, char *argv[]) {
 	double penal = atof(argv[3]);
 
 	vec a(N*N);
+	a.fill(pctmetal);
 	mat k(N,N);
-	vec rl(pow(N+1,2));
-	sp_mat ll(((N+1)*(N+1)), ((N+1)*(N+1)));
+	vec f(pow(N+1,2));
+	sp_mat K(((N+1)*(N+1)), ((N+1)*(N+1)));
 	vec u((N+1)*(N+1));
 	vec lambda((N+1)*(N+1));
-	vec dcda_arit(N*N);
+	vec dcda_ari(N*N);
 	vec difference(N*N);
 	vec dcda_check(N*N);
 	vec a_old(N*N);
@@ -31,16 +33,9 @@ int main(int argc, char *argv[]) {
 	int iterations = 0;
 	double change = 1.0; 
 
-	
-	for (int i = 0; i < N*N; ++i) {
-		a(i) = pctmetal; 
-	}
-
-	
-
 	while (change > 0.01) {
 
-	std::cout<<"iteration = "<<iterations<<std::endl;
+	cout<<"iteration = "<<iterations<<endl;
 
 	
 	if (iterations == 5){
@@ -59,48 +54,44 @@ int main(int argc, char *argv[]) {
 		penal = 7.0;
 	} 
 	
-	k = top::create_k(a, N, penal);
-	rl = top::RL(N);
-	ll = top::K_mat(k, N);
-	u = spsolve(ll,rl,"lapack");
+	k = create_k(a, N, penal);
+	f = RL(N);
+	K = K_mat(k, N);
+	u = spsolve(K,f,"lapack");
 
   
-  	string t = "temperature_";
-  	t += to_string(iterations);
-  	t += ".txt";
-	string path_temperature = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/temperature/";
-	path_temperature += t;
+	temperatureToTxtFile(u, iterations, N);
 
-	ofstream temperature_file;
-        temperature_file.open(path_temperature);
-        for (int i = 0; i < (N+1)*(N+1); ++i) {
-    		temperature_file <<u(i)<<std::endl;
-    	}
-    	temperature_file.close();
+	//double cost = objective_function1(u, N);
+	lambda = lambda1(u, K, N);
 
-	//double cost = top::objective_function1(u, N);
-	lambda = top::lambda1(u, ll, N);
+	//double cost = objective_function2(u, N);
+	//vec lambda = lambda2(K, N);
 
-	//double cost = top::objective_function2(u, N);
-	//vec lambda = top::lambda2(ll, N);
+	//double cost = objective_function3(u, N);
+	//vec lambda = lambda3(K, N);
 
-	//double cost = top::objective_function3(u, N);
-	//vec lambda = top::lambda3(ll, N);
+	//vec dcda_f = dcda_fd(u, f, a, N, penal);
+	dcda_ari = dcda_arit(lambda, u, a, N, penal);
+	//vec dcda_har = dcda_harm(lambda, u, a, k, N, penal);
 
-	//vec dcda_fd = top::dcda_fd(u, rl, a, N, penal);
-	//vec dcda_arit = top::dcda_arit(lambda, u, a, N, penal);
-	vec dcda_harm = top::dcda_harm(lambda, u, a, k, N, penal);
+	double rmin = 2.0;
+	dcda_check = check(N, rmin, a, dcda_ari);
+
+	gradientToTxtFile(dcda_check, iterations, N);
 
 
 	//for (int i = 0; i < N*N ; i++){
 	//	difference(i) = dcda_arit(i)-dcda_fd(i);
 	//}
 
-	double rmin = 2.0;
-	dcda_check = top::check(N, rmin, a, dcda_harm);
+	differenceToTxtFile(difference, iterations, N);
+
 	a_old = a;
 
-	a = top::OC(N, a, 0.4, dcda_check);
+	a = OC(N, a, 0.4, dcda_check);
+
+	metalToTxtFile(a, iterations, N);
 	
 	double change_n = 0.0;
 
@@ -110,52 +101,7 @@ int main(int argc, char *argv[]) {
 	} 
 
 	change = change_n;
-	std::cout<<"change ="<<change<<std::endl;
-
-  	string d = "difference_";
-  	d += to_string(iterations);
-  	d += ".txt";
-	string path_difference = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/difference/";
-	path_difference += d;
-
-	ofstream difference_file;
-        difference_file.open(path_difference);
-        for (int i = 0; i < N*N; ++i) {
-    		difference_file <<difference(i)<<std::endl;
-    	}
-    	difference_file.close();
-
-  	string g = "gradient_";
-  	g += to_string(iterations);
-  	g += ".txt";
-	string path_gradient = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/gradient/";
-	path_gradient += g;
-
-	ofstream gradient_file;
-        gradient_file.open(path_gradient);
-        for (int i = 0; i < N*N; ++i) {
-    		gradient_file <<dcda_check(i)<<std::endl;
-    	}
-    	gradient_file.close();
-
-  	string m = "metal_";
-  	m += to_string(iterations);
-  	m += ".txt";
-	string path_metal = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/metal/";
-	path_metal += m;
-
-	ofstream metal_file;
-        metal_file.open(path_metal);
-        for (int i = 0; i < N*N; ++i) {
-    		metal_file <<a[i]<<std::endl;
-    	}
-    	metal_file.close();
+	cout<<"change ="<<change<<endl;
 	iterations += 1;
-	if (change <= 0.1){
-		penal += 1.0;
 	}
-	}
-	
-
-
 }
