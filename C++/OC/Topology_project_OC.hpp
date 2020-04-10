@@ -21,7 +21,7 @@ namespace top {
 
 
 // Dichtheid k in elk element met SIMP methode. Input: percentage metaal in elk element. Output: Dichtheid k in elk element
-mat create_k(vec a, int N, double penal) {
+mat create_k(vec& a, int N, double penal) {
 	mat k(N,N);
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < N; ++j) {
@@ -32,7 +32,7 @@ mat create_k(vec a, int N, double penal) {
 }
 
 // Grote matrix met ook k-waarden op randen van elementen (arithmisch gemiddelde)
-mat bigkmat(mat k, int N){
+mat bigkmat(mat& k, int N){
 	mat bigmat(2*N+1, 2*N+1);
 	bigmat.fill(0.0);
 	// Midden van elk element
@@ -191,8 +191,8 @@ mat LL(mat& bigkmat, int N){
 } */
 
 double mean(double a, double b){
-	return (a+b)/2.0;	//arithmetic
-	//return 2.0*(a*b)/(a+b);		//harmonic
+	//return (a+b)/2.0; //arithmetic
+	return 2.0*(a*b)/(a+b);	//harmonic
 }
 
 
@@ -470,7 +470,7 @@ vec dcda_fd(vec& T, vec& RL, vec& a, int N, double penal){
 
 // dc/da is een vector van gradienten die nodig is in de optimalisatie stap
 // Deze dcda moet gebruikt worden indien met arithmetic mean wordt gewerkt
-vec dcda_arit(vec lambda, vec T, vec& a, int N, double penal){
+vec dcda_arit(vec& lambda, vec T, vec& a, int N, double penal){
 	//Initialiseren dc/da en opvullen met nullen
 	vec dcda(N*N);
 	dcda.fill(0.0);
@@ -947,7 +947,7 @@ vec dcda_harm(vec& lambda, vec& T, vec& a, mat& k, int N, double penal){
 	
 
 
-vec check(int N, double rmin, vec x, mat dc){
+vec check(int N, double rmin, vec& x, mat& dc){
 
 vec dcn = zeros<vec>(N*N);
 
@@ -967,7 +967,7 @@ for (int i = 0; i < N; i++) {
 return dcn;
 }
 
-vec OC(int N, vec x, double volfrac, vec dc){
+vec OC(int N, vec& x, double volfrac, vec dc){
 
 double l1 = 0.0;
 double l2 = 100000.0;
@@ -998,7 +998,7 @@ while ((l2-l1)>1e-4){
 return xnew;
 }
 
-void temperatureToTxtFile(vec u , int iterations, int N){
+void temperatureToTxtFile(vec& u , int iterations, int N){
 
   	string t = "temperature_";
   	t += to_string(iterations);
@@ -1015,7 +1015,7 @@ void temperatureToTxtFile(vec u , int iterations, int N){
 
 }
 
-void gradientToTxtFile(vec dcda, int iterations, int N){
+void gradientToTxtFile(vec& dcda, int iterations, int N){
 
   	string g = "gradient_";
   	g += to_string(iterations);
@@ -1032,7 +1032,7 @@ void gradientToTxtFile(vec dcda, int iterations, int N){
 
 }
 
-void metalToTxtFile(vec a, int iterations, int N){
+void metalToTxtFile(vec& a, int iterations, int N){
 
   	string m = "metal_";
   	m += to_string(iterations);
@@ -1051,7 +1051,7 @@ void metalToTxtFile(vec a, int iterations, int N){
 
 }
 
-void differenceToTxtFile(vec difference, int iterations, int N){
+void differenceToTxtFile(vec& difference, int iterations, int N){
 
   	string d = "difference_";
   	d += to_string(iterations);

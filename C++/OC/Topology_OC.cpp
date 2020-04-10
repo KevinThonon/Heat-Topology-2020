@@ -25,7 +25,9 @@ int main(int argc, char *argv[]) {
 	sp_mat K(((N+1)*(N+1)), ((N+1)*(N+1)));
 	vec u((N+1)*(N+1));
 	vec lambda((N+1)*(N+1));
-	vec dcda_ari(N*N);
+	vec dcda_a(N*N); // arithmetic
+	vec dcda_h(N*N); // harmonic
+	vec dcda_f(N*N); // finite differences
 	vec difference(N*N);
 	vec dcda_check(N*N);
 	vec a_old(N*N);
@@ -37,26 +39,33 @@ int main(int argc, char *argv[]) {
 
 	cout<<"iteration = "<<iterations<<endl;
 
-	
 	if (iterations == 5){
-		penal = 4.0;
+		penal = 2.0;
 	}
 
+	if (iterations == 10){
+		penal = 3.0;
+	}
+ 
 	if (iterations == 15){
+		penal = 4.0;
+	} 
+
+	if (iterations == 20){
 		penal = 5.0;
 	}
 
-	if (iterations == 20){
-		penal = 6.0;
+	if (iterations == 25){
+		penal = 10.0;
 	}
  
 	if (iterations == 25){
-		penal = 7.0;
+		penal = 9.0;
 	} 
 	
 	k = create_k(a, N, penal);
-	f = RL(N);
 	K = K_mat(k, N);
+	f = RL(N);
 	u = spsolve(K,f,"lapack");
 
   
@@ -72,20 +81,13 @@ int main(int argc, char *argv[]) {
 	//vec lambda = lambda3(K, N);
 
 	//vec dcda_f = dcda_fd(u, f, a, N, penal);
-	dcda_ari = dcda_arit(lambda, u, a, N, penal);
-	//vec dcda_har = dcda_harm(lambda, u, a, k, N, penal);
+	//dcda_a = dcda_arit(lambda, u, a, N, penal);
+	vec dcda_h = dcda_harm(lambda, u, a, k, N, penal);
 
 	double rmin = 2.0;
-	dcda_check = check(N, rmin, a, dcda_ari);
+	dcda_check = check(N, rmin, a, dcda_h);
 
 	gradientToTxtFile(dcda_check, iterations, N);
-
-
-	//for (int i = 0; i < N*N ; i++){
-	//	difference(i) = dcda_arit(i)-dcda_fd(i);
-	//}
-
-	differenceToTxtFile(difference, iterations, N);
 
 	a_old = a;
 
