@@ -565,20 +565,20 @@ end
 
 
 function [dcda_m] = dcda_arit(lambda, T, a, N, penal)
-dcda_m = zeros(N*N,1);
-dcdk = zeros(N*N,1);
+dcda_m = sparse(N*N,1);
+dcdk = sparse(N*N,1);
 
 % element per element opvullen
 for i = 2:1:N-1
-    for j = 2:1:N-1
+    for j = 1:1:N-2
         dKdk_u = sparse((N+1)*(N+1),1);
-        dKdk_u(i + (j-1)*(N+1)) = -1.0*T(i + (j-1)*(N+1)) + 0.5*T(i+1 + (j-1)*(N+1)) + 0.5*T(i + (j)*(N+1));
-        dKdk_u(i+1 + (j-1)*(N+1)) = -1.0*T(i+1 + (j-1)*(N+1)) + 0.5*T(i + (j-1)*(N+1)) + 0.5*T(i+1 + (j)*(N+1));
-        dKdk_u(i + (j)*(N+1)) = -1.0*T(i + (j)*(N+1)) + 0.5*T(i + (j-1)*(N+1)) + 0.5*T(i+1 + (j)*(N+1));
-        dKdk_u(i+1 + (j)*(N+1)) = -1.0*T(i+1 + (j)*(N+1)) + 0.5*T(i+1 + (j-1)*(N+1)) + 0.5*T(i + (j)*(N+1));
+        dKdk_u(j*(N+1)+i) = -1.0*T(j*(N+1)+i) + 0.5*T(j*(N+1)+i+1) + 0.5*T((j+1)*(N+1)+i);
+        dKdk_u(j*(N+1)+i+1) = -1.0*T(j*(N+1)+i+1) + 0.5*T(j*(N+1)+i) + 0.5*T((j+1)*(N+1)+i+1);
+        dKdk_u((j+1)*(N+1)+i) = -1.0*T((j+1)*(N+1)+i) + 0.5*T(j*(N+1)+i) + 0.5*T((j+1)*(N+1)+i+1);
+        dKdk_u((j+1)*(N+1)+i+1) = -1.0*T((j+1)*(N+1)+i+1) + 0.5*T(j*(N+1)+i+1) + 0.5*T((j+1)*(N+1)+i);
         
-        dcdk(i + (j-1)*N) = dot(lambda, dKdk_u);
-        dcda_m(i + (j-1)*N) = penal*(65.0-0.2)*pow(a(i + N*(j-1)),penal-1)*dcdk(i + (j-1)*N);
+        dcdk(i + (j)*N) = dot(lambda, dKdk_u);
+        dcda_m(i + (j)*N) = penal*(65.0-0.2)*pow(a(i + N*(j)),penal-1)*dcdk(i + (j)*N);
     end
 end
 
@@ -594,9 +594,9 @@ dcda_m(1) = penal*(65.0-0.2)*pow(a(1),penal-1)*dcdk(1);
 
 %Linksonder
 dKdk_ulo = sparse((N+1)*(N+1),1);
-dKdk_ulo(N+1) = -1.0*T(N) + 0.5*T(N-1) + 0.5*T(2*N+1);
-dKdk_ulo(N) = -1.0*T(N-1) + 0.5*T(N) + 0.5*T(2*N);
-dKdk_ulo(2*N+2) = -1.0*T(2*N+2) + 0.5*T(N+1) + 0.5*T(2*N);
+dKdk_ulo(N+1) = -1.0*T(N+1) + 0.5*T(N) + 0.5*T(2*N+2);
+dKdk_ulo(N) = -1.0*T(N) + 0.5*T(N+1) + 0.5*T(2*N+1);
+dKdk_ulo(2*N+2) = -1.0*T(2*N+2) + 0.5*T(N+1) + 0.5*T(2*N+1);
 dKdk_ulo(2*N+1) = -1.0*T(2*N+1) + 0.5*T(N) + 0.5*T(2*N+2);
 
 dcdk(N) = dot(lambda, dKdk_ulo);
@@ -616,7 +616,8 @@ dcda_m((N-1)*N+1) = penal*(65.0-0.2)*pow(a((N-1)*N+1),penal-1)*dcdk((N-1)*N+1);
 dKdk_uro = sparse((N+1)*(N+1),1);
 dKdk_uro(N*N + 2*N+1) = -1.0*T(N*N + 2*N + 1) + 0.5*T(N*N + 2*N ) + 0.5*T(N*N + N);
 dKdk_uro(N*N + 2*N) = -1.0*T(N*N + 2*N) + 0.5*T(N*N + 2*N+1) + 0.5*T(N*N + N - 1);
-dKdk_uro(N*N + N) = -1.0*T(N*N + N ) + 0.5*T(N*N + 2*N) + 0.5*T(N*N + N - 1);
+dKdk_uro(N*N + N) = -1.0*T(N*N + N ) + 0.5*T(N*N + 2*N+1) + 0.5*T(N*N + N - 1);
+dKdk_uro(N*N + N - 1) = -1.0*T(N*N + N - 1) + 0.5*T(N*N + 2*N) + 0.5*T(N*N + N);
 
 dcdk(N*N) = dot(lambda, dKdk_uro);
 dcda_m(N*N) = penal*(65.0-0.2)*pow(a(N*N),penal-1)*dcdk(N*N);
@@ -655,35 +656,44 @@ for i = 2:1:(0.3*N-1)
     dcdk(i) = dot(lambda, dKdk_unlb);
     dcda_m(i) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
     
-    dKdk_unlo = sparse((N+1)*(N+1),1);
-    dKdk_unlo(N+1-i+1) = -1*T(N+1-i+1) + 0.5*T(N+1-i) + 0.5*T(2*(N+1)-i+1);
-    dKdk_unlo(N+1-i) = -1*T(N+1-i) + 0.5*T(N+1-i+1) + 0.5*T(2*(N+1)-i);
-    dKdk_unlo(2*(N+1)-i+1) = -1*T(2*(N+1)-i+1) + 0.5*T(N+1-i) + 0.5*T(2*(N+1)-i);
-    dKdk_unlo(2*(N+1)-i) = -1*T(2*(N+1)-i) + 0.5*T(N+1-i+1) + 0.5*T(2*(N+1)-i+1);
-    
-    dcdk(N-i+1) = dot(lambda, dKdk_unlo);
-	dcda_m(N-i+1) = penal*(65.0-0.2)*pow(a(N-i+1),penal-1)*dcdk(N-i+1);
 end
+
+
+for i = (0.7*N+2):1:(N-1)
+    dKdk_unlo = sparse((N+1)*(N+1),1);
+    dKdk_unlo(i) = -1*T(i) + 0.5*T(i+1) + 0.5*T(i + (N+1));
+    dKdk_unlo(i+1) = -1*T(i+1) + 0.5*T(i) + 0.5*T(i+1 + (N+1));
+    dKdk_unlo(i + (N+1)) = -1*T(i + (N+1)) + 0.5*T(i) + 0.5*T(i+1 + (N+1));
+    dKdk_unlo(i+1 + (N+1)) = -1*T(i+1 + (N+1)) + 0.5*T(i+1) + 0.5*T(i + (N+1));
+    
+    dcdk(i) = dot(lambda, dKdk_unlo);
+	dcda_m(i) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
+    
+end
+
+
 
 %Neumann rechts
 for i = 2:1:(0.3*N-1)
-    dKdk_unlb = sparse((N+1)*(N+1),1);
-    dKdk_unlb((N+1)*N+i) = -1*T((N+1)*N+i) + 0.5*T((N+1)*N +i+1) + 0.5*T(i + N*N-1);
-    dKdk_unlb((N+1)*N +i+1) = -1*T((N+1)*N +i+1) + 0.5*T((N+1)*N+i) + 0.5*T(i+1 + N*(N-1));
-    dKdk_unlb(i + N*N-1) = -1*T(i + N*N-1) + 0.5*T((N+1)*N+i) + 0.5*T(i+1 + N*N-1);
-    dKdk_unlb(i+1 + N*N-1) = -1*T(i+1 + N*N-1) + 0.5*T((N+1)*N +i+1) + 0.5*T(i + N*N-1);
-    
-    dcdk(N*(N-1)+i) = dot(lambda, dKdk_unlb);
+    dKdk_unrb = sparse((N+1)*(N+1),1);
+    dKdk_unrb(i + (N-1)*(N+1)) = -1.0*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N)*(N+1));
+    dKdk_unrb(i+1 + (N-1)*(N+1)) = -1.0*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N)*(N+1));
+    dKdk_unrb(i + (N)*(N+1)) = -1.0*T(i + (N)*(N+1)) + 0.5*T(i+1 + (N)*(N+1)) + 0.5*T(i + (N-1)*(N+1));
+    dKdk_unrb(i+1 + (N)*(N+1)) = -1.0*T(i+1 + (N)*(N+1)) + 0.5*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N)*(N+1));
+   
+    dcdk(N*(N-1)+i) = dot(lambda, dKdk_unrb);
     dcda_m(N*(N-1)+i) = penal*(65.0-0.2)*pow(a(N*(N-1)+i),penal-1)*dcdk(N*(N-1)+i);
-    
+end
+
+for i = (0.7*N+2):1:N-1
     dKdk_unlo = sparse((N+1)*(N+1),1);
-    dKdk_unlo((N+1)*(N+1)-i+1) = -1*T((N+1)*(N+1)-i+1) + 0.5*T((N+1)*(N+1)-i) + 0.5*T(N*(N+1)-i+1);
-    dKdk_unlo((N+1)*(N+1)-i) = -1*T((N+1)*(N+1)-i) + 0.5*T((N+1)*(N+1)-i+1) + 0.5*T(N*(N+1)-i);
-    dKdk_unlo(N*(N+1)-i+1) = -1*T(N*(N+1)-i+1) + 0.5*T((N+1)*(N+1)-i+1) + 0.5*T(N*(N+1)-i);
-    dKdk_unlo(N*(N+1)-i) = -1*T(N*(N+1)-i) + 0.5*T((N+1)*(N+1)-i) + 0.5*T(N*(N+1)-i+1);
-    
-    dcdk(N*N-i+1) = dot(lambda, dKdk_unlo);
-	dcda_m(N*N-i+1) = penal*(65.0-0.2)*pow(a(N*N-i+1),penal-1)*dcdk(N*N-i+1);
+    dKdk_unlo(i + (N-1)*(N+1)) = -1.0*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N)*(N+1));
+    dKdk_unlo(i+1 + (N-1)*(N+1)) = -1.0*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N)*(N+1));
+    dKdk_unlo(i + (N)*(N+1)) = -1.0*T(i + (N)*(N+1)) + 0.5*T(i+1 + (N)*(N+1)) + 0.5*T(i + (N-1)*(N+1));
+    dKdk_unlo(i+1 + (N)*(N+1)) = -1.0*T(i+1 + (N)*(N+1)) + 0.5*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N)*(N+1));
+   
+    dcdk(N*(N-1)+i) = dot(lambda, dKdk_unlo);
+	dcda_m(N*(N-1)+i) = penal*(65.0-0.2)*pow(a(N*(N-1)+i),penal-1)*dcdk(N*(N-1)+i);
 end
 
 
@@ -694,8 +704,8 @@ dKdk_uhlb(0.3*N) = -1*T(0.3*N) + 0.5*T(0.3*N+1) + 0.5*T(0.3*N +(N+1));
 dKdk_uhlb(0.3*N +(N+1)) = -1*T(0.3*N +(N+1)) + 0.5*T(0.3*N) + 0.5*T(0.3*N +(N+1)+ 1);
 dKdk_uhlb(0.3*N +(N+1)+ 1) = -1*T(0.3*N +(N+1)+ 1) + 0.5*T(0.3*N+1) + 0.5*T(0.3*N +(N+1));
 
-dcdk(0.3*N-1) = dot(lambda, dKdk_uhlb);
-dcda_m(0.3*N-1) = penal*(65.0-0.2)*pow(a(0.3*N),penal-1)*dcdk(0.3*N-1);
+dcdk(0.3*N) = dot(lambda, dKdk_uhlb);
+dcda_m(0.3*N) = penal*(65.0-0.2)*pow(a(0.3*N),penal-1)*dcdk(0.3*N);
 
 %Vakje met 1 hoekpunt van 293K, linkerkant, onder dirichlett boundary condition
 dKdk_uhlo = sparse((N+1)*(N+1),1);
@@ -726,16 +736,16 @@ dKdk_uhrb((N+1)*N + 0.3*N) = -1*T((N+1)*N + 0.3*N) + 0.5*T((N+1)*N + 0.3*N+1) + 
 dKdk_uhrb((N+1)*(N-1) + 0.3*N) = -1*T((N+1)*(N-1) + 0.3*N) + 0.5*T((N+1)*N + 0.3*N) + 0.5*T((N+1)*(N-1) + 0.3*N+1);
 dKdk_uhrb((N+1)*(N-1) + 0.3*N+1) = -1*T((N+1)*(N-1) + 0.3*N+1) + 0.5*T((N+1)*N + 0.3*N+1) + 0.5*T((N+1)*(N-1) + 0.3*N);
 
-dcdk((N+1)*N + 0.3*N) = dot(lambda, dKdk_uhrb);
-dcda_m((N+1)*N + 0.3*N) =  penal*(65.0-0.2)*pow(a((N+1)*N + 0.3*N),penal-1)*dcdk((N+1)*N + 0.3*N);
+dcdk((N-1)*N + 0.3*N) = dot(lambda, dKdk_uhrb);
+dcda_m((N-1)*N + 0.3*N) =  penal*(65.0-0.2)*pow(a((N-1)*N + 0.3*N),penal-1)*dcdk((N-1)*N + 0.3*N);
 
 %Vakje met 1 hoekpunt van 293K, rechterkant, onder dirichlett boundary condition
 dKdk_uhro = sparse((N+1)*(N+1),1);
 %(N*(N+1) + 0.7*N)
-dKdk_uhro(N*(N+1) + 0.7*N+1) = -1*T(N*(N+1) + 0.7*N+1) + 0.5*T((N-1)*(N+1)+0.7*N+1) + 0.5*T(N*(N+1) + 0.7*N);
-dKdk_uhro((N-1)*(N+1)+0.7*N) = -1*T((N-1)*(N+1)+0.7*N) + 0.5*T((N-1)*(N+1)+0.7*N+1) + 0.5*T(N*(N+1) + 0.7*N);
-dKdk_uhro((N-1)*(N+1)+0.7*N+1) = -1*T((N-1)*(N+1)+0.7*N+1) + 0.5*T(N*(N+1) + 0.7*N+1) + 0.5*T((N-1)*(N+1)+0.7*N);
-
+dKdk_uhro(0.7*N + (N-1)*(N+1)+1) = -1*T(0.7*N + (N-1)*(N+1)+1) + 0.5*T(0.7*N+1 + (N-1)*(N+1)+1) + 0.5*T(0.7*N + (N)*(N+1));
+dKdk_uhro(0.7*N+1 + (N-1)*(N+1)+1) = -1*T(0.7*N+1 + (N-1)*(N+1)+1) + 0.5*T(0.7*N + (N-1)*(N+1)+1) + 0.5*T(0.7*N+1 + (N)*(N+1)+1);
+dKdk_uhro(0.7*N+1 + (N)*(N+1)+1) = -1*T(0.7*N+1 + (N)*(N+1)+1) + 0.5*T(0.7*N+1 + (N-1)*(N+1)+1) + 0.5*T(0.7*N + (N)*(N+1));
+%0.7*N + (N)*(N+1)
 dcdk(N*(N-1) + 0.7*N +1) = dot(lambda, dKdk_uhro);
 dcda_m(N*(N-1) + 0.7*N +1) = penal*(65.0-0.2)*pow(a(N*(N-1) + 0.7*N +1),penal-1)*dcdk(N*(N-1) + 0.7*N +1);
 
@@ -743,21 +753,229 @@ dcda_m(N*(N-1) + 0.7*N +1) = penal*(65.0-0.2)*pow(a(N*(N-1) + 0.7*N +1),penal-1)
 
 %Vakjes direct naast de rechtse dirichlett boundary condition. Deze hebben 2 hoekpunten van 293K
 
-for i = ((N+1)*N + 0.3*N+1):1:(N*(N+1) + 0.7*N)
+for i = 0.3*N+1:1:0.7*N
     dKdk_udr = sparse((N+1)*(N+1),1);
-    dKdk_udr(i-(N+1)) = -1*T(i-(N+1)) + 0.5*T(i-(N+1)+1)  + 0.5*T(i);
-    dKdk_udr(i-(N+1)+1) = -1*T(i-(N+1)+1) + 0.5*T(i-(N+1)) + 0.5*T(i+1);
-    %(i)
-    %(i+1)
+    dKdk_udr(i + (N-1)*(N+1)) = -1*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N-1)*(N+1))  + 0.5*T(i + (N)*(N+1));
+    dKdk_udr(i+1 + (N-1)*(N+1)) = -1*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N)*(N+1));
+    %(i + (N)*(N+1))
+    %(i+1 + (N)*(N+1))
     
-    dcdk(i) = dot(lambda, dKdk_udr);
+    dcdk(i + (N-1)*N) = dot(lambda, dKdk_udr);
+    dcda_m(i + (N-1)*N) = penal*(65.0-0.2)*pow(a(i + (N-1)*N),penal-1)*dcdk(i + (N-1)*N);
+end
+
+
+
+
+end
+
+
+function [dcda_m] = dcda_harm(lambda, T, a, k, N, penal)
+dcda_m = sparse(N*N,1);
+dcdk = sparse(N*N,1);
+% element per element opvullen
+for i = 2:1:N-1
+    for j = 2:1:N-1
+        dKdk_u = sparse((N+1)*(N+1),1);
+        dKdk_u(i + (j-1)*(N+1)) = (-2.0*(pow(k(i,j-1),2)/pow((k(i,j-1) + k(i,j)),2) + pow(k(i-1,j),2)/pow((k(i-1,j) + k(i,j)),2)))*T(i + (j-1)*(N+1)) + (2.0*(pow(k(i,j-1),2)/pow((k(i,j-1) + k(i,j)),2)))*T(i+1 + (j-1)*(N+1)) + (2.0*pow(k(i-1,j),2)/pow((k(i-1,j) + k(i,j)),2))*T(i + (j)*(N+1));
+        dKdk_u(i+1 + (j-1)*(N+1)) = (-2.0*(pow(k(i,j-1),2)/pow((k(i,j-1) + k(i,j)),2) + pow(k(i+1,j),2)/pow((k(i+1,j) + k(i,j)),2)))*T(i+1 + (j-1)*(N+1)) + (2.0*(pow(k(i,j-1),2)/pow((k(i,j-1) + k(i,j)),2)))*T(i + (j-1)*(N+1)) + (2.0*pow(k(i+1,j),2)/pow((k(i+1,j) + k(i,j)),2))*T(i+1 + (j)*(N+1));
+        dKdk_u(i + (j)*(N+1)) = (-2.0*(pow(k(i-1,j),2)/pow((k(i-1,j) + k(i,j)),2) + pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2)))*T(i + (j)*(N+1)) + (2.0*(pow(k(i-1,j),2)/pow((k(i-1,j) + k(i,j)),2)))*T(i + (j-1)*(N+1)) + (2.0*pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2))*T(i+1 + (j)*(N+1));
+        dKdk_u(i+1 + (j)*(N+1)) = (-2.0*(pow(k(i+1,j),2)/pow((k(i+1,j) + k(i,j)),2) + pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2)))*T(i+1 + (j)*(N+1)) + (2.0*(pow(k(i+1,j),2)/pow((k(i+1,j) + k(i,j)),2)))*T(i+1 + (j-1)*(N+1)) + (2.0*(pow(k(i,j+1),2)/pow((k(i,j+1) + k(i,j)),2)))*T(i + (j)*(N+1));
+        			
+        dcdk(i + (j-1)*N) = dot(lambda, dKdk_u);
+        dcda_m(i + (j-1)*N) = penal*(65.0-0.2)*pow(a(i + N*(j-1)),penal-1)*dcdk(i + (j-1)*N);
+    end
+end
+
+%Linksboven
+dKdk_ulb = sparse((N+1)*(N+1),1);
+dKdk_ulb(1) = -1.0*T(1) + 0.5*T(2) + 0.5*T(N+2);
+dKdk_ulb(2) = (-0.5 - 2.0*(pow(k(2,1),2)/pow((k(2,1) + k(1,1)),2)))*T(2) + 0.5*T(1) + (2.0*pow(k(2,1),2)/pow((k(2,1) + k(1,1)),2))*T(N+3);
+dKdk_ulb(N+2) = (-0.5 - 2.0*(pow(k(1,2),2)/pow((k(1,2) + k(1,1)),2)))*T(N+2) + 0.5*T(1) + (2.0*pow(k(1,2),2)/pow((k(1,2) + k(1,1)),2))*T(N+3);
+dKdk_ulb(N+3) = (-2.0*(pow(k(2,1),2)/pow((k(2,1) + k(1,1)),2) + pow(k(1,2),2)/pow((k(1,2) + k(1,1)),2)))*T(N+3) + (2.0*(pow(k(2,1),2)/pow((k(2,1) + k(2,1)),2)))*T(2) + (2.0*(pow(k(1,2),2)/pow((k(1,2) + k(1,1)),2)))*T(N+2);
+
+dcdk(1) = dot(lambda, dKdk_ulb);
+dcda_m(1) = penal*(65.0-0.2)*pow(a(1),penal-1)*dcdk(1);
+
+%Linksonder
+dKdk_ulo = sparse((N+1)*(N+1),1);
+dKdk_ulo(N-1+1) = (-0.5 - 2.0*(pow(k(N-2+1,0+1),2)/pow((k(N-2+1,0+1) + k(N-1+1,0+1)),2)))*T(N-1+1) + 0.5*T(N+1) + (2.0*pow(k(N-2+1,0+1),2)/pow((k(N-2+1,0+1) + k(N-1+1,0+1)),2))*T(2*N+1);
+dKdk_ulo(N+1) = -1.0*T(N+1) + 0.5*T(N-1+1) + 0.5*T(2*N+1+1);
+dKdk_ulo(2*N+1) = (-2.0*(pow(k(N-2+1,0+1),2)/pow((k(N-2+1,0+1) + k(N-1+1,0+1)),2) + pow(k(N-1+1,1+1),2)/pow((k(N-1+1,1+1) + k(N-1+1,0+1)),2)))*T(2*N+1) + (2.0*(pow(k(N-2+1,0+1),2)/pow((k(N-2+1,0+1) + k(N-1+1,0+1)),2)))*T(N-1+1) + (2.0*pow(k(N-1+1,1+1),2)/pow((k(N-1+1,1+1) + k(N-1+1,0+1)),2))*T(2*N+1+1);
+dKdk_ulo(2*N+1+1) = (-0.5 - 2.0*(pow(k(N-1+1,1+1),2)/pow((k(N-1+1,1+1) + k(N-1+1,0+1)),2)))*T(2*N+1+1) + 0.5*T(N+1) + (2.0*(pow(k(N-1+1,1+1),2)/pow((k(N-1+1,1+1) + k(N-1+1,0+1)),2)))*T(2*N+1);
+
+dcdk(N) = dot(lambda, dKdk_ulo);
+dcda_m(N) = penal*(65.0-0.2)*pow(a(N),penal-1)*dcdk(N);
+
+%Rechtsboven
+dKdk_urb = sparse((N+1)*(N+1),1);
+dKdk_urb(N*N - 1+1) = (-2.0*(pow(k(0+1,N-2+1),2)/pow((k(0+1,N-2+1) + k(0+1,N-1+1)),2)) - 0.5)*T(N*N - 1+1) + (2.0*(pow(k(0+1,N-2+1),2)/pow((k(0+1,N-2+1) + k(0+1,N-1+1)),2)))*T(N*N+1) + 0.5*T(N*(N+1)+1);
+dKdk_urb(N*N+1) = (-2.0*(pow(k(0+1,N-2+1),2)/pow((k(0+1,N-2+1) + k(0+1,N-1+1)),2) + pow(k(1+1,N-1+1),2)/pow((k(1+1,N-1+1) + k(0+1,N-1+1)),2)))*T(N*N+1) + (2.0*(pow(k(0+1,N-2+1),2)/pow((k(0+1,N-2+1) + k(0+1,N-1+1)),2)))*T(N*N - 1+1) + (2.0*pow(k(1+1,N-1+1),2)/pow((k(1+1,N-1+1) + k(0+1,N-1+1)),2))*T(N*(N+1) + 1+1);
+dKdk_urb(N*(N+1)+1) = -1.0*T(N*(N+1)+1) + 0.5*T(N*N - 1+1) + 0.5*T(N*(N+1) + 1+1);
+dKdk_urb(N*(N+1) + 1+1) = (-2.0*(pow(k(1+1,N-1+1),2)/pow((k(1+1,N-1+1) + k(0+1,N-1+1)),2)) - 0.5)*T(N*(N+1)+1 + 1) + (2.0*(pow(k(1+1,N-1+1),2)/pow((k(1+1,N-1+1) + k(0+1,N-1+1)),2)))*T(N*N+1) + 0.5*T(N*(N+1)+1);
+	
+dcdk((N-1)*N+1) = dot(lambda, dKdk_urb);
+dcda_m((N-1)*N+1) = penal*(65.0-0.2)*pow(a((N-1)*N+1),penal-1)*dcdk((N-1)*N+1);
+
+%Rechtsonder
+dKdk_uro = sparse((N+1)*(N+1),1);
+dKdk_uro(N*N + 2*N+1) = -1.0*T(N*N + 2*N+1) + 0.5*T(N*N + N) + 0.5*T(N*N + 2*N);
+dKdk_uro(N*N + 2*N) = (-2.0*(pow(k(N-1,N),2)/pow((k(N-1,N) + k(N,N)),2)) - 0.5)*T(N*N + 2*N) + (2.0*(pow(k(N-1,N),2)/pow((k(N-1,N) + k(N,N)),2)))*T(N*N + N - 1) + 0.5*T(N*N + 2*N+1);
+dKdk_uro(N*N + N) = (-2.0*(pow(k(N,N-1),2)/pow((k(N,N-1) + k(N,N)),2)) - 0.5)*T(N*N + N) + (2.0*(pow(k(N,N-1),2)/pow((k(N,N-1) + k(N,N)),2)))*T(N*N + N - 1) + 0.5*T(N*N + 2*N +1);
+dKdk_uro(N*N + N - 1) = (-2.0*(pow(k(N,N-1),2)/pow((k(N,N-1) + k(N,N)),2) + pow(k(N-1,N),2)/pow((k(N-1,N) + k(N,N)),2)))*T(N*N + N - 1) + (2.0*(pow(k(N,N-1),2)/pow((k(N,N-1) + k(N,N)),2)))*T(N*N + N) + (2.0*pow(k(N-1,N),2)/pow((k(N-1,N) + k(N,N)),2))*T(N*N + 2*N);
+
+dcdk(N*N) = dot(lambda, dKdk_uro);
+dcda_m(N*N) = penal*(65.0-0.2)*pow(a(N*N),penal-1)*dcdk(N*N);
+
+
+% Boven en onderrand
+
+for j = 1:1:N-2
+    dKdk_ub = sparse((N+1)*(N+1),1);
+    dKdk_ub(j*(N+1)+1) = (-2.0*(pow(k(1,j),2)/pow((k(1,j) + k(1,j+1)),2)) - 0.5)*T(j*(N+1)+1) + (2.0*(pow(k(1,j),2)/pow((k(1,j) + k(1,j+1)),2)))*T(2 + j*(N+1)) + 0.5*T((j+1)*(N+1)+1);
+    dKdk_ub(j*(N+1)+2) = (-2.0*(pow(k(1,j),2)/pow((k(1,j) + k(1,j+1)),2) + pow(k(2,j+1),2)/pow((k(2,j+1) + k(1,j+1)),2)))*T(2 + j*(N+1)) + (2.0*(pow(k(1,j),2)/pow((k(1,j) + k(1,j+1)),2)))*T(j*(N+1)+1) + (2.0*pow(k(2,j+1),2)/pow((k(2,j+1) + k(1,j+1)),2))*T(2 + (j+1)*(N+1));
+    dKdk_ub((j+1)*(N+1)+1) = (-0.5 - 2.0*(pow(k(1,j+2),2)/pow((k(1,j) + k(1,j+1)),2)))*T((j+1)*(N+1)+1) + 0.5*T(j*(N+1)+1) + (2.0*pow(k(1,j+2),2)/pow((k(1,j+2) + k(1,j+1)),2))*T(2 + (j+1)*(N+1));
+	dKdk_ub((j+1)*(N+1)+2) = (-2.0*(pow(k(2,j+1),2)/pow((k(2,j+1) + k(1,j+1)),2) + pow(k(1,j+2),2)/pow((k(1,j+2) + k(1,j+1)),2)))*T(2 + (j+1)*(N+1)) + (2.0*(pow(k(2,j+1),2)/pow((k(2,j+1) + k(1,j+1)),2)))*T(2 + j*(N+1)) + (2.0*(pow(k(1,j+2),2)/pow((k(1,j+2) + k(1,j+1)),2)))*T((j+1)*(N+1)+1);
+    
+    dcdk(j*N+1) = dot(lambda, dKdk_ub);
+    dcda_m(j*N+1) = penal*(65.0-0.2)*pow(a(j*N+1),penal-1)*dcdk(j*N+1);
+    
+    dKdk_uo = sparse((N+1)*(N+1),1);
+    dKdk_uo((j+1)*(N+1)-1) = (-2.0*(pow(k(N,j),2)/pow((k(N,j) + k(N,j+1)),2) + pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N,j+1)),2)))*T(N + j*(N+1)) + (2.0*(pow(k(N,j),2)/pow((k(N,j) + k(N,j+1)),2)))*T(N +1+ j*(N+1)) + (2.0*pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N,j+1)),2))*T(N + (j+1)*(N+1));
+    dKdk_uo((j+1)*(N+1)) = (-2.0*(pow(k(N,j),2)/pow((k(N,j) + k(N,j+1)),2)) - 0.5)*T(N+1 + j*(N+1)) + (2.0*(pow(k(N,j),2)/pow((k(N,j) + k(N,j+1)),2)))*T(N + j*(N+1)) + 0.5*T(N + 1+(j+1)*(N+1));
+    dKdk_uo((j+2)*(N+1)-1) = (-2.0*(pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N,j+1)),2) + pow(k(N,j+2),2)/pow((k(N,j+2) + k(N,j+1)),2)))*T(N + (j+1)*(N+1)) + (2.0*(pow(k(N-1,j+1),2)/pow((k(N-1,j+1) + k(N,j+1)),2)))*T(N + j*(N+1)) + (2.0*pow(k(N,j+2),2)/pow((k(N,j+2) + k(N,j+1)),2))*T(N + 1+(j+1)*(N+1));
+    dKdk_uo((j+2)*(N+1)) = (-0.5 - 2.0*(pow(k(N,j+2),2)/pow((k(N,j+2) + k(N,j+1)),2)))*T(N+1 + (j+1)*(N+1)) + 0.5*T(N+1 + j*(N+1)) + (2.0*(pow(k(N,j+2),2)/pow((k(N,j+2) + k(N,j+2)),2)))*T(N + (j+1)*(N+1));
+    
+    dcdk((j+1)*N) = dot(lambda, dKdk_ub);
+    dcda_m((j+1)*N) = penal*(65.0-0.2)*pow(a((j+1)*N),penal-1)*dcdk((j+1)*N);
+end
+
+%Neumann links boven en onder dirichlett
+for i = 2:1:(0.3*N-1)
+    dKdk_unlb = sparse((N+1)*(N+1),1);
+    dKdk_unlb(i) = (-0.5 - 2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2)))*T(i) + 0.5*T(i+1) + (2.0*pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2))*T(i + (N+1));
+    dKdk_unlb(i+1) = (-0.5 - 2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2)))*T(i+1) + 0.5*T(i) + (2.0*pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2))*T(i+1 + (N+1));
+	dKdk_unlb(i + (N+1)) = (-2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2) + pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1)) + (2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2)))*T(i) + (2.0*pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2))*T(i+1 + (N+1));
+	dKdk_unlb(i+1 + (N+1)) = (-2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2) + pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i+1 + (N+1)) + (2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2)))*T(i+1) + (2.0*(pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1));
+
+    dcdk(i) = dot(lambda, dKdk_unlb);
     dcda_m(i) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
 end
 
+for i = (0.7*N+2):1:(N-1)
+    dKdk_unlo = sparse((N+1)*(N+1),1);
+    dKdk_unlo(i) = (-0.5 - 2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2)))*T(i) + 0.5*T(i+1) + (2.0*pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2))*T(i + (N+1));
+    dKdk_unlo(i+1) = (-0.5 - 2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2)))*T(i+1) + 0.5*T(i) + (2.0*pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2))*T(i+1 + (N+1));
+	dKdk_unlo(i + (N+1)) = (-2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2) + pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1)) + (2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2)))*T(i) + (2.0*pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2))*T(i+1 + (N+1));
+	dKdk_unlo(i+1 + (N+1)) = (-2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2) + pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i+1 + (N+1)) + (2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2)))*T(i+1) + (2.0*(pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1));
 
+    dcdk(i) = dot(lambda, dKdk_unlo);
+	dcda_m(i) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
+    
+end
+
+
+%Neumann rechts
+for i = 2:1:(0.3*N-1)
+    dKdk_unlb = sparse((N+1)*(N+1),1);
+    
+    dKdk_unlb(i + (N-1)*(N+1)) = (-2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2) + pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + (2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + (2.0*pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2))*T(i + (N)*(N+1));
+    dKdk_unlb(i+1 + (N-1)*(N+1)) = (-2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2) + pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + (2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + (2.0*pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2))*T(i+1 + (N)*(N+1));
+    dKdk_unlb(i + (N)*(N+1)) = (-2.0*(pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2)) - 0.5)*T(i + (N)*(N+1)) + (2.0*(pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N)*(N+1));
+    dKdk_unlb(i+1 + (N)*(N+1)) = (-2.0*(pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2)) - 0.5)*T(i+1 + (N)*(N+1)) + (2.0*(pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N)*(N+1));
+
+    dcdk(N*(N-1)+i) = dot(lambda, dKdk_unlb);
+    dcda_m(N*(N-1)+i) = penal*(65.0-0.2)*pow(a(N*(N-1)+i),penal-1)*dcdk(N*(N-1)+i);
+    
+end
+
+for i = (0.7*N+2):1:(N-1)
+    
+    dKdk_unlo = sparse((N+1)*(N+1),1);
+   
+    dKdk_unlo(i + (N-1)*(N+1)) = (-2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2) + pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + (2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + (2.0*pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2))*T(i + (N)*(N+1));
+	dKdk_unlo(i+1 + (N-1)*(N+1)) = (-2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2) + pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + (2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + (2.0*pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2))*T(i+1 + (N)*(N+1));
+	dKdk_unlo(i + (N)*(N+1)) = (-2.0*(pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2)) - 0.5)*T(i + (N)*(N+1)) + (2.0*(pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + 0.5*T(i+1 + (N)*(N+1));
+	dKdk_unlo(i+1 + (N)*(N+1)) = (-2.0*(pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2)) - 0.5)*T(i+1 + (N)*(N+1)) + (2.0*(pow(k(i+1,N),2)/pow((k(i+1,N-1) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + 0.5*T(i + (N)*(N+1));
+
+    dcdk(N*(N-1)+i) = dot(lambda, dKdk_unlo);
+	dcda_m(N*(N-1)+i) = penal*(65.0-0.2)*pow(a(N*(N-1)+i),penal-1)*dcdk(N*(N-1)+i);
+end
+
+%Links dirichlet
+for i = (0.3*N+1):1:0.7*N
+    dKdk_udl = sparse((N+1)*(N+1),1);
+    dKdk_udl(i+(N+1)) = (-2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2) + pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1)) + (2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2)))*T(i) + (2.0*pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2))*T(i+1 + (N+1));
+    dKdk_udl(i+(N+1)+1) = (-2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2) + pow(k(i,1),2)/pow((k(i,2) + k(i,1)),2)))*T(i+1 + (N+1)) + (2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2)))*T(i+1) + (2.0*(pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1));
+    %(i)
+    %(i+1)
+    dcdk(i) = dot(lambda, dKdk_udl);
+    dcda_m(i) =  penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i);
+    
+end
+
+%rechts dirichlet
+for i = (0.3*N+1):1:0.7*N
+    dKdk_udr = sparse((N+1)*(N+1),1);
+    
+    dKdk_udr(i + (N-1)*(N+1)) = (-2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2) + pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + (2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + (2.0*pow(k(i-1,N),2)/pow((k(i-1,N) + k(i,N)),2))*T(i + (N)*(N+1));
+	dKdk_udr(i+1 + (N-1)*(N+1)) = (-2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2) + pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2)))*T(i+1 + (N-1)*(N+1)) + (2.0*(pow(k(i,N-1),2)/pow((k(i,N-1) + k(i,N)),2)))*T(i + (N-1)*(N+1)) + (2.0*pow(k(i+1,N),2)/pow((k(i+1,N) + k(i,N)),2))*T(i+1 + (N)*(N+1));
+
+    dcdk(i + (N-1)*N) = dot(lambda, dKdk_udr);
+    dcda_m(i + (N-1)*N) = penal*(65.0-0.2)*pow(a(i),penal-1)*dcdk(i + (N-1)*N);
+    
+end
+
+
+%Vakje met 1 hoekpunt van 293K, linkerkant, boven dirichlett boundary condition
+dKdk_uhlb = sparse((N+1)*(N+1),1);
+dKdk_uhlb(0.3*N) = (-0.5 - 2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N,1)),2)))*T(0.3*N) + 0.5*T(0.3*N+1) + (2.0*pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N,1)),2))*T(0.3*N  + (N+1));
+%(0.3*N+1)
+dKdk_uhlb(0.3*N +(N+1)) = (-2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N ,1)),2) + pow(k(0.3*N ,2),2)/pow((k(0.3*N,2) + k(0.3*N,2)),2)))*T(0.3*N + (N+1)) + (2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N,1)),2)))*T(0.3*N) + (2.0*pow(k(0.3*N ,2),2)/pow((k(0.3*N ,2) + k(0.3*N ,1)),2))*T(0.3*N +1+ (N+1));
+dKdk_uhlb(0.3*N +(N+1)+ 1) = (-2.0*(pow(k(0.3*N+1,1),2)/pow((k(0.3*N+1,1) + k(0.3*N,1)),2) + pow(k(0.3*N,2),2)/pow((k(0.3*N,2) + k(0.3*N,2)),2)))*T(0.3*N + 1+(N+1)) + (2.0*(pow(k(0.3*N+1,1),2)/pow((k(0.3*N+1,1) + k(0.3*N,1)),2)))*T(0.3*N+1) + (2.0*(pow(k(0.3*N,2),2)/pow((k(0.3*N,2) + k(0.3*N ,1)),2)))*T(0.3*N + (N+1));
+dcdk(0.3*N) = dot(lambda, dKdk_uhlb);
+dcda_m(0.3*N) = penal*(65.0-0.2)*pow(a(0.3*N),penal-1)*dcdk(0.3*N);
+
+%Vakje met 1 hoekpunt van 293K, linkerkant, onder dirichlett boundary condition
+dKdk_uhlo = sparse((N+1)*(N+1),1);
+dKdk_uhlo(0.7*N+1+1) = (-0.5 - 2.0*(pow(k(0.7*N+1+1,1),2)/pow((k(0.7*N+2,1) + k(0.7*N+1,1)),2)))*T(0.7*N+2) + 0.5*T(0.7*N+1) + (2.0*pow(k(0.7*N+2,1),2)/pow((k(0.7*N+2,1) + k(0.7*N+1,1)),2))*T(0.7*N+2 + (N+1));
+%(0.7*N+1)
+dKdk_uhlo(0.7*N+1+(N+1)) = (-2.0*(pow(k(0.7*N,1),2)/pow((k(0.7*N,1) + k(0.7*N+1,1)),2) + pow(k(0.7*N+1,2),2)/pow((k(0.7*N+1,2) + k(0.7*N+1,1)),2)))*T(0.7*N + 1+(N+1)) + (2.0*(pow(k(0.7*N,1),2)/pow((k(0.7*N,1) + k(0.7*N+1,1)),2)))*T(0.7*N+1) + (2.0*pow(k(0.7*N+1,2),2)/pow((k(0.7*N+1,2) + k(0.7*N+1,1)),2))*T(0.7*N+2 + (N+1));
+dKdk_uhlo(0.7*N +(N+1)+1+1) = (-2.0*(pow(k(0.7*N+2,1),2)/pow((k(0.7*N+2,1) + k(0.7*N+1,1)),2) + pow(k(0.7*N+1,2),2)/pow((k(0.7*N+1,2) + k(0.7*N+1,1)),2)))*T(0.7*N+2 + (N+1)) + (2.0*(pow(k(0.7*N+2,1),2)/pow((k(0.7*N+2,1) + k(0.7*N+1,1)),2)))*T(0.7*N+2) + (2.0*(pow(k(0.7*N+1,2),2)/pow((k(0.7*N+1,2) + k(0.7*N+1,1)),2)))*T(0.7*N + 1+(N+1));
+
+dcdk(0.7*N+1) = dot(lambda, dKdk_uhlo);
+dcda_m(0.7*N+1) = penal*(65.0-0.2)*pow(a(0.7*N+1),penal-1)*dcdk(0.7*N+1);
+
+
+%Vakje met 1 hoekpunt van 293K, rechterkant, boven dirichlett boundary condition
+dKdk_uhrb = sparse((N+1)*(N+1),1);
+
+
+dKdk_uhrb(0.3*N  + (N-1)*(N+1)) = (-2.0*(pow(k(0.3*N ,N-1),2)/pow((k(0.3*N ,N-1) + k(0.3*N,N)),2) + pow(k(0.3*N - 1,N),2)/pow((k(0.3*N - 1,N) + k(0.3*N ,N)),2)))*T(0.3*N + (N-1)*(N+1)) + (2.0*(pow(k(0.3*N ,N-1),2)/pow((k(0.3*N,N-1) + k(0.3*N ,N)),2)))*T(0.3*N +1+(N-1)*(N+1)) + (2.0*pow(k(0.3*N - 1,N),2)/pow((k(0.3*N - 1,N) + k(0.3*N ,N)),2))*T(0.3*N  + (N)*(N+1));
+dKdk_uhrb(0.3*N+1 + (N-1)*(N+1)) = (-2.0*(pow(k(0.3*N ,N-1),2)/pow((k(0.3*N ,N-1) + k(0.3*N,N)),2) + pow(k(0.3*N+1,N),2)/pow((k(0.3*N+1,N) + k(0.3*N ,N)),2)))*T(0.3*N + 1+(N-1)*(N+1)) + (2.0*(pow(k(0.3*N ,N-1),2)/pow((k(0.3*N ,N-1) + k(0.3*N ,N)),2)))*T(0.3*N + (N-1)*(N+1)) + (2.0*pow(k(0.3*N+1,N),2)/pow((k(0.3*N+1,N) + k(0.3*N,N)),2))*T(0.3*N + 1+(N)*(N+1));
+dKdk_uhrb(0.3*N + (N)*(N+1)) = (-2.0*(pow(k(0.3*N - 1,N),2)/pow((k(0.3*N - 1,N) + k(0.3*N,N)),2)) - 0.5)*T(0.3*N  + (N)*(N+1)) + (2.0*(pow(k(0.3*N - 1,N),2)/pow((k(0.3*N - 1,N) + k(0.3*N ,N)),2)))*T(0.3*N + (N-1)*(N+1)) + 0.5*T(0.3*N +1+ (N)*(N+1));
+	
+
+dcdk((N-1)*N + 0.3*N) = dot(lambda, dKdk_uhrb);
+dcda_m((N-1)*N + 0.3*N) =  penal*(65.0-0.2)*pow(a((N-1)*N + 0.3*N),penal-1)*dcdk((N-1)*N + 0.3*N);
+
+%Vakje met 1 hoekpunt van 293K, rechterkant, onder dirichlett boundary condition
+dKdk_hro = sparse((N+1)*(N+1),1);
+%(N*(N+1) + 0.7*N)
+
+dKdk_hro(0.7*N + (N-1)*(N+1)+1) = (-2.0*(pow(k(0.7*N+1,N-2+1),2)/pow((k(0.7*N+1,N-2+1) + k(0.7*N+1,N-1+1)),2) + pow(k(0.7*N-1+1,N-1+1),2)/pow((k(0.7*N-1+1,N-1+1) + k(0.7*N+1,N-1+1)),2)))*T(0.7*N + (N-1)*(N+1)+1) + (2.0*(pow(k(0.7*N+1,N-2+1),2)/pow((k(0.7*N+1,N-2+1) + k(0.7*N+1,N-1+1)),2)))*T(0.7*N+1 + (N-1)*(N+1)+1) + (2.0*pow(k(0.7*N+1-1,N-1+1),2)/pow((k(0.7*N-1+1,N-1+1) + k(0.7*N+1,N-1+1)),2))*T(0.7*N + (N)*(N+1)+1);
+dKdk_hro(0.7*N+1 + (N-1)*(N+1)+1) = (-2.0*(pow(k(0.7*N+1,N-2+1),2)/pow((k(0.7*N+1,N-2+1) + k(0.7*N+1,N-1+1)),2) + pow(k(0.7*N+1+1,N-1+1),2)/pow((k(0.7*N+1+1,N-1+1) + k(0.7*N+1,N-1+1)),2)))*T(0.7*N+1 +1+ (N-1)*(N+1)) + (2.0*(pow(k(0.7*N+1,N-2+1),2)/pow((k(0.7*N+1,N-2+1) + k(0.7*N+1,N-1+1)),2)))*T(0.7*N +1+ (N-1)*(N+1)) + (2.0*pow(k(0.7*N+1+1,N-1+1),2)/pow((k(0.7*N+1+1,N-1+1) + k(0.7*N+1,N-1+1)),2))*T(0.7*N+1+1 + (N)*(N+1));
+dKdk_hro(0.7*N+1 + (N)*(N+1)+1) = (-2.0*(pow(k(0.7*N+1+1,N-1+1),2)/pow((k(0.7*N+1+1,N-1+1) + k(0.7*N+1,N-1+1)),2)) - 0.5)*T(0.7*N+1 +1+ (N)*(N+1)) + (2.0*(pow(k(0.7*N+1+1,N-1+1),2)/pow((k(0.7*N+1+1,N-1+1) + k(0.7*N+1,N-1+1)),2)))*T(0.7*N+1 +1+ (N-1)*(N+1)) + 0.5*T(0.7*N + 1+(N)*(N+1));
+
+dcdk(0.7*N + (N-1)*N+1) = dot(lambda, dKdk_hro);
+dcda_m(0.7*N + (N-1)*N+1) = penal*(65.0-0.2)*pow(a(0.7*N + N*(N-1)+1),penal-1)*dcdk(0.7*N + (N-1)*N+1);
+
+end
 
 
 end
+
+
 
 
 
