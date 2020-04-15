@@ -83,11 +83,11 @@ int main(int argc, char *argv[]) {
 	//vec lambda = lambda3(K, N);
 
 	//dcda_f = dcda_fd(u, f, a, N, penal);
-	dcda_a = dcda_arit(lambda, u, a, N, penal);
-	//dcda_h = dcda_harm(lambda, u, a, k, N, penal);
+	//dcda_a = dcda_arit(lambda, u, a, N, penal);
+	dcda_h = dcda_harm(lambda, u, a, k, N, penal);
 
 	double rmin = 2.0;
-	dcda_check = check(N, rmin, a, dcda_a);
+	dcda_check = check(N, rmin, a, dcda_h);
 
 	gradientToTxtFile(dcda_check, iterations, N);
 

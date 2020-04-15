@@ -3,7 +3,7 @@ close all
 
 
 % gegevens
-N = 50;
+N = 10;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 
@@ -16,7 +16,7 @@ dcda_mat = zeros(N,N);
 
 loop1 = 0;
 change = 1.0;
-while loop1 <= 30 %change > 0.01
+while loop1 <= 1 %change > 0.01
     
         
     pctmetal_old = pctmetal;
@@ -91,7 +91,7 @@ for i = 1:1:loop1-1
     pause(0.5)
 end
 
-close all
+
 
 
 
@@ -235,90 +235,6 @@ for j = 2:1:N
     end
 end
 
-
-
-
-% %col1 hardcoden in LL
-%
-% %dirichletRVW in LL
-% LL = zeros(dp^2,dp^2);
-% dirll = eye(counter2);
-% LL(dp*dp-dp+1:dp*dp,dp*dp-dp+1:dp*dp)=dirll;
-% LL(1:dp,1:dp) = dirll;
-%
-% %hoekpunten
-% %linskboven (1,1), LL(1,:)
-% LL(1,1) = -0.5*(bigkmat(2,1)+bigkmat(1,2));
-% LL(1,2) = 0.5* bigkmat(2,1);%south
-% LL(1,1+dp) = 0.5*bigkmat(1,2);%east
-% %linksonder (dp,1), LL(dp,:)
-% LL(dp,dp) = -0.5*(bigkmat((2*dp-1)-1,1)+bigkmat(2*dp-1,2));
-% LL(dp,dp-1) = 0.5*bigkmat((2*dp-1)-1,1);%north
-% LL(dp,dp+dp) = 0.5*bigkmat(2*dp-1,2);%east
-% %rechtsboven (1,dp),
-% LL(dp*dp-dp+1,dp*dp-dp+1) = -0.5*(bigkmat(1,dp*2-1-1)+bigkmat(2,dp*2-1));
-% LL(dp*(dp-1)+1,dp*(dp-1)+1+1)=0.5*bigkmat(2,dp*2-1);%south
-% LL(dp*(dp-1)+1,dp*dp-dp+1-dp)= 0.5*bigkmat(1,dp*2-1-1);%west
-% %rechtsonder (dp,dp), LL(dp*dp,:)
-% LL(dp*dp,dp*dp) = -0.5*(bigkmat(dp*2-1,dp*2-1-1)+bigkmat(dp*2-1-1,dp*2-1));
-% LL(dp*dp,dp*dp-1) = 0.5*bigkmat(dp*2-1-1,dp*2-1);%north
-% LL(dp*dp,dp*dp-dp)=0.5*bigkmat(dp*2-1,dp*2-1-1);%west
-%
-% %Neumann links & rechts
-% for j = 2:(dp-1)
-%     if(h*(j-1)<0.003)||(h*(j-1)>0.007)
-%         %LL(1:dp,1:2*dp)
-%         LL(j,j) = -(bigkmat(j*2-1,2)+0.5*bigkmat(j*2-1-1,1)+0.5*bigkmat(j*2-1+1,1));%east,north,south
-%         LL(j,j+dp) = bigkmat(j*2-1,2); %east
-%         LL(j,j-1) = 0.5*bigkmat(j*2-1-1,1);%north
-%         LL(j,j+1) = 0.5*bigkmat(j*2-1+1,1);%south
-%
-%         %LL(dp*(dp-1)+1:dp*dp,dp*(dp-2)+1:dp*dp)
-%         LL(dp*dp-dp+j,dp*dp-dp+j) = -(bigkmat(j*2-1,dp*2-1-1)+0.5*bigkmat(j*2-1-1,2*dp-1)+0.5*bigkmat(j*2-1+1,2*dp-1));%west,north,south
-%         LL(dp*dp-dp+j,dp*dp-dp+j-dp) = bigkmat(j*2-1,dp*2-1-1); %west
-%         LL(dp*dp-dp+j,dp*dp-dp+j-1) = 0.5*bigkmat(j*2-1-1,2*dp-1);%north
-%         LL(dp*dp-dp+j,dp*dp-dp+j+1) = 0.5*bigkmat(j*2-1+1,2*dp-1);%south
-%
-%     end
-% end
-%
-% %Neumann boven & onder
-%
-% for j = 1:(dp-2)
-%     k = j+1;
-%     %boven
-%     LL(j*dp+1,j*dp+1) = -(bigkmat(2,2*k-1)+0.5*bigkmat(1,2*k-1-1)+0.5*bigkmat(1,2*k-1+1));%south,west,east
-%     LL(j*dp+1,j*dp+1+1) =bigkmat(2,2*k-1);%south
-%     LL(j*dp+1,j*dp+1-dp) = 0.5*bigkmat(1,2*k-1-1);%west
-%     LL(j*dp+1,j*dp+1+dp) = 0.5*bigkmat(1,2*k-1+1);%east
-%
-%     %onder
-%     LL(j*dp+dp,j*dp+dp)= -(bigkmat(2*dp-1-1,2*k-1)+0.5*bigkmat(2*dp-1,2*k-1-1)+0.5*bigkmat(2*dp-1,2*k-1+1));%north,west,east
-%     LL(j*dp+dp,j*dp+dp-1) = bigkmat(2*dp-1-1,2*k-1);%north
-%     LL(j*dp+dp,j*dp+dp-dp) = 0.5*bigkmat(2*dp-1,2*k-1-1);%west
-%     LL(j*dp+dp,j*dp+dp+dp) = 0.5*bigkmat(2*dp-1,2*k-1+1);%east
-% end
-%
-% %gewonekolommen
-%
-% for i = 2:(dp-1)
-%     for j = 2:(dp-1)
-%         k = (i-1)*dp+j;
-%         i2 = 2*i-1;
-%         j2 = 2*j-1;
-%         LL(k,k) = -(bigkmat(i2+1,j2)+bigkmat(i2-1,j2)+bigkmat(i2,j2+1)+bigkmat(i2,j2-1));%east,west,south,north
-%         LL(k,k+dp)=bigkmat(i2+1,j2);%east
-%         LL(k,k-dp)=bigkmat(i2-1,j2);%west
-%         LL(k,k+1)=bigkmat(i2,j2+1);%south
-%         LL(k,k-1)=bigkmat(i2,j2-1);%north
-%     end
-% end
-%
-% Z = LL-ll
-% normZ = norm(Z)
-%
-% ll=LL;
-
 end
 
 
@@ -331,40 +247,6 @@ end
 
 function [lambda] = lambda1(T, K, N)
 lambda = transpose(K)\((-2.0/N^2)*T);
-end
-
-
-function [der] = dcda(lambda, T, pctmetal, N)
-dcdam = zeros(N,N);
-dcdk = zeros(N*N,1);
-penal = 3.0;
-
-%dcda element per element opvullen
-
-for i = 1:1:N
-    for j = 1:1:N
-        dKdk_u = zeros((N+1)*(N+1),1);
-        
-        dKdk_u(i + (j-1)*(N+1)) = -1.0*T(i + (j-1)*(N+1)) + 0.5*T(i+1 + (j-1)*(N+1)) + 0.5*T(i + (j)*(N+1));
-        dKdk_u(i+1 + (j-1)*(N+1)) = -1.0*T(i+1 + (j-1)*(N+1)) + 0.5*T(i + (j-1)*(N+1)) + 0.5*T(i+1 + (j)*(N+1));
-        dKdk_u(i + (j)*(N+1)) = -1.0*T(i + (j)*(N+1)) + 0.5*T(i + (j-1)*(N+1)) + 0.5*T(i+1 + (j)*(N+1));
-        dKdk_u(i+1 + (j)*(N+1)) = -1.0*T(i+1 + (j)*(N+1)) + 0.5*T(i+1 + (j-1)*(N+1)) + 0.5*T(i + (j)*(N+1));
-        
-        %dKdk_u(i + (j-1)*(N+1)) = -1.0*T(i + (j-1)*(N+1)) + mean(T(i+1 + (j-1)*(N+1)), T(i + (j)*(N+1)));
-        %dKdk_u(i+1 + (j-1)*(N+1)) = -1.0*T(i+1 + (j-1)*(N+1)) + mean(T(i + (j-1)*(N+1)), T(i+1 + (j)*(N+1)));
-        %dKdk_u(i + (j)*(N+1)) = -1.0*T(i + (j)*(N+1)) + mean(T(i + (j-1)*(N+1)), T(i+1 + (j)*(N+1)));
-        %dKdk_u(i+1 + (j)*(N+1)) = -1.0*T(i+1 + (j)*(N+1)) + mean(T(i+1 + (j-1)*(N+1)), T(i + (j)*(N+1)));
-        
-        dcdk(i+(j-1)*N) = transpose(lambda)*dKdk_u;
-        dcdam(i,j) = penal*(65.0-0.2)*pow(pctmetal(i,j),penal-1)*dcdk(i + (j-1)*N);
-        
-        
-    end
-end
-
-der = dcdam;
-
-
 end
 
 function [sol] = pow(a,b)
@@ -442,184 +324,6 @@ while (l2-l1)>1e-4
 end
 end
 
-
-
-
-
-% times = 4;
-% N = times*N;
-% dp = N+1;
-% pctmetal = meshrefine(pctmetal,times);
-%
-% loop2 = loop1;
-% change = 1.;
-% while loop2<200%change > 0.04
-%     loop2 = loop2 +1
-%     pctmetal_old = pctmetal;
-%     [k] = createK(pctmetal, N);
-%     [T, K, f] = fvm_func(k, N, q);
-%
-% %     figure()
-% %     spy(K)
-% %
-% %     Tmat = zeros(dp,dp);
-% %     for i = 1:dp
-% %          Tmat(:,i)=T(i*dp-dp+1:i*dp);
-% %     end
-% %
-% %     figure()
-% %     surface(Tmat)
-%
-%     %cost = cost2(T, dp);
-%
-%     lambda_vec = lambda1(T, K, dp);
-%     dcda_mat1 = dcda(lambda_vec, T, pctmetal, N);
-%     dcda_mat = check(N, rmin, pctmetal, dcda_mat1);
-%
-%     pctmetal = OC(N, pctmetal, 0.4, dcda_mat);
-%
-%     change = max(max(abs(pctmetal-pctmetal_old)))
-% end
-%
-%
-%
-% % times = 2;
-% % N = times*N;
-% % dp = N+1;
-% % pctmetal = meshrefine(pctmetal,times);
-% %
-% % loop = 0;
-% % change = 1.;
-% % while change > 0.01
-% %     loop = loop +1
-% %     pctmetal_old = pctmetal;
-% %     [T, K, f] = fvm_func(pctmetal, N, q);
-% %
-% % %     figure()
-% % %     spy(K)
-% % %
-% % %     Tmat = zeros(dp,dp);
-% % %     for i = 1:dp
-% % %          Tmat(:,i)=T(i*dp-dp+1:i*dp);
-% % %     end
-% % %
-% % %     figure()
-% % %     surface(Tmat)
-% %
-% %     %cost = cost2(T, dp);
-% %
-% %     lambda_vec = lambda1(T, K, dp);
-% %     dcda_mat1 = dcda(lambda_vec, T, pctmetal, N);
-% %     dcda_mat = check(N, rmin, pctmetal, dcda_mat1);
-% %
-% %     pctmetal = OC(N, pctmetal, 0.4, dcda_mat);
-% %
-% %     change = max(max(abs(pctmetal-pctmetal_old)))
-% % end
-%
-% figure()
-% surface(pctmetal)
-%
-% times = 2;
-% N = times*N;
-% dp = N+1;
-% pctmetal = meshrefine(pctmetal,times);
-%
-% loop3 = loop2;
-% change = 1.;
-% while loop3<300%change > 0.03
-%     loop3 = loop3 +1
-%     pctmetal_old = pctmetal;
-%     [k] = createK(pctmetal, N);
-%     [T, K, f] = fvm_func(k, N, q);
-%
-% %     figure()
-% %     spy(K)
-% %
-% %     Tmat = zeros(dp,dp);
-% %     for i = 1:dp
-% %          Tmat(:,i)=T(i*dp-dp+1:i*dp);
-% %     end
-% %
-% %     figure()
-% %     surface(Tmat)
-%
-%     %cost = cost2(T, dp);
-%
-%     lambda_vec = lambda1(T, K, dp);
-%     dcda_mat1 = dcda(lambda_vec, T, pctmetal, N);
-%     dcda_mat = check(N, rmin, pctmetal, dcda_mat1);
-%
-%     pctmetal = OC(N, pctmetal, 0.4, dcda_mat);
-%
-%     change = max(max(abs(pctmetal-pctmetal_old)))
-% end
-%
-% figure()
-% surface(pctmetal)
-%
-% times = 10/8;
-% N = times*N;
-% dp = N+1;
-% pctmetal = meshrefine(pctmetal,times);
-%
-% loop4 = loop3;
-% change = 1.;
-% while change > 0.01
-%     loop4 = loop4 +1
-%     pctmetal_old = pctmetal;
-%     [k] = createK(pctmetal, N);
-%     [T, K, f] = fvm_func(k, N, q);
-%
-% %     figure()
-% %     spy(K)
-% %
-% %     Tmat = zeros(dp,dp);
-% %     for i = 1:dp
-% %          Tmat(:,i)=T(i*dp-dp+1:i*dp);
-% %     end
-% %
-% %     figure()
-% %     surface(Tmat)
-%
-%     %cost = cost2(T, dp);
-%
-%     lambda_vec = lambda1(T, K, dp);
-%     dcda_mat1 = dcda(lambda_vec, T, pctmetal, N);
-%     dcda_mat = check(N, rmin, pctmetal, dcda_mat1);
-%
-%     pctmetal = OC(N, pctmetal, 0.4, dcda_mat);
-%
-%     change = max(max(abs(pctmetal-pctmetal_old)))
-% end
-%
-% figure()
-% surface(pctmetal)
-%
-% %%
-% heatsink = pctmetal*60 + (1-pctmetal)*0.2;
-%
-% [T, K, f] = fvm_func(heatsink, N, q);
-%
-% Tmat = zeros(dp,dp);
-% for i = 1:dp
-%      Tmat(:,i)=T(i*dp-dp+1:i*dp);
-% end
-%
-% figure()
-% surface(dcda_mat1, 'FaceColor', 'interp')
-%
-%
-% figure()
-% surface(Tmat)
-%
-% figure()
-% surface(heatsink)
-%
-% figure()
-% surface(pctmetal)
-%
-% % N = 100 -> 179 loops nodig
 
 
 function [dcda_m] = dcda_arit(lambda, T, a, N, penal)
