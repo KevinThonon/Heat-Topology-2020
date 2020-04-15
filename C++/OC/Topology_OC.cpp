@@ -35,10 +35,11 @@ int main(int argc, char *argv[]) {
 	int iterations = 0;
 	double change = 1.0; 
 
-	while (change > 0.01) {
+	while (change > 0.001) {
 
 	cout<<"iteration = "<<iterations<<endl;
 
+	/*
 	if (iterations == 5){
 		penal = 2.0;
 	}
@@ -62,6 +63,7 @@ int main(int argc, char *argv[]) {
 	if (iterations == 25){
 		penal = 9.0;
 	} 
+	*/
 	
 	k = create_k(a, N, penal);
 	K = K_mat(k, N);
@@ -80,12 +82,12 @@ int main(int argc, char *argv[]) {
 	//double cost = objective_function3(u, N);
 	//vec lambda = lambda3(K, N);
 
-	//vec dcda_f = dcda_fd(u, f, a, N, penal);
-	//dcda_a = dcda_arit(lambda, u, a, N, penal);
-	vec dcda_h = dcda_harm(lambda, u, a, k, N, penal);
+	//dcda_f = dcda_fd(u, f, a, N, penal);
+	dcda_a = dcda_arit(lambda, u, a, N, penal);
+	//dcda_h = dcda_harm(lambda, u, a, k, N, penal);
 
 	double rmin = 2.0;
-	dcda_check = check(N, rmin, a, dcda_h);
+	dcda_check = check(N, rmin, a, dcda_a);
 
 	gradientToTxtFile(dcda_check, iterations, N);
 

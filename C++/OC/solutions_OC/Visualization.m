@@ -1,4 +1,4 @@
-N = 50;
+N = 30;
 
 for iterations = 0:30
     
@@ -22,23 +22,16 @@ for iterations = 0:30
     fileID = fopen(temperature,'r');
     formatSpec = '%f';
     temperature = fscanf(fileID,formatSpec);
-    
-    d = strcat('difference_',iter);
-    difference = strcat(d,'.txt');
-    fileID = fopen(difference,'r');
-    formatSpec = '%f';
-    difference = fscanf(fileID,formatSpec);
+   
     
     gradient_mat = zeros(N,N);
     metal_mat = zeros(N,N);
-    difference_mat = zeros(N,N);
     temperature_mat = zeros(N+1,N+1);
     
     dp = N;
     for i = 1:dp
         gradient_mat(:,i)=gradient(i*dp-dp+1:i*dp);
         metal_mat(:,i)=metal(i*dp-dp+1:i*dp);
-        difference_mat(:,i)=difference(i*dp-dp+1:i*dp);
         
     end
     
@@ -60,7 +53,7 @@ for iterations = 0:30
     
 end
 
-pause(1)
+pause(3)
 close all
 
 

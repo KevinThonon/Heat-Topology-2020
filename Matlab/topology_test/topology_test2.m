@@ -1,8 +1,9 @@
 clear all
 close all
 
+
 % gegevens
-N = 30;
+N = 50;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 
@@ -11,11 +12,12 @@ dp = N+1;
 % percentage metaal
 pctmetal = 0.3*ones(N,N);
 penal = 3.0;
+dcda_mat = zeros(N,N);
 
 loop1 = 0;
 change = 1.0;
-while loop1 < 30 %change > 0.01
-    loop1 = loop1 + 1
+while loop1 <= 30 %change > 0.01
+    
         
     pctmetal_old = pctmetal;
     
@@ -23,18 +25,74 @@ while loop1 < 30 %change > 0.01
     [T, K, f] = fvm_func(k, N, q);
     
     lambda_vec = lambda1(T, K, N);
-    dcda_mat1 = dcda_fd(T, pctmetal, N, penal);
-    %dcda_mat = check(N, rmin, pctmetal, dcda_mat1);
+    %dcda_f = dcda_fd(T, pctmetal, N, penal);
+    %dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
+    dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
     
-    pctmetal = OC(N, pctmetal, 0.4, dcda_mat1);
+    for i = 1:1:N
+           %dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
+           dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
+    end
+    
+    
+    %dcda_check = check(N, rmin, pctmetal, dcda_f);
+    dcda_check = check(N, rmin, pctmetal, dcda_mat);
+   
+    
+    pctmetal = OC(N, pctmetal, 0.4, dcda_check);
+    pctmetal_iter{loop1+1} = pctmetal;
     
     change = max(max(abs(pctmetal-pctmetal_old)));
+    
+    % Load C++ solution
+    
+    iter = int2str(loop1);
+    
+    m = strcat('metal_',iter);
+    metal = strcat(m,'.txt');
+    fileID = fopen(metal,'r');
+    formatSpec = '%f';
+    metal = fscanf(fileID,formatSpec);
+    
+    g = strcat('gradient_',iter);
+    gradient = strcat(g,'.txt');
+    fileID = fopen(gradient,'r');
+    formatSpec = '%f';
+    gradient = fscanf(fileID,formatSpec);
+
+    metal_mat = zeros(N,N);
+    gradient_mat = zeros(N,N);
+    
+    dp = N;
+    for i = 1:dp
+        metal_mat(:,i)=metal(i*dp-dp+1:i*dp); 
+        gradient_mat(:,i)=gradient(i*dp-dp+1:i*dp);
+    end
+    
+    difference_metal{loop1+1} = metal_mat-pctmetal;
+    difference_gradient{loop1+1} = gradient_mat-dcda_check;
+ 
+    loop1 = loop1 + 1;
 end
 
+for i = 1:1:loop1-1
+    hfig = figure;
+    pos = get(hfig,'position');
+    set(hfig,'position',pos.*[.5 1 2 1]);
+    subplot(1,3,1)
+    surface(difference_metal{i},'FaceColor','interp')
+    colorbar
+    subplot(1,3,2)
+    surface(difference_gradient{i},'FaceColor','interp')
+    colorbar
+    subplot(1,3,3)
+    surface(pctmetal_iter{i},'FaceColor','interp')
+    colorbar
+    pause(0.5)
+end
 
-figure()
-pctmetal = meshrefine(pctmetal,2);
-surface(pctmetal)
+close all
+
 
 
 function [K] = createK(pctmetal, N, penal)
@@ -969,9 +1027,6 @@ dKdk_hro(0.7*N+1 + (N)*(N+1)+1) = (-2.0*(pow(k(0.7*N+1+1,N-1+1),2)/pow((k(0.7*N+
 
 dcdk(0.7*N + (N-1)*N+1) = dot(lambda, dKdk_hro);
 dcda_m(0.7*N + (N-1)*N+1) = penal*(65.0-0.2)*pow(a(0.7*N + N*(N-1)+1),penal-1)*dcdk(0.7*N + (N-1)*N+1);
-
-end
-
 
 end
 
