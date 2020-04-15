@@ -3,7 +3,7 @@ close all
 
 
 % gegevens
-N = 10;
+N = 50;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 
@@ -16,7 +16,7 @@ dcda_mat = zeros(N,N);
 
 loop1 = 0;
 change = 1.0;
-while loop1 <= 1 %change > 0.01
+while loop1 <= 50 %change > 0.01
     
         
     pctmetal_old = pctmetal;
@@ -79,13 +79,10 @@ for i = 1:1:loop1-1
     hfig = figure;
     pos = get(hfig,'position');
     set(hfig,'position',pos.*[.5 1 2 1]);
-    subplot(1,3,1)
-    surface(difference_metal{i},'FaceColor','interp')
-    colorbar
-    subplot(1,3,2)
+    subplot(1,2,1)
     surface(difference_gradient{i},'FaceColor','interp')
     colorbar
-    subplot(1,3,3)
+    subplot(1,2,2)
     surface(pctmetal_iter{i},'FaceColor','interp')
     colorbar
     pause(0.5)
@@ -239,8 +236,8 @@ end
 
 
 function k = mean(a, b)
-k = (a+b)/2;           % arithmetic mean
-%k = 2.0*(a*b)/(a+b);    % harmonic mean
+%k = (a+b)/2;           % arithmetic mean
+k = 2.0*(a*b)/(a+b);    % harmonic mean
 end
 
 
@@ -668,7 +665,7 @@ end
 for i = (0.3*N+1):1:0.7*N
     dKdk_udl = sparse((N+1)*(N+1),1);
     dKdk_udl(i+(N+1)) = (-2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2) + pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1)) + (2.0*(pow(k(i-1,1),2)/pow((k(i-1,1) + k(i,1)),2)))*T(i) + (2.0*pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2))*T(i+1 + (N+1));
-    dKdk_udl(i+(N+1)+1) = (-2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2) + pow(k(i,1),2)/pow((k(i,2) + k(i,1)),2)))*T(i+1 + (N+1)) + (2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2)))*T(i+1) + (2.0*(pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1));
+    dKdk_udl(i+(N+1)+1) = (-2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2) + pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i+1 + (N+1)) + (2.0*(pow(k(i+1,1),2)/pow((k(i+1,1) + k(i,1)),2)))*T(i+1) + (2.0*(pow(k(i,2),2)/pow((k(i,2) + k(i,1)),2)))*T(i + (N+1));
     %(i)
     %(i+1)
     dcdk(i) = dot(lambda, dKdk_udl);
@@ -693,8 +690,8 @@ end
 dKdk_uhlb = sparse((N+1)*(N+1),1);
 dKdk_uhlb(0.3*N) = (-0.5 - 2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N,1)),2)))*T(0.3*N) + 0.5*T(0.3*N+1) + (2.0*pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N,1)),2))*T(0.3*N  + (N+1));
 %(0.3*N+1)
-dKdk_uhlb(0.3*N +(N+1)) = (-2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N ,1)),2) + pow(k(0.3*N ,2),2)/pow((k(0.3*N,2) + k(0.3*N,2)),2)))*T(0.3*N + (N+1)) + (2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N,1)),2)))*T(0.3*N) + (2.0*pow(k(0.3*N ,2),2)/pow((k(0.3*N ,2) + k(0.3*N ,1)),2))*T(0.3*N +1+ (N+1));
-dKdk_uhlb(0.3*N +(N+1)+ 1) = (-2.0*(pow(k(0.3*N+1,1),2)/pow((k(0.3*N+1,1) + k(0.3*N,1)),2) + pow(k(0.3*N,2),2)/pow((k(0.3*N,2) + k(0.3*N,2)),2)))*T(0.3*N + 1+(N+1)) + (2.0*(pow(k(0.3*N+1,1),2)/pow((k(0.3*N+1,1) + k(0.3*N,1)),2)))*T(0.3*N+1) + (2.0*(pow(k(0.3*N,2),2)/pow((k(0.3*N,2) + k(0.3*N ,1)),2)))*T(0.3*N + (N+1));
+dKdk_uhlb(0.3*N +(N+1)) = (-2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N ,1)),2) + pow(k(0.3*N ,2),2)/pow((k(0.3*N,2) + k(0.3*N,1)),2)))*T(0.3*N + (N+1)) + (2.0*(pow(k(0.3*N - 1,1),2)/pow((k(0.3*N - 1,1) + k(0.3*N,1)),2)))*T(0.3*N) + (2.0*pow(k(0.3*N ,2),2)/pow((k(0.3*N ,2) + k(0.3*N ,1)),2))*T(0.3*N +1+ (N+1));
+dKdk_uhlb(0.3*N +(N+1)+ 1) = (-2.0*(pow(k(0.3*N+1,1),2)/pow((k(0.3*N+1,1) + k(0.3*N,1)),2) + pow(k(0.3*N,2),2)/pow((k(0.3*N,2) + k(0.3*N,1)),2)))*T(0.3*N + 1+(N+1)) + (2.0*(pow(k(0.3*N+1,1),2)/pow((k(0.3*N+1,1) + k(0.3*N,1)),2)))*T(0.3*N+1) + (2.0*(pow(k(0.3*N,2),2)/pow((k(0.3*N,2) + k(0.3*N ,1)),2)))*T(0.3*N + (N+1));
 dcdk(0.3*N) = dot(lambda, dKdk_uhlb);
 dcda_m(0.3*N) = penal*(65.0-0.2)*pow(a(0.3*N),penal-1)*dcdk(0.3*N);
 
