@@ -1,4 +1,4 @@
-N = 100;
+N = 20;
 
 for iterations = 1:30
     

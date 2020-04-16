@@ -15,21 +15,15 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	std::cout<<"iteration = "<<*(int *)data<<std::endl;
 	*(int *)data += 1;
 	
-	double penal = 1.0;
+	double penal = 2.0;
 	int d = *(int *)data;
-
-	if (d >= 40) {
-		std::cout<<d<<std::endl;
-		
-		penal = 4.0;
-	}
-	std::cout<<"penal ="<<penal<<std::endl;
 
 	int N = sqrt(n);
 
 	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);
 	sp_mat ll = top::K_mat(k, N);
+	std::cout<<ll<<std::endl;
 	vec u = spsolve(ll,rl,"lapack");
 
   
@@ -56,11 +50,11 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	vec dcda = top::dcda(lambda, u, a, N, penal);
-	//vec dcda = top::dcda_harm(lambda, u, a, k, N, penal);
+	vec dcda_a = top::dcda_arit(lambda, u, a, N, penal);
+	//vec dcda_h = top::dcda_harm(lambda, u, a, k, N, penal);
 
 	double rmin = 2.0;
-	vec dcda_check = top::check(N, rmin, a, dcda);
+	vec dcda_check = top::check(N, rmin, a, dcda_a);
 
   	string g = "gradient_";
   	g += to_string(*(int *)data);
@@ -71,7 +65,7 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	ofstream gradient_file;
         gradient_file.open(path_gradient);
         for (int i = 0; i < n; ++i) {
-    		gradient_file <<dcda(i)<<std::endl;
+    		gradient_file <<dcda_check(i)<<std::endl;
     	}
     	gradient_file.close();
 
@@ -116,7 +110,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 
 int main() {
 
-int N = 30;
+int N = 20;
 int iterations = 0;
 
 // MMA - method
@@ -161,14 +155,14 @@ nlopt_set_min_objective(opt, myfunc, &iterations);
 nlopt_add_inequality_constraint(opt, myconstraint, NULL, 1e-14);
 
 // stopping criteria
-nlopt_set_xtol_rel(opt, 1e-8);
-//nlopt_set_maxeval(opt,1);
+//nlopt_set_xtol_rel(opt, 1e-8);
+nlopt_set_maxeval(opt,50);
 
 // Initial guess
 
 double a[N*N];  // some initial guess: average percentage of metal in one element is 0.4
 for (int i = 0; i < N*N; ++i) {
-	a[i] = 0.35; 
+	a[i] = 0.3; 
 }
 
 // value of the objective function during the iterations.
