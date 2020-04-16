@@ -1,18 +1,6 @@
 clear all
 close all
 
-N=10;
-j=1;
-h = 0.01/10;
-
-dp =N+1;
-
-[T,~,~] = fvm_func(j,N);
-Tmat = zeros(dp,dp);
-for i = 1:1:dp
-    Tmat(:,i) = T((i-1)*dp+1:i*dp);
-end
-
 
 %% kwadratische functie
 % y = -(x-0.01)*x
