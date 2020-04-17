@@ -31,6 +31,16 @@ mat create_k(const double* a, int N, double penal) {
 	return k;
 }
 
+mat create_k_fd(vec a, int N, double penal) {
+	mat k(N,N);
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < N; ++j) {
+			k(i,j) = (65-0.2)*pow(a(i + N*j),penal) + 0.2;
+		}
+	}
+	return k;
+}
+
 // Grote matrix met ook k-waarden op randen van elementen (arithmisch gemiddelde)
 mat bigkmat(mat& k, int N){
 	mat bigmat(2*N+1, 2*N+1);
@@ -191,8 +201,8 @@ mat LL(mat& bigkmat, int N){
 } */
 
 double mean(double a, double b){
-	//return (a+b)/2.0; //arithmetic
-	return 2.0*(a*b)/(a+b);	//harmonic
+	return (a+b)/2.0; //arithmetic
+	//return 2.0*(a*b)/(a+b);	//harmonic
 }
 
 
@@ -438,29 +448,34 @@ vec lambda3(sp_mat& K, int N){
 	return lambda;
 }
 
-/*
+
 
 //Finite difference
 vec dcda_fd(vec& T, vec& RL, const double* a, int N, double penal){
 	vec dcda(N*N);
 	dcda.fill(0.0);
-	
+	vec pct(N*N);
+
+	for (int i = 0; i < N*N; i++){
+		pct(i) = a[i];
+
+	}
 	//cost function using original a
 	double cost_original = objective_function1(T, N);
 	
 	for (int i = 0; i < N; i++){
 		for (int j = 0; j < N; j++){
 			//Change element a_i,j a little bit (reduce percentage of metal in a_i,j with 0.01) 
-			a[i + j*N] -= 0.01;
+			pct(i + j*N) -= 0.005;
 			//With updated a_i,j calculate k again, then K, then u
-			mat k = create_k(a, N, penal);
+			mat k = create_k_fd(pct, N, penal);
 			sp_mat ll = K_mat(k, N);
 			vec u = spsolve(ll,RL,"lapack");
 			//Use this updated u in the cost function
 			double cost_update = objective_function1(u, N);
 			//Use finite difference between original cost function and updated cost function where the difference between original and updated a_i,j = 0.01
 			dcda(i + j*N) = (cost_original - cost_update)/0.01;
-			a[i + j*N] += 0.01;
+			pct(i + j*N) += 0.005;
 		}
 	}
 	
@@ -468,7 +483,7 @@ vec dcda_fd(vec& T, vec& RL, const double* a, int N, double penal){
 
 }
 
-*/
+
 			
 
 // dc/da is een vector van gradienten die nodig is in de optimalisatie stap

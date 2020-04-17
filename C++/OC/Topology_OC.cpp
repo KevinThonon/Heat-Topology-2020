@@ -5,7 +5,6 @@
 #include <string>
 #include <algorithm>
 #include <math.h>
-#include <nlopt.h>
 
 using namespace std;
 using namespace arma;

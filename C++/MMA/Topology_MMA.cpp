@@ -18,12 +18,23 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	double penal = 2.0;
 	int d = *(int *)data;
 
+	/*
+	if (d > 10){
+		penal = 4.0;
+	}
+
+
+	if (d > 10){
+		penal = 4.0;
+	}
+	*/
+	
+
 	int N = sqrt(n);
 
 	mat k = top::create_k(a, N, penal);
 	vec rl = top::RL(N);
 	sp_mat ll = top::K_mat(k, N);
-	std::cout<<ll<<std::endl;
 	vec u = spsolve(ll,rl,"lapack");
 
   
@@ -50,11 +61,12 @@ double myfunc(unsigned n, const double *a, double *grad, void *data){
 	//double cost = top::objective_function3(u, N);
 	//vec lambda = top::lambda3(ll, N);
 
-	vec dcda_a = top::dcda_arit(lambda, u, a, N, penal);
+	//vec dcda_a = top::dcda_arit(lambda, u, a, N, penal);
 	//vec dcda_h = top::dcda_harm(lambda, u, a, k, N, penal);
+	vec dcda_f = top::dcda_fd(u, rl, a, N, penal);
 
 	double rmin = 2.0;
-	vec dcda_check = top::check(N, rmin, a, dcda_a);
+	vec dcda_check = top::check(N, rmin, a, dcda_f);
 
   	string g = "gradient_";
   	g += to_string(*(int *)data);
@@ -110,7 +122,7 @@ double myconstraint(unsigned n, const double *a, double *grad, void *data){
 
 int main() {
 
-int N = 20;
+int N = 40;
 int iterations = 0;
 
 // MMA - method
@@ -162,7 +174,7 @@ nlopt_set_maxeval(opt,50);
 
 double a[N*N];  // some initial guess: average percentage of metal in one element is 0.4
 for (int i = 0; i < N*N; ++i) {
-	a[i] = 0.3; 
+	a[i] = 0.01; 
 }
 
 // value of the objective function during the iterations.
