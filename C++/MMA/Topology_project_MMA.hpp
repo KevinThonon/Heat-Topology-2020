@@ -1,3 +1,7 @@
+// Project Mathematical Engineering: Topology Optimization
+// 2019-2020
+// Names: Kevin Thonon, Phillipe Dewart, Urbaan Lemmens
+
 #ifndef top_Topology_project_OC_hpp
 #define top_Topology_project_OC_hpp
 #include <cassert>

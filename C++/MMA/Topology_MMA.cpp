@@ -1,3 +1,8 @@
+// Project Mathematical Engineering: Topology Optimization
+// 2019-2020
+// Names: Kevin Thonon, Phillipe Dewart, Urbaan Lemmens
+
+
 #include "Topology_project_MMA.hpp"
 #include <armadillo>
 #include <iostream>
