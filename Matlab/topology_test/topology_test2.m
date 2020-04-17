@@ -400,7 +400,7 @@ for j = 1:1:N-2
     dKdk_uo((j+2)*(N+1)-1) = -1*T((j+2)*(N+1)-1) + 0.5*T((j+1)*(N+1)-1) + 0.5*T((j+2)*(N+1));
     dKdk_uo((j+2)*(N+1)) = -1*T((j+2)*(N+1)) + 0.5*T((j+1)*(N+1)) + 0.5*T((j+2)*(N+1)-1);
     
-    dcdk((j+1)*N) = dot(lambda, dKdk_ub);
+    dcdk((j+1)*N) = dot(lambda, dKdk_uo);
     dcda_m((j+1)*N) = penal*(65.0-0.2)*pow(a((j+1)*N),penal-1)*dcdk((j+1)*N);
 end
 
