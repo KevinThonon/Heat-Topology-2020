@@ -710,3 +710,49 @@ dcda_m(0.7*N + (N-1)*N+1) = penal*(65.0-0.2)*pow(a(0.7*N + N*(N-1)+1),penal-1)*d
 
 end
 
+function [pct] = meshrefine(pctmetal, times)
+ny_nx = times*size(pctmetal);
+N = ny_nx(1);
+pct=zeros(N,N);
+for i = 1:N/times
+    for j = 1:N/times
+        pct(times*i-times+1:times*i,times*j-times+1:times*j) = pctmetal(i,j);
+    end
+end
+
+
+end
+
+function [cost] = cost1(T, dp)
+cost = dot(T,T)/dp^2;
+end
+
+function [cost] = cost2(T, dp)
+cost = sum(T)/dp^2;
+end
+
+function [cost] = cost3(T,dp)
+A = (1/dp)^2;
+w = A*ones(dp^2,1);
+w(0) = A/4;
+w(N) = A/4;
+w(dp^2) = A/4;
+w(dp^2-dp+1) = A/4;
+
+for i = 2:1:(dp-1)
+    w(i) = A/2;
+    w(dp^2-dp + i) = A/2;
+    w(i*dp) = A/2;
+    w(i*dp-dp+1) = A/2;
+end
+
+cost = dot(w,T);
+
+end
+
+
+function [c] = costfunc(temp, dp)
+
+    c = transpose(temp)*temp/(dp*dp);
+end
+
