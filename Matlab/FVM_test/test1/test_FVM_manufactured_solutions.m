@@ -218,58 +218,7 @@ for i = 1:1:dp%1:1:(0.7*N+1)
     ll(dp^2-i+1, dp^2-i+1) = 1;
 end
 
-% %hoekpunten
-% %linksboven
-% ll(1,1) = -mean(k(1,1), k(1,1));
-% ll(1,2) = 0.5*k(1,1);
-% ll(1,dp+1) = 0.5*k(1,1);
-% %linksonder
-% ll(dp,dp) = -mean(k(N,1), k(N,1));
-% ll(dp,dp-1) = 0.5*k(N,1);
-% ll(dp,2*dp) = 0.5*k(N,1);
-% %rechtsboven
-% ll((dp-1)*dp+1,(dp-1)*dp+1) = -mean(k(1,N), k(1,N));
-% ll((dp-1)*dp+1,(dp-1)*dp+2) = 0.5*k(1,N);
-% ll((dp-1)*dp+1,dp*(dp-2)+1) = 0.5*k(1,N);
-% %rechtsonder
-% ll(dp^2,dp^2) = -mean(k(N,N), k(N,N));
-% ll(dp^2,(dp-1)*dp) = 0.5*k(N,N);
-% ll(dp^2,dp^2-1) = 0.5*k(N,N);
 
-%Neumann links&rechts
-% i = 1;
-% while i<0.3*N
-%     ll(i+1,i+1) = -0.5*k(i,1) -0.5*k(i+1,1) - mean(k(i,1),k(i+1,1));
-%     ll(i+1,i) = 0.5*k(i,1);
-%     ll(i+1,i+2) = 0.5*k(i+1,1);
-%     ll(i+1,i+N+2) = mean(k(i,1), k(i+1,1));
-%     
-%     ll(N-i+1,N-i+1) = -0.5*k(N-i+1,1) -0.5*k(N-i,1) - mean(k(N-i+1,1), k(N-i,1));
-%     ll(N-i+1,N-i) = 0.5*k(N-i,1);
-%     ll(N-i+1,N-i+2) = 0.5*k(N-i+1,1);
-%     ll(N-i+1,N-i+N+2) = mean(k(N-i+1,1), k(N-i,1));
-%     
-%     i = i+1;
-% end
-% 
-% 
-% i = 1;
-% while i<0.3*N
-%     ll(N*(N+1)+i+1,N*(N+1)+i+1) = -0.5*k(i,N) -0.5*k(i+1,N) - mean(k(i,N), k(i+1,N));
-%     ll(N*(N+1)+i+1,N*(N+1)+i) = 0.5*k(i,N);
-%     ll(N*(N+1)+i+1,N*(N+1)+i+2) = 0.5*k(i+1,N);
-%     ll(N*(N+1)+i+1,N*(N+1)+i-(N+1)+1) = mean(k(i,N), k(i+1,N));
-%     
-%     ll(N*(N+2)-i+1,N*(N+2)-i+1) = -0.5*k(N-i+1,N) -0.5*k(N-1-i+1,N) - mean(k(N-i+1,N), k(N-1-i+1,N));
-%     ll(N*(N+2)-i+1,N*(N+2)-i) = 0.5*k(N-1-i+1,N);
-%     ll(N*(N+2)-i+1,N*(N+2)-i+2) = 0.5*k(N-i+1,N);
-%     ll(N*(N+2)-i+1,N*(N+2)-i-(N+1)+1) = mean(k(N-i+1,N), k(N-1-i+1,N));
-%     
-%     i = i+1;
-% end
-
-%i = 2;
-%while i<(N+1)
 for i = 2:1:N
     
     ll((i-1)*(N+1)+1,(i-1)*(N+1)+1) = -0.5*k(1,i-1) -0.5*k(1,i) - mean(k(1,i-1), k(1,i));
