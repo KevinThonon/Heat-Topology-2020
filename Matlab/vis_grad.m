@@ -1,4 +1,4 @@
-N = 100;
+N = 20;
 fileID = fopen('gradient_1.txt','r');
 formatSpec = '%f';
 gradient = fscanf(fileID,formatSpec);
@@ -28,6 +28,7 @@ end
     end
     
 %surface(gradient_mat,'FaceColor','interp')
-metal_mat = meshrefine(metal_mat,2);
+%metal_mat = meshrefine(metal_mat,2);
 surface(metal_mat,'FaceColor','interp')
+colorbar
 %surface(temperature_mat)

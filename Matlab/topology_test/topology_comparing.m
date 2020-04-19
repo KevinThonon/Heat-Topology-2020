@@ -1,9 +1,8 @@
-clear all
 close all
 
 
 % gegevens
-N = 50;
+N = 100;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 
@@ -16,7 +15,15 @@ dcda_mat = zeros(N,N);
 
 loop1 = 0;
 change = 1.0;
-while loop1 <= 50 %change > 0.01
+while loop1 <= 32 %change > 0.01
+    
+	if (loop1 == 25)
+		penal = 4.0;
+    end
+	
+	if (loop1 == 30)
+		penal = 5.0;
+    end
     
         
     pctmetal_old = pctmetal;
@@ -24,14 +31,17 @@ while loop1 <= 50 %change > 0.01
     [k] = createK(pctmetal, N, penal);
     [T, K, f] = fvm_func(k, N, q);
     
+    cost_matlab = cost1(T,N);
+    cost_matlab_iter{loop1+1} = cost_matlab;
+    
     lambda_vec = lambda1(T, K, N);
     %dcda_f = dcda_fd(T, pctmetal, N, penal);
-    %dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
-    dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
+    dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
+    %dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
     
     for i = 1:1:N
-           %dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
-           dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
+           dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
+           %dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
     end
     
     
@@ -59,9 +69,18 @@ while loop1 <= 50 %change > 0.01
     fileID = fopen(gradient,'r');
     formatSpec = '%f';
     gradient = fscanf(fileID,formatSpec);
+    
+    c = strcat('cost_',iter);
+    cost = strcat(c,'.txt');
+    fileID = fopen(cost,'r');
+    formatSpec = '%f';
+    cost = fscanf(fileID,formatSpec);
+    
+    cost_c_iter{loop1+1} = cost(1);
 
     metal_mat = zeros(N,N);
     gradient_mat = zeros(N,N);
+    
     
     dp = N;
     for i = 1:dp
@@ -72,7 +91,7 @@ while loop1 <= 50 %change > 0.01
     difference_metal{loop1+1} = metal_mat-pctmetal;
     difference_gradient{loop1+1} = gradient_mat-dcda_check;
  
-    loop1 = loop1 + 1;
+    loop1 = loop1 + 1
 end
 
 for i = 1:1:loop1-1
@@ -83,7 +102,7 @@ for i = 1:1:loop1-1
     surface(difference_gradient{i},'FaceColor','interp')
     colorbar
     subplot(1,2,2)
-    surface(pctmetal_iter{i},'FaceColor','interp')
+    surface(difference_metal{i},'FaceColor','interp')
     colorbar
     pause(0.5)
 end
@@ -101,6 +120,11 @@ for i = 1:1:N
     end
 end
 
+end
+
+function k = mean(a, b)
+k = (a+b)/2;           % arithmetic mean
+%k = 2.0*(a*b)/(a+b);    % harmonic mean
 end
 
 function [solution, LL, RL] = fvm_func(kmat, N, q)
@@ -235,10 +259,7 @@ end
 end
 
 
-function k = mean(a, b)
-%k = (a+b)/2;           % arithmetic mean
-k = 2.0*(a*b)/(a+b);    % harmonic mean
-end
+
 
 
 
@@ -770,7 +791,7 @@ end
 end
 
 function [cost] = cost1(T, dp)
-cost = dot(T,T)/dp^2;
+cost = dot(T,T)/(dp)^2;
 end
 
 function [cost] = cost2(T, dp)

@@ -1,9 +1,5 @@
-clear all
-close all
-
-
 % gegevens
-N = 50;
+N = 90;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 
@@ -16,9 +12,15 @@ dcda_mat = zeros(N,N);
 
 loop1 = 0;
 change = 1.0;
-while loop1 <= 50 %change > 0.01
+while loop1 <= 32 %change > 0.01
+    if (loop1 == 25)
+        penal = 4.0;
+    end
     
-        
+    if (loop1 == 30)
+        penal = 5.0;
+    end
+    
     pctmetal_old = pctmetal;
     
     [k] = createK(pctmetal, N, penal);
@@ -30,21 +32,20 @@ while loop1 <= 50 %change > 0.01
     dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
     
     for i = 1:1:N
-           %dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
-           dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
+        %dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
+        dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
     end
     
     
     %dcda_check = check(N, rmin, pctmetal, dcda_f);
     dcda_check = check(N, rmin, pctmetal, dcda_mat);
-   
+    
     
     pctmetal = OC(N, pctmetal, 0.4, dcda_check);
-    pctmetal_iter{loop1+1} = pctmetal;
     
     change = max(max(abs(pctmetal-pctmetal_old)));
- 
-    loop1 = loop1 + 1;
+    
+    loop1 = loop1 + 1
 end
 
 
@@ -57,6 +58,11 @@ for i = 1:1:N
     end
 end
 
+end
+
+function k = mean(a, b)
+%k = (a+b)/2;           % arithmetic mean
+k = 2.0*(a*b)/(a+b);    % harmonic mean
 end
 
 function [solution, LL, RL] = fvm_func(kmat, N, q)
@@ -191,13 +197,6 @@ end
 end
 
 
-function k = mean(a, b)
-%k = (a+b)/2;           % arithmetic mean
-k = 2.0*(a*b)/(a+b);    % harmonic mean
-end
-
-
-
 function [lambda] = lambda1(T, K, N)
 lambda = transpose(K)\((-2.0/N^2)*T);
 end
@@ -283,16 +282,15 @@ end
 
 
 % inputs: N, pctmetal, 0.4, dcda_mat
-function [xnew] = OC(N, x, volfrac, dc)
-%OC Summary of this function goes here
-%   Detailed explanation goes here
+function [pctmetal_new] = OC(N, pctmetal, volfrac, dcda)
+
 l1 = 0;
 l2 = 100000;
 move = 0.2;
 while (l2-l1)>1e-4
     lmid = 0.5*(l2+l1);
-    xnew = max(0.001, max(x-move,min(1.,min(x+move,x.*sqrt(-dc./lmid)))));
-    if sum(sum(xnew))-volfrac*N*N>0
+    pctmetal_new = max(0.001, max(pctmetal-move,min(1.,min(pctmetal+move,pctmetal.*sqrt(-dcda./lmid)))));
+    if sum(sum(pctmetal_new))-volfrac*N*N>0
         l1 = lmid;
     else
         l2 = lmid;
@@ -303,8 +301,8 @@ end
 
 
 function [dcda_m] = dcda_arit(lambda, T, a, N, penal)
-dcda_m = sparse(N*N,1);
-dcdk = sparse(N*N,1);
+dcda_m = zeros(N*N,1);
+dcdk = zeros(N*N,1);
 
 % element per element opvullen
 for i = 2:1:N-1

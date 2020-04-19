@@ -1,6 +1,6 @@
-N = 100;
+N = 50;
 
-for iterations = 1:30
+for iterations = 0:1:40
     
     iter = int2str(iterations);
 
@@ -23,9 +23,16 @@ for iterations = 1:30
     formatSpec = '%f';
     temperature = fscanf(fileID,formatSpec);
     
+    c = strcat('cost_',iter);
+    cost = strcat(c,'.txt');
+    fileID = fopen(cost,'r');
+    formatSpec = '%f';
+    cost = fscanf(fileID,formatSpec);
+    
     gradient_mat = zeros(N,N);
     metal_mat = zeros(N,N);
     temperature_mat = zeros(N+1,N+1);
+    cost_list(iterations+1) = cost;
     
     dp = N;
     for i = 1:dp
@@ -39,7 +46,7 @@ for iterations = 1:30
         temperature_mat(:,i)=temperature(i*dp-dp+1:i*dp);
     end
 
-    metal_mat = meshrefine(metal_mat,2);
+    %metal_mat = meshrefine(metal_mat,2);
     gradient_mat = meshrefine(gradient_mat,2);
     temperature_mat = meshrefine(temperature_mat,2);
     
@@ -52,8 +59,9 @@ for iterations = 1:30
     
 end
 
-pause(1)
-close all
+pause(0.1)
+
+
 
 
 

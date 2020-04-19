@@ -901,6 +901,23 @@ void differenceToTxtFile(vec& difference, int iterations, int N){
 
 }
 
+void costToTxtFile(double cost, int iterations, int N){
+
+  	string c = "cost_";
+  	c += to_string(iterations);
+  	c += ".txt";
+	string path_cost = "/Users/Urban/Documents/GitHub/Heat-Topology-2020/C++/OC/solutions_OC/cost/";
+	path_cost += c;
+
+	ofstream cost_file;
+        cost_file.open(path_cost);
+    	cost_file <<cost<<std::endl;
+    	cost_file.close();
+
+
+
+}
+
 
 
 
