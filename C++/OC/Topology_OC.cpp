@@ -53,9 +53,7 @@ int main(int argc, char *argv[]) {
 	if (iterations == 30){
 		penal = 5.0;
 	}
-	
-	
-	
+
 	
 	k = create_k(a, N, penal);
 	K = K_mat(k, N);
@@ -65,8 +63,8 @@ int main(int argc, char *argv[]) {
   
 	//temperatureToTxtFile(u, iterations, N);
 
-	//double cost = objective_function1(u, N);
-	//std::cout<<"cost = "<<cost<<std::endl;
+	double cost = objective_function1(u, N);
+	std::cout<<"cost = "<<cost<<std::endl;
 	lambda = lambda1(u, K, N);
 
 	//double cost = objective_function2(u, N);
@@ -101,8 +99,8 @@ int main(int argc, char *argv[]) {
 		change_n = max(change_v(i),change_n);
 	} 
 
-	//change = change_n;
-	//cout<<"change ="<<change<<endl;
+	change = change_n;
+	cout<<"change ="<<change<<endl;
 	iterations += 1;
 	}
 	auto stop = high_resolution_clock::now();
