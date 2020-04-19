@@ -13,4 +13,5 @@ Instructions:
 * The size of the grid (int), Initial guess for % metal for every cell (double), penalty (double)
 * An example: 50, 0.3 and 3.0
 * ./test 50 0.3 3.0
+  
 Can we use and modify your code for demonstrations concerning the course? Yes
