@@ -855,7 +855,7 @@ while ((l2-l1)>1e-4){
 	double lmid = 0.5*(l2+l1);
 
 	for (int i = 0; i < N*N; i++){
-    		xnew(i) = max(0.001, max(x(i)-move,min(1.0,min(x(i)+move, x(i)*sqrt(-dc(i)/lmid)))));
+    		xnew(i) = max(0.0, max(x(i)-move,min(1.0,min(x(i)+move, x(i)*sqrt(-dc(i)/lmid)))));
 	}	
 
 	double sum_x = 0.0;

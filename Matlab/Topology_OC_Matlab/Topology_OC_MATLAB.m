@@ -515,8 +515,8 @@ end
 
 
 function [dcda_m] = dcda_harm(lambda, T, a, k, N, penal)
-dcda_m = sparse(N*N,1);
-dcdk = sparse(N*N,1);
+dcda_m = zeros(N*N,1);
+dcdk = zeros(N*N,1);
 % element per element opvullen
 for i = 2:1:N-1
     for j = 2:1:N-1

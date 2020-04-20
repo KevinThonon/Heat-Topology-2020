@@ -68,7 +68,8 @@ int main(int argc, char *argv[]) {
 	lambda = lambda1(u, K, N);
 	
 	//double cost = objective_function1w(u, N);
-	//vec lambda = lambda1w(K, N);
+	//std::cout<<"cost = "<<cost<<std::endl;
+	//vec lambda = lambda1w(K, u, N);
 
 	//double cost = objective_function2(u, N);
 	//vec lambda = lambda2(K, N);
@@ -86,14 +87,14 @@ int main(int argc, char *argv[]) {
 	dcda_check = check(N, rmin, a, dcda_h);
 	
 
-	//gradientToTxtFile(dcda_check, iterations, N);
-	//costToTxtFile(cost, iterations, N);
+	gradientToTxtFile(dcda_check, iterations, N);
+	costToTxtFile(cost, iterations, N);
 
 	a_old = a;
 
 	a = OC(N, a, 0.4, dcda_check);
 
-	//metalToTxtFile(a, iterations, N);
+	metalToTxtFile(a, iterations, N);
 	
 	double change_n = 0.0;
 
