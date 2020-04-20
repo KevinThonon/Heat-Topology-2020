@@ -268,7 +268,7 @@ vec lambda1(vec& T, sp_mat& K, int N){
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = -w .* u
-vec lambda1w(sp_mat& K, int N){
+vec lambda1w(sp_mat& K, vec& T, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
 	w.fill(A);
