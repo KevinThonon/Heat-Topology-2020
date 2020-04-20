@@ -200,8 +200,33 @@ sp_mat K_mat(mat& k, int N){
 }
 
 // Kostfunctie = u^T * u / #elementen
+// Deze kostfunctie is een kwadratische kostfunctie die gelijkaardig is aan een least-squares method
 double objective_function1(vec& T, int N){
-	double cost = dot(T,T)/(N*N);
+	double cost = dot(T,T)/(pow(N+1, 2));
+	return cost;
+}
+
+// Kostfunctie = (w .* u)^T * u
+// Deze kostfunctie is de gewogen kwadratische kostfunctie 
+// w is het gewicht van elk temperatuur-punt. De som van alle gewichten is 1. Een middenpunt heeft gewicht 1/N² = h_x * h_y. Een randpunt heeft hiervan de helft (vakje is half zo klein).
+// Een hoekpunt heeft gewicht h_x * h_y / 4 (vakje is een kwart van een middelste vakje).
+double objective_function1w(vec& T, int N){
+	double A = pow((1.0/N),2);
+	vec w(pow((N+1),2));
+	w.fill(A);
+	w(0) = A/4.0;
+	w(N) = A/4.0;
+	w(pow(N,2)+N) = A/4.0;
+	w(pow(N,2)+2*N) = A/4.0;
+	for (int i = 1; i < N; i++){
+		w(i) = A/2.0;
+		w(pow(N,2)+2*N-i) = A/2.0;
+		w(i*(N+1)) = A/2.0;
+		w(i*(N+1)+N) = A/2.0;
+	}
+	vec wT(pow((N+1), 2));
+	wT = w % T;
+	double cost = dot(wT,T);
 	return cost;
 }
 
@@ -218,7 +243,7 @@ double objective_function2(vec& T, int N){
 // Deze kostfunctie is het gewogen gemiddelde van alle temperatuur-punten.
 // w is het gewicht van elk temperatuur-punt. De som van alle gewichten is 1. Een middenpunt heeft gewicht 1/N² = h_x * h_y. Een randpunt heeft hiervan de helft (vakje is half zo klein).
 // Een hoekpunt heeft gewicht h_x * h_y / 4 (vakje is een kwart van een middelste vakje).
-double objective_function3(vec& T, int N){
+double objective_function2w(vec& T, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
 	w.fill(A);
@@ -236,9 +261,30 @@ double objective_function3(vec& T, int N){
 	return cost;
 }
 
-// Lambda is de oplossing van K^T * lambda = -dg/du = -2*u / #elementen
+// Lambda is de oplossing van K^T * lambda = -dg/du = -2*u / # Temperatuurpunten
 vec lambda1(vec& T, sp_mat& K, int N){
-	vec lambda = spsolve(K.t(), (-2.0/(N*N))*T, "lapack"); //Veranderd van 2.0 naar -2.0
+	vec lambda = spsolve(K.t(), (-2.0/(pow(N+1, 2)))*T, "lapack"); //Veranderd van 2.0 naar -2.0
+	return lambda;
+}
+
+// Lambda is de oplossing van K^T * lambda = -dg/du = -w .* u
+vec lambda1w(sp_mat& K, int N){
+	double A = pow((1.0/N),2);
+	vec w(pow((N+1),2));
+	w.fill(A);
+	w(0) = A/4.0;
+	w(N) = A/4.0;
+	w(pow(N,2)+N) = A/4.0;
+	w(pow(N,2)+2*N) = A/4.0;
+	for (int i = 1; i < N; i++){
+		w(i) = A/2.0;
+		w(pow(N,2)+2*N-i) = A/2.0;
+		w(i*(N+1)) = A/2.0;
+		w(i*(N+1)+N) = A/2.0;
+	}
+	vec wT(pow((N+1), 2));
+	wT = w % T;
+	vec lambda = spsolve(K.t(), -1.0*wT,"lapack");
 	return lambda;
 }
 
@@ -251,7 +297,7 @@ vec lambda2(sp_mat& K, int N){
 }
 
 // Lambda is de oplossing van K^T * lambda = -dg/du = -w
-vec lambda3(sp_mat& K, int N){
+vec lambda2w(sp_mat& K, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
 	w.fill(A);

@@ -66,12 +66,15 @@ int main(int argc, char *argv[]) {
 	double cost = objective_function1(u, N);
 	std::cout<<"cost = "<<cost<<std::endl;
 	lambda = lambda1(u, K, N);
+	
+	//double cost = objective_function1w(u, N);
+	//vec lambda = lambda1w(K, N);
 
 	//double cost = objective_function2(u, N);
 	//vec lambda = lambda2(K, N);
 
-	//double cost = objective_function3(u, N);
-	//vec lambda = lambda3(K, N);
+	//double cost = objective_function2w(u, N);
+	//vec lambda = lambda2w(K, N);
 
 	//dcda_f = dcda_fd(u, f, a, N, penal);
 	//dcda_a = dcda_arit(lambda, u, a, N, penal);
