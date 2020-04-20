@@ -1,6 +1,6 @@
-N = 50;
+N = 100;
 
-for iterations = 0:1:40
+for iterations = 0:1:32
     
     iter = int2str(iterations);
 
@@ -46,9 +46,7 @@ for iterations = 0:1:40
         temperature_mat(:,i)=temperature(i*dp-dp+1:i*dp);
     end
 
-    %metal_mat = meshrefine(metal_mat,2);
-    gradient_mat = meshrefine(gradient_mat,2);
-    temperature_mat = meshrefine(temperature_mat,2);
+ 
     
     figure()
     surface(metal_mat,'FaceColor','interp')

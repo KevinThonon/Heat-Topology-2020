@@ -201,7 +201,7 @@ sp_mat K_mat(mat& k, int N){
 
 // Kostfunctie = u^T * u / #elementen
 double objective_function1(vec& T, int N){
-	double cost = dot(T,T)/(N*N);
+	double cost = dot(T,T)/((N+1)*(N+1));
 	return cost;
 }
 
@@ -809,7 +809,7 @@ while ((l2-l1)>1e-4){
 	double lmid = 0.5*(l2+l1);
 
 	for (int i = 0; i < N*N; i++){
-    		xnew(i) = max(0.001, max(x(i)-move,min(1.0,min(x(i)+move, x(i)*sqrt(-dc(i)/lmid)))));
+    		xnew(i) = max(0.0, max(x(i)-move,min(1.0,min(x(i)+move, x(i)*sqrt(-dc(i)/lmid)))));
 	}	
 
 	double sum_x = 0.0;

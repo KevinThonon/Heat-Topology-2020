@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 	u = spsolve(K,f,"lapack");
 
   
-	//temperatureToTxtFile(u, iterations, N);
+	temperatureToTxtFile(u, iterations, N);
 
 	double cost = objective_function1(u, N);
 	std::cout<<"cost = "<<cost<<std::endl;
@@ -83,14 +83,14 @@ int main(int argc, char *argv[]) {
 	dcda_check = check(N, rmin, a, dcda_h);
 	
 
-	//gradientToTxtFile(dcda_check, iterations, N);
-	//costToTxtFile(cost, iterations, N);
+	gradientToTxtFile(dcda_check, iterations, N);
+	costToTxtFile(cost, iterations, N);
 
 	a_old = a;
 
 	a = OC(N, a, 0.4, dcda_check);
 
-	//metalToTxtFile(a, iterations, N);
+	metalToTxtFile(a, iterations, N);
 	
 	double change_n = 0.0;
 
