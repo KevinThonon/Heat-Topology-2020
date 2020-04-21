@@ -131,8 +131,8 @@ int main(int argc, char *argv[]) {
 
 	// Optimization method.
 	// gridsize, percentages of metal per cell, max avg. amount of metal, gradients
-	// N+1 constraints: 
-	// N constraints: 0 <= a(i,j) <= 1 (N constraints)
+	// N^2 + 1 constraints: 
+	// N^2 constraints: 0 <= a(i,j) <= 1 (N constraints)
 	// 1 constraint: sum(a(i,j))/N^2 <= 0.4
 
 	a = OC(N, a, 0.4, dcda_check);
