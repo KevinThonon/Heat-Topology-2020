@@ -261,13 +261,13 @@ double objective_function2w(vec& T, int N){
 	return cost;
 }
 
-// Lambda is de oplossing van K^T * lambda = -dc/du = -2*u / # Temperatuurpunten
+// Lambda is de oplossing van K^T * lambda = -dg/du = -2*u / # Temperatuurpunten
 vec lambda1(vec& T, sp_mat& K, int N){
 	vec lambda = spsolve(K.t(), (-2.0/(pow(N+1, 2)))*T, "lapack"); //Veranderd van 2.0 naar -2.0
 	return lambda;
 }
 
-// Lambda is de oplossing van K^T * lambda = -dc/du = -2*w .* u
+// Lambda is de oplossing van K^T * lambda = -dg/du = -w .* u
 vec lambda1w(sp_mat& K, vec& T, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
@@ -284,11 +284,11 @@ vec lambda1w(sp_mat& K, vec& T, int N){
 	}
 	vec wT(pow((N+1), 2));
 	wT = w % T;
-	vec lambda = spsolve(K.t(), -2.0*wT,"lapack");
+	vec lambda = spsolve(K.t(), -1.0*wT,"lapack");
 	return lambda;
 }
 
-// Lambda is de oplossing van K^T * lambda = -dc/du = - eenheidsvector / #elementen
+// Lambda is de oplossing van K^T * lambda = -dg/du = - eenheidsvector / #elementen
 vec lambda2(sp_mat& K, int N){
 	vec w(pow((N+1),2));
 	w.fill(-1.0);
@@ -296,7 +296,7 @@ vec lambda2(sp_mat& K, int N){
 	return lambda;
 }
 
-// Lambda is de oplossing van K^T * lambda = -dc/du = -w
+// Lambda is de oplossing van K^T * lambda = -dg/du = -w
 vec lambda2w(sp_mat& K, int N){
 	double A = pow((1.0/N),2);
 	vec w(pow((N+1),2));
@@ -855,7 +855,7 @@ while ((l2-l1)>1e-4){
 	double lmid = 0.5*(l2+l1);
 
 	for (int i = 0; i < N*N; i++){
-    		xnew(i) = max(0.001, max(x(i)-move,min(1.0,min(x(i)+move, x(i)*sqrt(-dc(i)/lmid)))));
+    		xnew(i) = max(0.0, max(x(i)-move,min(1.0,min(x(i)+move, x(i)*sqrt(-dc(i)/lmid)))));
 	}	
 
 	double sum_x = 0.0;

@@ -20,6 +20,8 @@ using namespace chrono;
 
 int main(int argc, char *argv[]) {
 
+	for (int i = 0; i < 101; i+=20){
+
 	// Start of the clock for timing of the program.
 
 	auto start = high_resolution_clock::now();
@@ -27,7 +29,9 @@ int main(int argc, char *argv[]) {
 	// Command line arguments: gridsize, initial guess and penalty 
 
 	int N = atoi(argv[1]);
-	double pctmetal = atof(argv[2]);
+	N = N + i;
+	cout<<"N = "<<N<<endl;
+ 	double pctmetal = atof(argv[2]);
 	double penal = atof(argv[3]);
 
 	// Pre-allocation of vectors and matrices and declaring some variables.
@@ -63,7 +67,7 @@ int main(int argc, char *argv[]) {
 
 	// Start of the iterations.
 
-	while (iterations < 33) {
+	while (iterations < 5) {
 
 	cout<<"iteration = "<<iterations<<endl;
 
@@ -88,7 +92,7 @@ int main(int argc, char *argv[]) {
 	// Choose one of the four cost functions.
 
 	double cost = objective_function1(u, N);
-	cout<<"cost = "<<cost<<endl;
+	//cout<<"cost = "<<cost<<endl;
 	lambda = lambda1(u, K, N);
 	
 	/*
@@ -122,10 +126,8 @@ int main(int argc, char *argv[]) {
 	dcda_check = check(N, rmin, a, dcda_a);
 	*/
 
-	
 	dcda_h = dcda_harm(lambda, u, a, k, N, penal);
 	dcda_check = check(N, rmin, a, dcda_h);
-	
 
 	// Save the old vector with the percentages of metal.
 	
@@ -143,12 +145,12 @@ int main(int argc, char *argv[]) {
 	// If you would like to choose the path you need to
 	// change the path in the .hpp file in these 4 functions.
 
-	
+	/*
 	metalToTxtFile(a, iterations, N);
 	temperatureToTxtFile(u, iterations, N);
 	gradientToTxtFile(dcda_check, iterations, N);
 	costToTxtFile(cost, iterations, N);
-	
+	*/
 	
 	// calculating the change between the 2 iterations of the percentages of metal.
 
@@ -161,7 +163,7 @@ int main(int argc, char *argv[]) {
 
 	change = change_n;
 
-	cout<<"change ="<<change<<endl;
+	//cout<<"change ="<<change<<endl;
 
 	// Incrementing the iteration number.
 
@@ -171,6 +173,7 @@ int main(int argc, char *argv[]) {
 	// A clock to compute the timing of this program in seconds.
 
 	auto stop = high_resolution_clock::now();
-	auto duration = duration_cast<seconds>(stop - start);
-	cout << duration.count() << endl; 
+	auto duration = duration_cast<microseconds>(stop - start)/5;
+	cout << duration.count() << endl;
+	} 
 }

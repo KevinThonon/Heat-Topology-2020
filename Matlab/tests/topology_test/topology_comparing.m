@@ -36,12 +36,12 @@ while loop1 <= 32 %change > 0.01
     
     lambda_vec = lambda1(T, K, N);
     %dcda_f = dcda_fd(T, pctmetal, N, penal);
-    dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
-    %dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
+    %dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
+    dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
     
     for i = 1:1:N
-           dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
-           %dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
+           %dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
+           dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
     end
     
     
@@ -123,8 +123,8 @@ end
 end
 
 function k = mean(a, b)
-k = (a+b)/2;           % arithmetic mean
-%k = 2.0*(a*b)/(a+b);    % harmonic mean
+%k = (a+b)/2;           % arithmetic mean
+k = 2.0*(a*b)/(a+b);    % harmonic mean
 end
 
 function [solution, LL, RL] = fvm_func(kmat, N, q)
@@ -264,7 +264,7 @@ end
 
 
 function [lambda] = lambda1(T, K, N)
-lambda = transpose(K)\((-2.0/N^2)*T);
+lambda = transpose(K)\((-2.0/(N+1)^2)*T);
 end
 
 

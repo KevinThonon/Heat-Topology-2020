@@ -1,4 +1,4 @@
-N = 100;
+N = 200;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 dp = N+1;
@@ -36,12 +36,12 @@ while iteration <= 32 %change > 0.01
     % if you change from harmonic to arithmetic you need to change the
     % function mean also from harmonic to arithmetic
   
-    %dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
-    dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
+    dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
+    %dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
     
     for i = 1:1:N
-        %dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
-        dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
+        dcda_mat(:,i) = dcda_a((i-1)*N+1:i*N);
+        %dcda_mat(:,i) = dcda_h((i-1)*N+1:i*N);
     end
     
     
@@ -69,8 +69,8 @@ end
 end
 
 function k = mean(a, b)
-%k = (a+b)/2;           % arithmetic mean
-k = 2.0*(a*b)/(a+b);    % harmonic mean
+k = (a+b)/2;           % arithmetic mean
+%k = 2.0*(a*b)/(a+b);    % harmonic mean
 end
 
 function [solution, LL, RL] = fvm_func(kmat, N, q)
