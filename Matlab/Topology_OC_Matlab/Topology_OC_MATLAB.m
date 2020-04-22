@@ -1,4 +1,4 @@
-N = 400;
+N = 100;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 dp = N+1;
@@ -8,18 +8,25 @@ pctmetal = 0.3*ones(N,N);
 dcda_mat = zeros(N,N);
 
 penal = 3.0;
+%penal = 1.0;
 
 
 iteration = 0;
 change = 1.0;
 while iteration <= 32 %change > 0.01
+    
+%     if (iteration < 25)
+%            penal = penal + 0.12
+%     end
+    
     if (iteration == 25)
-        penal = 4.0;
+        penal = 4.0
     end
     
     if (iteration == 30)
-        penal = 5.0;
+        penal = 5.0
     end
+    
     
     pctmetal_old = pctmetal;
     
