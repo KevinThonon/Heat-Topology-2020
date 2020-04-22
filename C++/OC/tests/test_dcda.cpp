@@ -40,13 +40,17 @@ int main(int argc, char *argv[]) {
 	vec dcda_arit = top::dcda_arit(lambda, u, a, N, penal);
 	vec dcda_harm = top::dcda_harm(lambda, u, a, k, N, penal);
 
-	vec difference(N*N);
+	vec difference_harm_fd(N*N);
+	vec difference_harm_arit(N*N);
+	vec difference_arit_fd(N*N);
 
 	for (int i = 0; i < N*N ; i++){
-		difference(i) = (dcda_harm(i)-dcda_fd(i))/cost;
+		difference_harm_fd(i) = (dcda_harm(i)-dcda_fd(i))/dcda_harm(i);
+		difference_harm_arit(i) = (dcda_harm(i)-dcda_arit(i))/dcda_harm(i);
+		difference_arit_fd(i) = (dcda_arit(i)-dcda_fd(i))/dcda_arit(i);
 	}
 	
-	std::cout<<difference<<std::endl;
+	//std::cout<<difference<<std::endl;
 	//std::cout<<" "<<std::endl;
 	//std::cout<<dcda_fd<<std::endl;
 	//std::cout<<" "<<std::endl;

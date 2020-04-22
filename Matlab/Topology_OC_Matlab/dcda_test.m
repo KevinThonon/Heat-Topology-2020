@@ -1,4 +1,4 @@
-N = 100;
+N = 20;
 q = 2/(0.01*0.01*0.001);
 rmin = 2;
 dp = N+1;
@@ -8,61 +8,32 @@ pctmetal = 0.3*ones(N,N);
 dcda_mat = zeros(N,N);
 
 penal = 3.0;
-%penal = 1.0;
+     
+pctmetal_old = pctmetal;
 
+[k] = createK(pctmetal, N, penal);
+[T, K, f] = fvm_func(k, N, q);
 
-iteration = 0;
-change = 1.0;
-while iteration <= 0 %change > 0.01
-    
-%     if (iteration < 25)
-%            penal = penal + 0.12
-%     end
-    
-    if (iteration == 25)
-        penal = 4.0
-    end
-    
-    if (iteration == 30)
-        penal = 5.0
-    end
-    
-    
-    pctmetal_old = pctmetal;
-    
-    [k] = createK(pctmetal, N, penal);
-    [T, K, f] = fvm_func(k, N, q);
-    
-    lambda_vec = lambda1(T, K, N);
-    
-    % Finite difference method
-    
-    dcda_f = dcda_fd(T, pctmetal, N, penal);
-    
-    % Analytic adjoint method: arithmetic & harmonic mean
-    % if you change from harmonic to arithmetic you need to change the
-    % function mean also from harmonic to arithmetic
-  
-    dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
-    dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
-    
-    for i = 1:1:N
-        dcda_mat_fd(:,i) = dcda_f((i-1)*N+1:i*N);
-        dcda_mat_a(:,i) = dcda_a((i-1)*N+1:i*N);
-        dcda_mat_h(:,i) = dcda_h((i-1)*N+1:i*N);
-    end
-    
-    
-    %dcda_check = check(N, rmin, pctmetal, dcda_f);
-    dcda_check = check(N, rmin, pctmetal, dcda_mat);
-    
-    
-    pctmetal = OC(N, pctmetal, 0.4, dcda_check);
-    
-    change = max(max(abs(pctmetal-pctmetal_old)));
-    
-    iteration = iteration + 1
+lambda_vec = lambda1(T, K, N);
+
+% Finite difference method
+
+dcda_f = dcda_fd(T, pctmetal, N, penal);
+
+% Analytic adjoint method: arithmetic & harmonic mean
+% if you change from harmonic to arithmetic you need to change the
+% function mean also from harmonic to arithmetic
+
+dcda_a = dcda_arit(lambda_vec, T, pctmetal, N, penal);
+dcda_h = dcda_harm(lambda_vec, T, pctmetal, k, N, penal);
+
+for i = 1:1:N
+    dcda_mat_fd(:,i) = dcda_f((i-1)*N+1:i*N);
+    dcda_mat_a(:,i) = dcda_a((i-1)*N+1:i*N);
+    dcda_mat_h(:,i) = dcda_h((i-1)*N+1:i*N);
 end
+
+diff_harm_arit = (dcda_mat_h-dcda_mat_a);%/dcda_mat_h;
 
 
 function [K] = createK(pctmetal, N, penal)
