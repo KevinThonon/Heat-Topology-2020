@@ -297,7 +297,7 @@ l2 = 100000;
 move = 0.2;
 while (l2-l1)>1e-4
     lmid = 0.5*(l2+l1);
-    pctmetal_new = max(0.001, max(pctmetal-move,min(1.,min(pctmetal+move,pctmetal.*sqrt(-dcda./lmid)))));
+    pctmetal_new = max(0.0, max(pctmetal-move,min(1.,min(pctmetal+move,pctmetal.*sqrt(-dcda./lmid)))));
     if sum(sum(pctmetal_new))-volfrac*N*N>0
         l1 = lmid;
     else
